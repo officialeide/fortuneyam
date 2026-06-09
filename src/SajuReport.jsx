@@ -388,8 +388,8 @@ function buildSajuData(input){
   const ohaengDist=calcOhaengDist(pillars);
   const ilO=normO(GAN_OE[ilgan]);
   const monthO=normO(JI_OE[wolju.ji.ko]);
-  const gen={木:"火",火:"土",土:"金",金:"水",水:"木"};
-  const monthHelps=(monthO===ilO)||(gen[monthO]===ilO);
+  const genCycle={木:"火",火:"土",土:"金",金:"水",水:"木"};
+  const monthHelps=(monthO===ilO)||(genCycle[monthO]===ilO);
   const singang=monthHelps?"신강(身强)":"신약(身弱)";
   const domO=Object.entries(ohaengDist).sort((a,b)=>b[1]-a[1])[0][0];
 
@@ -408,6 +408,66 @@ function buildSajuData(input){
   });
 
   const{lp,calc}=calcLifePath(y,m,d);
+  // MBTI 일간 기반 추정
+  const MBTI_BY_ILGAN={갑:"ENTJ",을:"ENFP",병:"ESFP",정:"INFP",무:"ESTJ",기:"ESFJ",경:"INTJ",신:"ISFJ",임:"INTP",계:"INFJ"};
+  const MBTI_DESC={갑:"목(木)의 리더십 + 강한 추진력 — 전략적 사고와 실행력이 강한 타입이에요.",을:"목(木)의 유연함 + 공감력 — 사람과 가능성에서 에너지를 얻는 타입이에요.",병:"화(火)의 열정 + 외향성 — 활기차고 현재를 즐기는 에너지가 넘치는 타입이에요.",정:"화(火)의 섬세함 + 내향성 — 깊은 감성과 이상을 추구하는 타입이에요.",무:"토(土)의 안정 + 원칙 — 책임감과 조직력이 강한 현실적인 리더 타입이에요.",기:"토(土)의 포용 + 관계 — 따뜻한 배려와 협력으로 빛나는 타입이에요.",경:"금(金)의 날카로움 + 독립 — 전략적이고 독립적인 완벽주의자 타입이에요.",신:"금(金)의 섬세함 + 배려 — 헌신적이고 실용적인 지원자 타입이에요.",임:"수(Water)의 통찰 + 분석 — 논리적이고 독창적인 사상가 타입이에요.",계:"수(水)의 공감 + 직관 — 깊은 통찰과 사명감을 가진 타입이에요."};
+  const mbtiType=MBTI_BY_ILGAN[ilgan]||"분석 중";
+  const mbtiDesc=MBTI_DESC[ilgan]||"사주 교차 분석 중이에요.";
+  const mbtiAxes=[
+    {axis:`${mbtiType[0]==="E"?"E (외향)":"I (내향)"}`,score:mbtiType[0]==="E"?65:70,basis:`${ilO} 일간의 ${mbtiType[0]==="E"?"외향적":"내향적"} 에너지예요.`},
+    {axis:`${mbtiType[1]==="N"?"N (직관)":"S (감각)"}`,score:mbtiType[1]==="N"?68:65,basis:`${mbtiType[1]==="N"?"직관과 가능성에 집중하는 타입이에요.":"현실과 구체적인 것에 집중하는 타입이에요."}`},
+    {axis:`${mbtiType[2]==="F"?"F (감정)":"T (사고)"}`,score:60,basis:"사주와 MBTI 교차 분석 결과예요."},
+    {axis:`${mbtiType[3]==="J"?"J (판단)":"P (인식)"}`,score:mbtiType[3]==="J"?75:60,basis:`${mbtiType[3]==="J"?"계획적이고 체계적인 타입이에요.":"유연하고 즉흥적인 타입이에요."}`},
+  ];
+  // 타로 연도별 개인연도수
+  function getPersonalYear(yr){
+    const bd=`0101`; // 생일 간소화 (01월01일 기준)
+    const digits=[...String(yr),...String(m).padStart(2,"0"),...String(d).padStart(2,"0")].map(Number);
+    let s=digits.reduce((a,b)=>a+b,0);
+    while(s>9&&![11,22,33].includes(s))s=String(s).split("").reduce((a,b)=>a+parseInt(b),0);
+    return s;
+  }
+  const TAROT_CARDS_MAP={1:"마법사",2:"고위여사제",3:"황후",4:"황제",5:"교황",6:"연인",7:"전차",8:"힘",9:"은둔자",10:"운명의 수레바퀴",11:"정의",22:"위대한 건축가(마스터 22)"};
+  const TAROT_DESC_MAP={1:"새로운 시작과 의지의 해예요.",2:"직관과 내면의 목소리를 따르는 해예요.",3:"창조와 풍요의 해예요.",4:"기반을 다지고 체계를 세우는 해예요.",5:"배움과 멘토의 해예요.",6:"선택과 관계의 해예요.",7:"의지와 승리의 해예요.",8:"내면의 힘을 발휘하는 해예요.",9:"내면을 돌아보는 해예요.",10:"예상치 못한 전환의 해예요.",11:"균형과 공정의 해예요.",22:"대각성의 해 — 큰 꿈이 현실이 돼요."};
+
+  // 5년 운세 점수 (용신/기신 세운 기반)
+  const yongsinOList = yongsinA_val.replace(/[^가-힣]/g,"").split("").filter(o=>["목","화","토","금","수"].includes(o));
+  const gisinOList = gisinA_val.replace(/[^가-힣]/g,"").split("").filter(o=>["목","화","토","금","수"].includes(o));
+  const KOR_O={갑:"목",을:"목",병:"화",정:"화",무:"토",기:"토",경:"금",신:"금",임:"수",계:"수"};
+  function yearScore(yr){
+    const yg=yearToGJ(yr);
+    const yO=KOR_O[yg.gan.ko]||"";
+    const vs=singang==="신강(身强)"?"strong":"weak";
+    let base=68;
+    if(yongsinOList.some(o=>yO.includes(o))) base+=18;
+    else if(gisinOList.some(o=>yO.includes(o))) base-=12;
+    // 대운과의 조화
+    const curD=daeun.find(d=>d.cur);
+    if(curD){
+      const dO=normO(GAN_OE[curD.label[0]])||"";
+      if(yongsinOList.some(o=>dO.toLowerCase().includes(o))) base+=8;
+    }
+    return Math.min(97,Math.max(52,base));
+  }
+  const YEAR_SUMMARIES={
+    high:"용신 에너지가 활성화되는 해예요. 준비한 것이 결실을 맺는 시기예요.",
+    mid:"흐름이 무난한 해예요. 꾸준히 나아가는 것이 중요해요.",
+    low:"기신 에너지가 강한 해예요. 무리한 확장보다 내실을 다지는 시기예요."
+  };
+  const yearForecast=[CY,CY+1,CY+2,CY+3,CY+4].map(yr=>{
+    const sc=yearScore(yr);
+    return{year:yr,score:sc,summary:sc>=78?YEAR_SUMMARIES.high:sc>=62?YEAR_SUMMARIES.mid:YEAR_SUMMARIES.low};
+  });
+  const yearCards=[CY,CY+1,CY+2,CY+3,CY+4,CY+5].map((yr,i)=>{
+    const py=getPersonalYear(yr);
+    const score=Math.min(90,Math.max(55,65+(py===22?25:py===11?15:py===lp?10:0)+(i<2?5:0)));
+    return{year:yr,num:py,card:TAROT_CARDS_MAP[py]||String(py),score,desc:TAROT_DESC_MAP[py]||`${py}번 에너지의 해예요.`};
+  });
+  // 생명경로수 타로 카드
+  const LP_CARDS={1:"마법사(The Magician)",2:"고위여사제(High Priestess)",3:"황후(The Empress)",4:"황제(The Emperor)",5:"교황(The Hierophant)",6:"연인(The Lovers)",7:"전차(The Chariot)",8:"힘(Strength)",9:"은둔자(The Hermit)",11:"정의(Justice)",22:"위대한 건축가"};
+  const LP_DESC={1:"의지와 실행의 에너지예요. 아이디어를 현실로 만드는 마법사예요.",2:"직관과 신비의 에너지예요. 보이지 않는 것을 보는 능력이 있어요.",3:"창조와 표현의 에너지예요. 무언가를 낳고 키우는 것이 삶의 핵심이에요.",4:"질서와 체계의 에너지예요. 꾸준히 쌓아 탑을 만드는 황제예요.",5:"자유와 변화의 에너지예요. 경험을 통해 성장하는 모험가예요.",6:"책임과 사랑의 에너지예요. 관계 속에서 꽃피는 타입이에요.",7:"탐구와 지혜의 에너지예요. 깊이 파고드는 분석가예요.",8:"힘과 성취의 에너지예요. 현실적인 성공을 향해 나아가요.",9:"완성과 봉사의 에너지예요. 세상에 나눠주는 사람이에요.",11:"영감과 이상의 에너지예요. 마스터 넘버 — 특별한 사명이 있어요.",22:"대건축가의 에너지예요. 마스터 넘버 22 — 꿈을 현실로 만드는 사람이에요."};
+  const lifePathCard=LP_CARDS[lp]||`${lp}번 카드`;
+  const lifePathDesc=LP_DESC[lp]||`생명경로수 ${lp}번의 에너지예요.`;
   const currentAge=CY-y+1;
   const sang=(y%100)%8||8,jung=currentAge%6||6,ha=8;
   const animal=ANIMALS[yeonju.ji.ko]||"";
@@ -436,7 +496,6 @@ function buildSajuData(input){
   });
 
   // 주역 본명괘 (사주 최다오행→상괘, 일간 관성오행→하괘)
-  const gen={木:"火",火:"土",土:"金",金:"水",Water:"木"};
   const kek2={木:"土",土:"水",水:"火",火:"金",金:"木"};
   const relO = kek2[ilO] || "木"; // 관성 오행 (나를 극하는 것)
   const ichingData = getIching(domO, relO);
@@ -472,7 +531,7 @@ function buildSajuData(input){
     headline:headline_text,
     summary:{
       persona,
-      yearForecast:[CY,CY+1,CY+2,CY+3,CY+4].map((yr,i)=>({year:yr,score:65+i*3,summary:`${yr}년 운기예요.`})),
+      yearForecast,
       sixSystems:[
         {system:"사주",key:`${ilju.hanja} 일주`,desc:`${ilO} 기운의 일간 — ${singang}이에요.`,insight:ilganDB.core},
         {system:"토정비결",key:`상${sang}·중${jung}·하${ha}`,desc:"토정비결 괘수 자동 산출이에요.",insight:""},
@@ -490,11 +549,11 @@ function buildSajuData(input){
     iching:{bonmyeonggae:ichingData.name,gaeSymbol:ichingData.symbol||"☯",gaeNum:ichingData.num||0,gaeUpper:`${domO}(최다오행)`,gaeLower:`${relO}(관성오행)`,gaeDesc:ichingData.desc,gaeNature:ichingData.nature,currentGae:ichingData.currentGae||"분석 중",currentYear:`${CY}년`,currentDesc:ichingData.currentDesc||"",strategy:ichingData.strategy||[],yearFlow:[]},
     tojung:{sang,jung,ha,bonun:"분석 중",bonunDesc:"토정비결 상세 분석은 준비 중이에요.",saja:"분석 중",sajaDesc:"",yearFlow:[],month2026:[]},
     astro:{sun:"분석 중",moon:"분석 중",asc:"분석 중",mercury:"분석 중",venus:"분석 중",mars:"분석 중",sunMeaning:"태양(☉)은 의식적 자아",moonMeaning:"달(☽)은 감정·본능",ascMeaning:"ASC는 첫인상",sunDesc:"점성술 분석 중이에요.",moonDesc:"점성술 분석 중이에요.",ascDesc:"점성술 분석 중이에요.",mercuryDesc:"분석 중",venusDesc:"분석 중",marsDesc:"분석 중",triangle:"",stellium:"",yearTransit:[]},
-    tarot:{lifePath:lp,isMaster:[11,22,33].includes(lp),lifePathCard:"분석 중",lifePathCardNum:"",lifePathDesc:`생명경로수 ${lp}번의 에너지를 가지고 있어요.`,soulCard:"",achieveCard:"",soulDesc:"",achieveDesc:"",calc,yearCards:[]},
+    tarot:{lifePath:lp,isMaster:[11,22,33].includes(lp),lifePathCard,lifePathCardNum:String(lp),lifePathDesc,soulCard:LP_CARDS[lp]||"분석 중",achieveCard:LP_CARDS[(lp+1)>9?1:lp+1]||"분석 중",soulDesc:LP_DESC[lp]||"분석 중",achieveDesc:"성취 에너지 분석 중이에요.",calc,yearCards},
     daynight:{overview:`${ilganDB.core} ${singang==="신강(身强)"?"강한 에너지를 가진 만큼, 그것을 흘려보내는 방법을 찾는 것이 중요해요.":"내면의 에너지를 충전하는 루틴이 필요해요."}`,
       day:{impression:dn_day.impression||"",mask:dn_day.mask||"",styling:{hair:"",fashion:"",color:"",makeup:"",perfume:""}},
       night:{desire:dn_night.desire||"",desire2:dn_night.desire2||"",triggers:dn_night.triggers||[],attraction:dn_night.attraction||"",idealType:dn_night.idealType||"",idealType2:dn_night.idealType2||""}},
-    mbti:{estimated:"분석 중",estType:"",esType:"",basis:"사주 교차 분석 중이에요.",axes:[],borderline:"",strengths:[],challenges:[],bestEnv:"",recovery:""},
+    mbti:{estimated:mbtiType,estType:mbtiType,esType:"",basis:mbtiDesc,axes:mbtiAxes,borderline:`${mbtiType[2]==='F'?'F':'T'}↔${mbtiType[2]==='F'?'T':'F'} 경계: 상황에 따라 유연하게 전환돼요.`,strengths:[`${ilO} 일간의 강점이 발휘되는 환경에서 최고의 실력이 나와요.`,`${singang} 구조로 에너지가 충분해요.`],challenges:[`${yongsinA_val} 기운이 부족하면 균형이 깨질 수 있어요.`],bestEnv:`${ilO} 에너지가 잘 발휘되는 환경이에요.`,recovery:`용신인 ${yongsinA_val}를 활용한 루틴이 도움이 돼요.`},
   };
 }
 
