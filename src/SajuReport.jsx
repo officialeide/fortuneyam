@@ -258,8 +258,8 @@ function getIching(ilO, relO) {
 
 // 3. 사주 계산 엔진 — buildSajuData(input)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const GAN_OE={갑:"木",을:"木",병:"火",정:"Fire",무:"土",기:"土",경:"金",신:"金",임:"Water",계:"Water"};
-const JI_OE={자:"Water",축:"土",인:"木",묘:"木",진:"土",사:"Fire",오:"Fire",미:"土",신:"金",유:"金",술:"土",해:"Water"};
+const GAN_OE={갑:"木",을:"木",병:"火",정:"火",무:"土",기:"土",경:"金",신:"金",임:"水",계:"水"};
+const JI_OE={자:"水",축:"土",인:"木",묘:"木",진:"土",사:"火",오:"火",미:"土",신:"金",유:"金",술:"土",해:"水"};
 const isYang=g=>["갑","병","무","경","임"].includes(g);
 const isYangJ=j=>["자","인","진","오","신","술"].includes(j);
 const normO=o=>({Fire:"火",Water:"水"}[o]||o);
@@ -410,7 +410,7 @@ function buildSajuData(input){
   const{lp,calc}=calcLifePath(y,m,d);
   // MBTI 일간 기반 추정
   const MBTI_BY_ILGAN={갑:"ENTJ",을:"ENFP",병:"ESFP",정:"INFP",무:"ESTJ",기:"ESFJ",경:"INTJ",신:"ISFJ",임:"INTP",계:"INFJ"};
-  const MBTI_DESC={갑:"목(木)의 리더십 + 강한 추진력 — 전략적 사고와 실행력이 강한 타입이에요.",을:"목(木)의 유연함 + 공감력 — 사람과 가능성에서 에너지를 얻는 타입이에요.",병:"화(火)의 열정 + 외향성 — 활기차고 현재를 즐기는 에너지가 넘치는 타입이에요.",정:"화(火)의 섬세함 + 내향성 — 깊은 감성과 이상을 추구하는 타입이에요.",무:"토(土)의 안정 + 원칙 — 책임감과 조직력이 강한 현실적인 리더 타입이에요.",기:"토(土)의 포용 + 관계 — 따뜻한 배려와 협력으로 빛나는 타입이에요.",경:"금(金)의 날카로움 + 독립 — 전략적이고 독립적인 완벽주의자 타입이에요.",신:"금(金)의 섬세함 + 배려 — 헌신적이고 실용적인 지원자 타입이에요.",임:"수(Water)의 통찰 + 분석 — 논리적이고 독창적인 사상가 타입이에요.",계:"수(水)의 공감 + 직관 — 깊은 통찰과 사명감을 가진 타입이에요."};
+  const MBTI_DESC={갑:"목(木)의 리더십 + 강한 추진력 — 전략적 사고와 실행력이 강한 타입이에요.",을:"목(木)의 유연함 + 공감력 — 사람과 가능성에서 에너지를 얻는 타입이에요.",병:"화(火)의 열정 + 외향성 — 활기차고 현재를 즐기는 에너지가 넘치는 타입이에요.",정:"화(火)의 섬세함 + 내향성 — 깊은 감성과 이상을 추구하는 타입이에요.",무:"토(土)의 안정 + 원칙 — 책임감과 조직력이 강한 현실적인 리더 타입이에요.",기:"토(土)의 포용 + 관계 — 따뜻한 배려와 협력으로 빛나는 타입이에요.",경:"금(金)의 날카로움 + 독립 — 전략적이고 독립적인 완벽주의자 타입이에요.",신:"금(金)의 섬세함 + 배려 — 헌신적이고 실용적인 지원자 타입이에요.",임:"수(水)의 통찰 + 분석 — 논리적이고 독창적인 사상가 타입이에요.",계:"수(水)의 공감 + 직관 — 깊은 통찰과 사명감을 가진 타입이에요."};
   const mbtiType=MBTI_BY_ILGAN[ilgan]||"분석 중";
   const mbtiDesc=MBTI_DESC[ilgan]||"사주 교차 분석 중이에요.";
   const mbtiAxes=[
@@ -621,25 +621,25 @@ function Acc({items}){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function TabSummary({d,changeTab}){return <>
   <section style={{...S.card,background:"linear-gradient(135deg,#fffde7,#fff3e0)",borderColor:"#ffe082"}}>
-    <div style={{fontSize:11,color:"#7b5800",fontWeight:600,marginBottom:4}}>윤정님은</div>
+    <div style={{fontSize:11,color:"#7b5800",fontWeight:600,marginBottom:4}}>{d.name}님은</div>
     <div style={{fontSize:20,fontWeight:900,color:"#e65100",lineHeight:1.4,marginBottom:10}}>{d.animalDesc} {d.animal}</div>
-    <p style={{margin:0,fontSize:13,color:"#5d4037",lineHeight:1.85}}>{d.headline}</p>
+    <p style={{margin:0,fontSize:13,color:"#5d4037",lineHeight:1.85}}>{d.headline||""}</p>
     <p style={{margin:"10px 0 0",fontSize:13,color:"#7b5800",lineHeight:1.85,borderTop:"1px solid #ffe08244",paddingTop:10}}>{d.daynight.overview}</p>
   </section>
   <section style={S.card}>
     <ST icon="🔮" title="사주 성격 요약"/>
     <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
-      {d.summary.persona.map((p,i)=><div key={i} style={{display:"flex",gap:10,padding:"11px 13px",background:"#fafafa",borderRadius:11,border:"1px solid #f0f0f0"}}><span style={{fontSize:20,flexShrink:0}}>{p.icon}</span><div><div style={{fontSize:13,fontWeight:800,color:"#111",marginBottom:2}}>{p.title}</div><div style={{fontSize:12,color:"#555",lineHeight:1.75}}>{p.desc}</div></div></div>)}
+      {(d.summary?.persona||[]).map((p,i)=><div key={i} style={{display:"flex",gap:10,padding:"11px 13px",background:"#fafafa",borderRadius:11,border:"1px solid #f0f0f0"}}><span style={{fontSize:20,flexShrink:0}}>{p.icon}</span><div><div style={{fontSize:13,fontWeight:800,color:"#111",marginBottom:2}}>{p.title}</div><div style={{fontSize:12,color:"#555",lineHeight:1.75}}>{p.desc}</div></div></div>)}
     </div>
   </section>
   <section style={S.card}>
     <ST icon="🌐" title="7체계 종합 분석" sub="사주·토정비결·주역·당사주·점성술·타로수비학·MBTI"/>
     <GT>일곱 가지 운명 분석 체계가 공통으로 가리키는 핵심 주제입니다.</GT>
     <div style={{marginTop:10,padding:"14px 16px",background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderRadius:12,marginBottom:10}}>
-      <p style={{fontSize:13,color:"#e0e7ff",lineHeight:1.9,margin:0}}>{d.summary.sevenInsight}</p>
+      <p style={{fontSize:13,color:"#e0e7ff",lineHeight:1.9,margin:0}}>{d.summary?.sevenInsight||""}</p>
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:6}}>
-      {d.summary.sixSystems.map((s,i)=>(
+      {(d.summary?.sixSystems||[]).map((s,i)=>(
         <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}>
           <div style={{width:60,fontSize:10,fontWeight:700,color:"#e65100",background:"#fff3e0",padding:"3px 5px",borderRadius:6,textAlign:"center",flexShrink:0,lineHeight:1.5}}>{s.system}</div>
           <div style={{flex:1}}>
@@ -654,7 +654,7 @@ function TabSummary({d,changeTab}){return <>
     <ST icon="📆" title={`향후 5년 흐름 (${CY}~${CY+4})`}/>
     <GT>6체계 교차 분석 종합 운기 점수입니다.</GT>
     <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
-      {d.summary.yearForecast.map((yf,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:scBg(yf.score),borderRadius:11}}><Ring score={yf.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}><span style={{fontSize:14,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>{yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}</div><div style={{fontSize:12,color:"#444",lineHeight:1.6}}>{yf.summary}</div></div></div>)}
+      {(d.summary?.yearForecast||[]).map((yf,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:scBg(yf.score),borderRadius:11}}><Ring score={yf.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}><span style={{fontSize:14,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>{yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}</div><div style={{fontSize:12,color:"#444",lineHeight:1.6}}>{yf.summary}</div></div></div>)}
     </div>
   </section>
   <section style={S.card}>
@@ -718,17 +718,17 @@ function Ohaeng({d}){
         {order.map(o=>{const c=OC[o],v=dist[o]||0,p=Math.round((v/total)*100);return <div key={o} style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:9,height:9,borderRadius:2,background:c.chart,flexShrink:0}}/><div style={{fontSize:12,color:c.text,fontWeight:700,minWidth:44}}>{c.name}</div><div style={{flex:1,height:5,background:"#f0f0f0",borderRadius:99,overflow:"hidden"}}><div style={{width:`${p}%`,height:"100%",background:c.chart,borderRadius:99}}/></div><div style={{fontSize:12,color:"#888",minWidth:24,textAlign:"right"}}>{v}개</div></div>;})}
       </div>
     </div>
-    <div style={{marginTop:10,padding:"10px 14px",background:"#e3f2fd",borderRadius:10,fontSize:13,color:"#0d47a1",lineHeight:1.75}}>{d.ohaengNote}</div>
+    <div style={{marginTop:10,padding:"10px 14px",background:"#e3f2fd",borderRadius:10,fontSize:13,color:"#0d47a1",lineHeight:1.75}}>{d.ohaengNote||""}</div>
     <div style={{marginTop:8,padding:"9px 12px",background:"#fafafa",borderRadius:10,display:"flex",alignItems:"center",gap:8,border:"1px solid #eee",marginBottom:8}}><span style={{fontSize:12,color:"#aaa"}}>신강·신약</span><span style={{fontSize:15,fontWeight:900,color:"#1565c0"}}>{d.singang}</span><span style={{fontSize:12,color:"#888"}}>— 癸축월(丑月) 득령, 신강 사주예요</span></div>
     <div style={{fontSize:10,color:"#aaa",fontWeight:600,marginBottom:8,letterSpacing:.5}}>용신(도움되는 기운) · 희신(간접 도움) · 기신(피할 기운)</div>
     <div style={{display:"flex",flexDirection:"column",gap:7}}>
       {[
-        {label:"戊戌 기준 (자정)",bg:"#f1f8e9",border:"#c5e1a5",items:[
+        {label:"A명식 기준 (자정)",bg:"#f1f8e9",border:"#c5e1a5",items:[
           {name:"용신",val:d.yongsinA,pillBg:"#33691e",pillTc:"#fff",valC:"#333"},
           {name:"희신",val:d.huisinA,pillBg:"#e8f5e0",pillTc:"#2d6a2d",valC:"#444"},
           {name:"기신",val:d.gisinA,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
         ]},
-        {label:"己亥 기준 (야자시)",bg:"#fff8e1",border:"#ffe082",items:[
+        {label:"B명식 기준 (야자시)",bg:"#fff8e1",border:"#ffe082",items:[
           {name:"용신",val:d.yongsinB,pillBg:"#e65100",pillTc:"#fff",valC:"#333"},
           {name:"희신",val:d.huisinB,pillBg:"#fff3e0",pillTc:"#7b5800",valC:"#444"},
           {name:"기신",val:d.gisinB,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
@@ -893,14 +893,14 @@ function TabSaju({d}){
     <section style={S.card}>
       <ST icon="⭐" title="신살(神殺)"/>
       <GT>신살은 사주 글자들의 특정 조합에서 발생하는 특수한 기운입니다. 타고난 재능이나 삶에서 반복되는 패턴으로 나타납니다.</GT>
-      <Acc items={d.sinsal.map(s=>({title:s.name,sub:s.hanja,easy:s.easy,desc:s.desc,tag:s.found}))}/>
+      <Acc items={(d.sinsal||[]).map(s=>({title:s.name,sub:s.hanja,easy:s.easy,desc:s.desc,tag:s.found}))}/>
     </section>
     <section style={S.card}>
       <ST icon="🔗" title="합(合)·충(沖)·형(刑)"/>
       <GT>사주 글자들은 서로 끌어당기거나(합), 충돌하거나(충), 마찰을 일으킵니다(형). 성격·인간관계·삶의 패턴에 직접 영향을 줍니다.</GT>
       <Acc items={[
         ...d.hap.map(h=>({title:h.pair,easy:h.easy,desc:h.desc,badge:{label:h.type,bg:"#e8f5e0",text:"#2d6a2d"}})),
-        ...d.hyeong.map(h=>({title:h.name,easy:"무은지형 — 믿는 사람에게 배신당하는 에너지",desc:h.desc,badge:{label:h.type,bg:"#fdecea",text:"#b71c1c"}})),
+        ...(d.hyeong||[]).map(h=>({title:h.name,easy:"무은지형 — 믿는 사람에게 배신당하는 에너지",desc:h.desc,badge:{label:h.type,bg:"#fdecea",text:"#b71c1c"}})),
       ]}/>
       {d.chung.length===0&&<div style={{marginTop:10,padding:"10px 14px",background:"#f9fbe7",borderRadius:10,fontSize:13,color:"#558b2f",lineHeight:1.75}}>✅ 충(沖) 없음 — 원국 내 큰 충돌 에너지가 없는 구조예요.</div>}
     </section>
@@ -909,7 +909,7 @@ function TabSaju({d}){
       <GT>대운은 10년마다 교체되는 외부 에너지입니다. 임(壬)년생 여성은 음양역순으로 역행(逆行)하며, 소한(小寒·1/6)까지 11일 ÷ 3 = 만 {d.daeunStart}세에 시작합니다.</GT>
       <div style={{position:"relative",marginTop:16,paddingLeft:38}}>
         <div style={{position:"absolute",left:16,top:8,bottom:8,width:2,background:"linear-gradient(to bottom,#ffb300,#e0e0e0)",borderRadius:99}}/>
-        {d.daeun.map((dv,i)=>{
+        {(d.daeun||[]).map((dv,i)=>{
           const g=gc(dv.label[0]),j=jc(dv.label[1]);
           return (
             <div key={i} style={{position:"relative",marginBottom:i<d.daeun.length-1?12:0}}>
@@ -1392,7 +1392,7 @@ function SajuInputForm({onSubmit}){
   const [form,setForm]=useState({
     name:"",year:"",month:"",day:"",
     hour:"23",minute:"38",
-    gender:"여",city:"경북 경산",
+    gender:"여",city:"서울",
   });
   const [err,setErr]=useState({});
   const up=(k,v)=>setForm(f=>({...f,[k]:v}));
@@ -1454,7 +1454,7 @@ function SajuInputForm({onSubmit}){
           <div style={SF.label}>생년월일 (양력)</div>
           <div style={{display:"flex",gap:8}}>
             {[
-              {k:"year",ph:"1993",w:"40%",max:4,err:err.year},
+              {k:"year",ph:"YYYY",w:"40%",max:4,err:err.year},
               {k:"month",ph:"01",w:"28%",max:2,err:err.month},
               {k:"day",ph:"17",w:"28%",max:2,err:err.day},
             ].map(({k,ph,w,max,err:e})=>(
