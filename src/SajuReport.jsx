@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 1. 오행·간지 기초
@@ -374,7 +374,7 @@ function Acc({items}){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 5. 요약 탭
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function TabSummary({d,setTab}){return <>
+function TabSummary({d,changeTab}){return <>
   <section style={{...S.card,background:"linear-gradient(135deg,#fffde7,#fff3e0)",borderColor:"#ffe082"}}>
     <div style={{fontSize:11,color:"#7b5800",fontWeight:600,marginBottom:4}}>윤정님은</div>
     <div style={{fontSize:20,fontWeight:900,color:"#e65100",lineHeight:1.4,marginBottom:10}}>{d.animalDesc} {d.animal}</div>
@@ -981,27 +981,112 @@ function TabMBTI({d}){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 11. 메인
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 로딩 화면 컴포넌트
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const OHAENG_LOADING=[
+  {symbol:"木",color:"#66bb6a",bg:"#e8f5e0",name:"목"},
+  {symbol:"火",color:"#ef5350",bg:"#fdecea",name:"화"},
+  {symbol:"土",color:"#ffb300",bg:"#fff8e1",name:"토"},
+  {symbol:"金",color:"#90a4ae",bg:"#f3f3f3",name:"금"},
+  {symbol:"水",color:"#42a5f5",bg:"#e3f2fd",name:"수"},
+];
+
+function LoadingScreen({name}){
+  const [idx,setIdx]=useState(0);
+  const [visible,setVisible]=useState(true);
+  useEffect(()=>{
+    const iv=setInterval(()=>{
+      setVisible(false);
+      setTimeout(()=>{setIdx(i=>(i+1)%5);setVisible(true);},300);
+    },900);
+    return()=>clearInterval(iv);
+  },[]);
+  const cur=OHAENG_LOADING[idx];
+  return(
+    <div style={{position:"fixed",inset:0,background:"#f4f4f6",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:50}}>
+      <div style={{
+        width:120,height:120,borderRadius:32,background:cur.bg,
+        display:"flex",alignItems:"center",justifyContent:"center",
+        marginBottom:24,
+        transition:"opacity 0.3s, transform 0.3s",
+        opacity:visible?1:0,
+        transform:visible?"scale(1)":"scale(0.9)",
+        boxShadow:`0 8px 32px ${cur.color}40`,
+      }}>
+        <span style={{fontSize:56,fontWeight:900,color:cur.color,fontFamily:"serif"}}>{cur.symbol}</span>
+      </div>
+      <div style={{fontSize:14,color:"#888",fontWeight:600,marginBottom:6}}>{name||""}님의 사주를 분석하고 있어요</div>
+      <div style={{display:"flex",gap:6,marginTop:4}}>
+        {OHAENG_LOADING.map((_,i)=>(
+          <div key={i} style={{width:6,height:6,borderRadius:99,background:i===idx?OHAENG_LOADING[i].color:"#ddd",transition:"background 0.3s"}}/>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function SajuReport(){
   const [tab,setTab]=useState("요약");
-  const [view,setView]=useState("report"); // "form" | "report"
+  const [phase,setPhase]=useState("form"); // "form"|"loading"|"report"
+  const [opacity,setOpacity]=useState(1);
+  const [userName,setUserName]=useState("");
   const TABS=["요약","사주","낮과 밤","토정·주역","별자리·타로","MBTI"];
   const contentRef=useRef(null);
+
   function changeTab(t){
     setTab(t);
     setTimeout(()=>{
-      if(contentRef.current) contentRef.current.scrollTop=0;
       window.scrollTo({top:0,behavior:"smooth"});
     },10);
   }
-  if(view==="form") return <SajuInputForm onBack={()=>setView("report")}/>;
-  return <div style={S.root}>
-    <div style={S.header}><button style={S.navBtn} onClick={()=>setView("form")}>‹</button><div style={S.headerTitle}>내 사주 명식</div><button style={S.navBtn} onClick={()=>changeTab("요약")}>⌂</button></div>
+
+  function handleFormSubmit(name){
+    setUserName(name||"");
+    // 폼 페이드아웃
+    setOpacity(0);
+    setTimeout(()=>{
+      setPhase("loading");
+      setOpacity(1);
+      // 로딩 1.8초 후 리포트 페이드인
+      setTimeout(()=>{
+        setOpacity(0);
+        setTimeout(()=>{
+          setPhase("report");
+          setTab("요약");
+          setOpacity(1);
+          window.scrollTo({top:0});
+        },300);
+      },1800);
+    },350);
+  }
+
+  function goToForm(){
+    setOpacity(0);
+    setTimeout(()=>{
+      setPhase("form");
+      setOpacity(1);
+    },300);
+  }
+
+  const wrapStyle={transition:"opacity 0.35s ease",opacity};
+
+  if(phase==="loading") return <LoadingScreen name={userName}/>;
+
+  if(phase==="form") return(
+    <div style={wrapStyle}>
+      <SajuInputForm onSubmit={handleFormSubmit}/>
+    </div>
+  );
+
+  return <div style={{...wrapStyle,...S.root}}>
+    <div style={S.header}><button style={S.navBtn} onClick={goToForm}>‹</button><div style={S.headerTitle}>fortuneyam</div><button style={S.navBtn} onClick={()=>changeTab("요약")}>⌂</button></div>
     <div style={S.profileBar}><div><div style={{display:"flex",alignItems:"baseline",gap:8}}><div style={S.pName}>윤정</div><div style={{fontSize:12,color:"#e65100",fontWeight:700,background:"#fff3e0",padding:"2px 8px",borderRadius:99}}>황금 돼지</div></div><div style={S.pBirth}>양력 1993년 1월 17일 23시 38분 경북 경산 生</div></div><div style={{padding:"4px 12px",borderRadius:99,fontSize:13,fontWeight:700,background:"#fce4ec",color:"#880e4f"}}>여성</div></div>
     <div style={{...S.tabBar,overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}}>
       {TABS.map(t=><button key={t} onClick={()=>changeTab(t)} style={{...S.tab,minWidth:60,whiteSpace:"nowrap",...(tab===t?S.tabA:{})}}>{t}</button>)}
     </div>
     <div style={S.content}>
-      {tab==="요약"       && <TabSummary d={D} setTab={setTab}/>}
+      {tab==="요약"       && <TabSummary d={D} changeTab={changeTab}/>}
       {tab==="사주"       && <TabSaju d={D}/>}
       {tab==="낮과 밤"    && <TabDayNight d={D}/>}
       {tab==="토정·주역"  && <TabTojung d={D}/>}
@@ -1045,7 +1130,7 @@ const HOURS=Array.from({length:24},(_,i)=>String(i).padStart(2,"0"));
 const MINS=["00","10","20","30","40","50"].flatMap(m=>[m]);
 const MINS_ALL=Array.from({length:60},(_,i)=>String(i).padStart(2,"0"));
 
-function SajuInputForm({onBack}){
+function SajuInputForm({onSubmit}){
   const [step,setStep]=useState(1); // 1=기본정보 2=시간 3=확인
   const [form,setForm]=useState({
     name:"",year:"",month:"",day:"",
@@ -1074,8 +1159,8 @@ function SajuInputForm({onBack}){
   if(step===1) return(
     <div style={SF.root}>
       <div style={SF.header}>
-        <button style={SF.back} onClick={onBack}>‹</button>
-        <div style={SF.title}>사주 분석</div>
+        <button style={SF.back} onClick={()=>onSubmit(form.name)}>‹</button>
+        <div style={SF.title}>fortuneyam</div>
         <div style={{width:32}}/>
       </div>
       <div style={SF.progress}>
@@ -1146,7 +1231,7 @@ function SajuInputForm({onBack}){
     <div style={SF.root}>
       <div style={SF.header}>
         <button style={SF.back} onClick={()=>setStep(1)}>‹</button>
-        <div style={SF.title}>사주 분석</div>
+        <div style={SF.title}>fortuneyam</div>
         <div style={{width:32}}/>
       </div>
       <div style={SF.progress}>
@@ -1208,7 +1293,7 @@ function SajuInputForm({onBack}){
     <div style={SF.root}>
       <div style={SF.header}>
         <button style={SF.back} onClick={()=>setStep(2)}>‹</button>
-        <div style={SF.title}>사주 분석</div>
+        <div style={SF.title}>fortuneyam</div>
         <div style={{width:32}}/>
       </div>
       <div style={SF.progress}>
@@ -1245,8 +1330,8 @@ function SajuInputForm({onBack}){
         </div>
 
         <button style={{...SF.btn,fontSize:16,padding:"16px 0",background:"linear-gradient(135deg,#e65100,#bf360c)"}}
-          onClick={onBack}>
-          🔮 사주 리포트 보기
+          onClick={()=>onSubmit(form.name)}>
+          🔮 fortuneyam 보기
         </button>
         <button style={{...SF.btn,background:"#f5f5f5",color:"#555",marginTop:8}} onClick={()=>setStep(1)}>
           ← 다시 입력
