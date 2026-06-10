@@ -39,7 +39,7 @@ exports.handler = async (event) => {
   }
 
   const payload = JSON.stringify({
-    model: reqBody.model || "claude-sonnet-4-20250514",
+    model: reqBody.model || "claude-haiku-4-5-20251001",
     max_tokens: reqBody.max_tokens || 1000,
     messages: reqBody.messages,
   });
