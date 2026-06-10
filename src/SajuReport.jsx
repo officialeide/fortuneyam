@@ -352,6 +352,7 @@ const STAGE_DESC={
   "태(胎)":"잉태된 씨앗의 에너지예요. 아직 드러나지 않은 가능성이 가득해요.",
   "양(養)":"보호받으며 자라는 에너지예요. 포용과 성장의 기운이에요.",
 };
+const KOR_JI_O={자:"수",축:"토",인:"목",묘:"목",진:"토",사:"화",오:"화",미:"토",신:"금",유:"금",술:"토",해:"수"};
 function calcSinsal(ilgan,yearJi,monthJi,dayJi,timeJi){
   const result=[];
   const taeul={갑:["축","미"],무:["축","미"],경:["축","미"],을:["자","신"],기:["자","신"],병:["해","유"],정:["해","유"],임:["묘","사"],계:["묘","사"],신:["오","인"]};
@@ -504,7 +505,6 @@ function buildSajuData(input){
     base+=Math.floor(seed/13*8)-4; // -4~+4 랜덤 보정
     return Math.min(95,Math.max(54,base));
   }
-  const KOR_JI_O={자:"수",축:"토",인:"목",묘:"목",진:"토",사:"화",오:"화",미:"토",신:"금",유:"금",술:"토",해:"수"};
   const YEAR_SUMMARIES={
     high:"용신 에너지가 활성화되는 해예요. 준비한 것이 결실을 맺는 시기예요.",
     mid:"흐름이 무난한 해예요. 꾸준히 나아가는 것이 중요해요.",
@@ -1698,7 +1698,7 @@ function SajuInputForm({onSubmit, recentList=[], onSelectRecent}){
     const e={};
     if(!form.name.trim()) e.name="이름을 입력해주세요";
     const y=parseInt(form.year),m=parseInt(form.month),d=parseInt(form.day);
-    if(!form.year||y<1900||y>2030) e.year="연도를 확인해주세요";
+    if(!form.year||!form.birthRaw||y<1900||y>2030) e.year="생년월일 6자리를 입력해주세요 (예: 93.01.17)";
     if(!form.month||m<1||m>12) e.month="월을 확인해주세요";
     if(!form.day||d<1||d>31) e.day="일을 확인해주세요";
     // 음력이면 양력으로 변환
@@ -1770,22 +1770,31 @@ function SajuInputForm({onSubmit, recentList=[], onSelectRecent}){
               ))}
             </div>
           </div>
-          <div style={{display:"flex",gap:8}}>
-            {[
-              {k:"year",ph:"YYYY",w:"40%",max:4,err:err.year},
-              {k:"month",ph:"01",w:"28%",max:2,err:err.month},
-              {k:"day",ph:"DD",w:"28%",max:2,err:err.day},
-            ].map(({k,ph,w,max,err:e})=>(
-              <div key={k} style={{width:w}}>
-                <input style={{...SF.input,width:"100%",boxSizing:"border-box",...(e?SF.inputErr:{})}}
-                  placeholder={ph} value={form[k]} maxLength={max}
-                  inputMode="numeric"
-                  onChange={ev=>up(k,ev.target.value.replace(/\D/g,""))}/>
-                {e&&<div style={SF.errMsg}>{e}</div>}
-              </div>
-            ))}
-          </div>
-          <div style={SF.hint}>{calType==="solar"?"양력 기준":"음력 기준 — 다음에 양력으로 자동 변환돼요"}</div>
+          <input
+            style={{...SF.input,...((err.year||err.month||err.day)?SF.inputErr:{})}}
+            placeholder="90.01.01"
+            value={form.birthRaw||""}
+            maxLength={8}
+            inputMode="numeric"
+            onChange={ev=>{
+              const raw=ev.target.value.replace(/\D/g,"");
+              // 자동 점 삽입: 2자리 후, 4자리 후
+              let fmt=raw;
+              if(raw.length>2) fmt=raw.slice(0,2)+"."+raw.slice(2);
+              if(raw.length>4) fmt=raw.slice(0,2)+"."+raw.slice(2,4)+"."+raw.slice(4);
+              up("birthRaw",fmt);
+              // year/month/day 파싱
+              if(raw.length>=6){
+                const yy=parseInt(raw.slice(0,2));
+                const year=yy<=30?2000+yy:1900+yy;
+                up("year",String(year));
+                up("month",String(parseInt(raw.slice(2,4))));
+                up("day",String(parseInt(raw.slice(4,6))));
+              }
+            }}
+          />
+          {(err.year||err.month||err.day)&&<div style={SF.errMsg}>{err.year||err.month||err.day}</div>}
+          <div style={SF.hint}>{calType==="solar"?"양력 기준 (예: 93.01.17)":"음력 기준 — 양력으로 자동 변환돼요"}</div>
           {showLeapToggle&&(
             <button onClick={()=>setIsLeap(v=>!v)}
               style={{marginTop:6,display:"flex",alignItems:"center",gap:6,padding:"6px 12px",borderRadius:8,border:`1.5px solid ${isLeap?"#e65100":"#e0e0e0"}`,background:isLeap?"#fff3e0":"#fff",fontSize:12,fontWeight:700,cursor:"pointer",color:isLeap?"#e65100":"#888",fontFamily:"inherit"}}>
@@ -1846,26 +1855,35 @@ function SajuInputForm({onSubmit, recentList=[], onSelectRecent}){
           </div>
         </div>
 
-        {/* 시간 선택 — 드럼롤 느낌의 큰 선택 */}
+        {/* 출생 시간 4자리 입력 */}
         <div style={SF.field}>
           <div style={SF.label}>출생 시간</div>
-          <div style={{display:"flex",gap:12,alignItems:"center"}}>
-            <div style={{flex:1}}>
-              <div style={{fontSize:10,color:"#aaa",marginBottom:4,textAlign:"center"}}>시(時)</div>
-              <select style={{...SF.select,textAlign:"center",fontSize:20,fontWeight:900,padding:"14px 0",color:"#e65100"}}
-                value={form.hour} onChange={e=>up("hour",e.target.value)}>
-                {HOURS.map(h=><option key={h} value={h}>{h}시</option>)}
-              </select>
-            </div>
-            <div style={{fontSize:24,color:"#ddd",fontWeight:300,paddingTop:20}}>:</div>
-            <div style={{flex:1}}>
-              <div style={{fontSize:10,color:"#aaa",marginBottom:4,textAlign:"center"}}>분(分)</div>
-              <select style={{...SF.select,textAlign:"center",fontSize:20,fontWeight:900,padding:"14px 0",color:"#e65100"}}
-                value={form.minute} onChange={e=>up("minute",e.target.value)}>
-                {MINS_ALL.map(m=><option key={m} value={m}>{m}분</option>)}
-              </select>
-            </div>
-          </div>
+          <input
+            style={{...SF.input,...(err.time?SF.inputErr:{})}}
+            placeholder="22:25"
+            value={form.timeRaw||""}
+            maxLength={5}
+            inputMode="numeric"
+            onChange={ev=>{
+              const raw=ev.target.value.replace(/\D/g,"");
+              let fmt=raw;
+              if(raw.length>2) fmt=raw.slice(0,2)+":"+raw.slice(2);
+              up("timeRaw",fmt);
+              if(raw.length>=4){
+                const h=parseInt(raw.slice(0,2));
+                const m=parseInt(raw.slice(2,4));
+                if(h>=0&&h<=23&&m>=0&&m<=59){
+                  up("hour",String(h).padStart(2,"0"));
+                  up("minute",String(m).padStart(2,"0"));
+                  up("time","ok");
+                }
+              } else if(raw.length===0){
+                up("hour","12");up("minute","00");
+              }
+            }}
+          />
+          {err.time&&<div style={SF.errMsg}>{err.time}</div>}
+          <div style={SF.hint}>24시간 형식 (예: 23:38) — 모르면 비워도 돼요</div>
         </div>
 
         {/* 자시 경계 안내 */}
@@ -1884,14 +1902,19 @@ function SajuInputForm({onSubmit, recentList=[], onSelectRecent}){
             <span>MBTI</span>
             <span style={{fontSize:11,color:"#aaa",fontWeight:400}}>선택사항</span>
           </div>
-          <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-            {["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ","모름"].map(t=>(
+          <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6}}>
+            {["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"].map(t=>(
               <button key={t} onClick={()=>up("mbti",form.mbti===t?"":t)}
-                style={{padding:"5px 10px",borderRadius:8,border:"1.5px solid #e0e0e0",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
+                style={{padding:"7px 0",borderRadius:8,border:"1.5px solid #e0e0e0",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",textAlign:"center",
                   background:form.mbti===t?"#e65100":"#fff",color:form.mbti===t?"#fff":"#666"}}>
                 {t}
               </button>
             ))}
+            <button onClick={()=>up("mbti",form.mbti==="모름"?"":"모름")}
+              style={{gridColumn:"span 4",padding:"7px 0",borderRadius:8,border:"1.5px solid #e0e0e0",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
+                background:form.mbti==="모름"?"#888":"#fff",color:form.mbti==="모름"?"#fff":"#999"}}>
+              잘 모르겠어요
+            </button>
           </div>
         </div>
         <div style={{display:"flex",gap:8,marginTop:16}}>
@@ -1925,6 +1948,7 @@ function SajuInputForm({onSubmit, recentList=[], onSelectRecent}){
             {icon:"📅",label:"생년월일",value:`${form.year}.${form.month.padStart(2,"0")}.${form.day.padStart(2,"0")}`},
             {icon:"🕐",label:"출생 시간",value:`${form.hour}시 ${form.minute}분`},
             {icon:"📍",label:"출생지",value:form.city},
+            ...(form.mbti&&form.mbti!=="모름"?[{icon:"🧠",label:"MBTI",value:form.mbti}]:[]),
           ].map(({icon,label,value},i,arr)=>(
             <div key={label} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 16px",borderBottom:i<arr.length-1?"1px solid #f5f5f5":"none"}}>
               <span style={{fontSize:18,width:24}}>{icon}</span>
@@ -1932,7 +1956,7 @@ function SajuInputForm({onSubmit, recentList=[], onSelectRecent}){
                 <div style={{fontSize:11,color:"#aaa",fontWeight:600}}>{label}</div>
                 <div style={{fontSize:15,fontWeight:800,color:"#111",marginTop:1}}>{value}</div>
               </div>
-              <button onClick={()=>setStep(i<3?1:i===3?2:1)}
+              <button onClick={()=>setStep(label==="MBTI"||label==="출생 시간"?2:1)}
                 style={{fontSize:11,color:"#e65100",background:"#fff3e0",border:"none",padding:"4px 10px",borderRadius:99,cursor:"pointer",fontWeight:700}}>
                 수정
               </button>
