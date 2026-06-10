@@ -600,7 +600,7 @@ function buildSajuData(input){
     daynight:{overview:`${ilganDB.core} ${singang==="신강(身强)"?"강한 에너지를 가진 만큼, 그것을 흘려보내는 방법을 찾는 것이 중요해요.":"내면의 에너지를 충전하는 루틴이 필요해요."}`,
       day:{impression:dn_day.impression||"",mask:dn_day.mask||"",styling:{hair:"",fashion:"",color:"",makeup:"",perfume:""}},
       night:{desire:dn_night.desire||"",desire2:dn_night.desire2||"",triggers:dn_night.triggers||[],attraction:dn_night.attraction||"",idealType:dn_night.idealType||"",idealType2:dn_night.idealType2||""}},
-    mbti:{estimated:mbtiType,estType:mbtiType,esType:"",userType:formInput?.mbti||"",basis:mbtiDesc,axes:mbtiAxes,borderline:`${mbtiType[2]==='F'?'F':'T'}↔${mbtiType[2]==='F'?'T':'F'} 경계: 상황에 따라 유연하게 전환돼요.`,strengths:ilganDB.strengths||[`${(OC[ilO]||{name:ilO}).name} 일간의 강점이 발휘되는 환경에서 최고의 실력이 나와요.`],challenges:ilganDB.challenges||[`용신 ${yongsinA_val} 기운이 부족하면 균형이 깨질 수 있어요.`],bestEnv:ilganDB.bestEnv||`${(OC[ilO]||{name:ilO}).name} 에너지가 잘 발휘되는 환경이에요.`,recovery:ilganDB.recovery||`용신인 ${yongsinA_val}를 활용한 루틴이 도움이 돼요.`},
+    mbti:{estimated:mbtiType,estType:mbtiType,esType:"",userType:input?.mbti||"",basis:mbtiDesc,axes:mbtiAxes,borderline:`${mbtiType[2]==='F'?'F':'T'}↔${mbtiType[2]==='F'?'T':'F'} 경계: 상황에 따라 유연하게 전환돼요.`,strengths:ilganDB.strengths||[`${(OC[ilO]||{name:ilO}).name} 일간의 강점이 발휘되는 환경에서 최고의 실력이 나와요.`],challenges:ilganDB.challenges||[`용신 ${yongsinA_val} 기운이 부족하면 균형이 깨질 수 있어요.`],bestEnv:ilganDB.bestEnv||`${(OC[ilO]||{name:ilO}).name} 에너지가 잘 발휘되는 환경이에요.`,recovery:ilganDB.recovery||`용신인 ${yongsinA_val}를 활용한 루틴이 도움이 돼요.`},
   };
 }
 
