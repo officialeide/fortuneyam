@@ -1411,46 +1411,70 @@ function TabAstro({d}){
   const a=d.astro,t=d.tarot;
   const [astroAI,setAstroAI]=React.useState(null);
   const [tarotAI,setTarotAI]=React.useState(null);
-  const [loadingAstro,setLoadingAstro]=React.useState(false);
-  const [loadingTarot,setLoadingTarot]=React.useState(false);
+  const [loadingAstro,setLoadingAstro]=React.useState(true);
+  const [loadingTarot,setLoadingTarot]=React.useState(true);
+  const [errAstro,setErrAstro]=React.useState(false);
+  const [errTarot,setErrTarot]=React.useState(false);
 
-  async function fetchNatal(){
-    if(astroAI||loadingAstro) return;
-    setLoadingAstro(true);
-    try{
-      const prompt=`사주: ${d.pillars?.map(p=>`${p.name} ${p.gan.hanja}${p.ji.hanja}`).join(", ")}. 일간: ${d.pillars?.[2]?.gan?.ko||"무"}. 생년월일: ${d.birth}. 서양 점성술 네이탈 차트 관점에서 이 사람의 태양궁·달궁·ASC·수성·금성·화성 위치를 사주 일간과 교차하여 분석해줘. 각 행성은 2~3문장으로 설명해. 마지막에 삼각 핵심 분석(태양·달·ASC 관계) 1문단 추가. 전체를 JSON으로만 응답: {"sun":"양자리 0도","sunDesc":"..","moon":"게자리","moonDesc":"..","asc":"천칭자리","ascDesc":"..","mercury":"물고기자리","mercuryDesc":"..","venus":"황소자리","venusDesc":"..","mars":"전갈자리","marsDesc":"..","triangle":".."}`;
-      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
-      const data=await res.json();
-      const text=data.content?.map(c=>c.text||"").join("").replace(/```json|```/g,"").trim();
-      setAstroAI(JSON.parse(text));
-    }catch(e){console.error(e);}
-    setLoadingAstro(false);
-  }
-
-  async function fetchTarotAchieve(){
-    if(tarotAI||loadingTarot) return;
-    setLoadingTarot(true);
-    try{
-      const prompt=`생명경로수: ${t.lifePath}. 본명 타로 카드: ${t.lifePathCard}. 영혼 카드: ${t.soulCard}. 사주 일간: ${d.pillars?.[2]?.gan?.ko||"무"}(${d.pillars?.[2]?.gan?.hanja||"戊"}). 성취 카드(Achievement Card)는 생명경로수+1번 카드인 ${t.achieveCard}이에요. 이 사람이 인생에서 실현해야 할 성취의 에너지를 사주 일간과 연결하여 구체적이고 깊게 설명해줘. 3~4문장. JSON으로만 응답: {"achieveDesc":"..."}`;
-      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:400,messages:[{role:"user",content:prompt}]})});
-      const data=await res.json();
-      const text=data.content?.map(c=>c.text||"").join("").replace(/```json|```/g,"").trim();
-      setTarotAI(JSON.parse(text));
-    }catch(e){console.error(e);}
-    setLoadingTarot(false);
-  }
+  React.useEffect(()=>{
+    let cancelled=false;
+    async function fetchNatal(){
+      try{
+        const pillarsStr=d.pillars?.map(p=>`${p.name} ${p.gan.hanja}${p.ji.hanja}`).join(", ")||"";
+        const ilganKo=d.pillars?.[2]?.gan?.ko||"무";
+        const ilganHanja=d.pillars?.[2]?.gan?.hanja||"戊";
+        const prompt=`사주 명식: ${pillarsStr}. 일간: ${ilganKo}(${ilganHanja}). 생년월일: ${d.birth}.
+이 사람의 서양 점성술 네이탈 차트를 사주 오행 에너지와 교차 분석해줘.
+출생 데이터를 기반으로 가장 가능성 높은 행성 위치를 추정하고, 각 행성이 사주 일간의 기질과 어떻게 공명하는지 설명해줘.
+각 행성 설명은 2~3문장. 삼각 핵심 분석(태양·달·ASC 관계)은 3~4문장.
+JSON만 응답 (다른 텍스트 없음):
+{"sun":"궁도 위치","sunDesc":"..","moon":"궁도 위치","moonDesc":"..","asc":"궁도 위치","ascDesc":"..","mercury":"궁도 위치","mercuryDesc":"..","venus":"궁도 위치","venusDesc":"..","mars":"궁도 위치","marsDesc":"..","triangle":".."}`;
+        const res=await fetch("/.netlify/functions/claude",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1200,messages:[{role:"user",content:prompt}]})
+        });
+        const data=await res.json();
+        const text=data.content?.map(c=>c.text||"").join("").replace(/```json|```/g,"").trim();
+        if(!cancelled) setAstroAI(JSON.parse(text));
+      }catch(e){console.error("astro:",e);if(!cancelled)setErrAstro(true);}
+      if(!cancelled) setLoadingAstro(false);
+    }
+    async function fetchTarot(){
+      try{
+        const ilganKo=d.pillars?.[2]?.gan?.ko||"무";
+        const ilganHanja=d.pillars?.[2]?.gan?.hanja||"戊";
+        const prompt=`생명경로수: ${t.lifePath}. 본명 타로 카드: ${t.lifePathCard}. 영혼 카드(Soul Card): ${t.soulCard}. 성취 카드(Achievement Card): ${t.achieveCard}. 사주 일간: ${ilganKo}(${ilganHanja}).
+이 사람이 인생에서 실현해야 할 성취의 에너지를 사주 일간의 기질과 타로 성취 카드의 원형 에너지를 연결해서 구체적으로 설명해줘. 어떤 방식으로 성취를 이루는 타입인지, 어떤 환경에서 빛나는지 포함해서 3~4문장.
+JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
+        const res=await fetch("/.netlify/functions/claude",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:500,messages:[{role:"user",content:prompt}]})
+        });
+        const data=await res.json();
+        const text=data.content?.map(c=>c.text||"").join("").replace(/```json|```/g,"").trim();
+        if(!cancelled) setTarotAI(JSON.parse(text));
+      }catch(e){console.error("tarot:",e);if(!cancelled)setErrTarot(true);}
+      if(!cancelled) setLoadingTarot(false);
+    }
+    fetchNatal();
+    fetchTarot();
+    return()=>{cancelled=true;};
+  },[]);
 
   const sunData=astroAI||a;
   const achieveDesc=tarotAI?.achieveDesc||t.achieveDesc;
 
+  // 스켈레톤 컴포넌트
+  const Skel=({h=12,w="100%",r=6})=><div style={{height:h,width:w,background:"linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%)",backgroundSize:"200% 100%",borderRadius:r,animation:"shimmer 1.4s infinite",marginBottom:4}}/>;
+  const shimmerStyle=`@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}`;
+
   return <>
+    <style>{shimmerStyle}</style>
     <section style={S.card}>
       <ST icon="✨" title="서양 점성술 네이탈 차트"/>
-      <GT>출생 시각과 장소를 기준으로 행성의 위치를 분석합니다. 태양·달·ASC 삼각 관계가 성격의 핵심 구조를 이룹니다.</GT>
-      {!astroAI&&<button onClick={fetchNatal} disabled={loadingAstro}
-        style={{marginTop:10,width:"100%",padding:"11px 0",borderRadius:10,border:"1.5px solid #5e35b1",fontSize:13,fontWeight:700,cursor:loadingAstro?"not-allowed":"pointer",background:loadingAstro?"#f5f5f5":"#fff",color:loadingAstro?"#aaa":"#5e35b1",fontFamily:"inherit"}}>
-        {loadingAstro?"✨ 네이탈 차트 분석 중...":"✨ AI 네이탈 차트 분석 받기"}
-      </button>}
+      <GT>{"출생 시각과 장소를 기준으로 행성의 위치를 분석합니다."}<br/>{"태양·달·ASC 삼각 관계가 성격의 핵심 구조를 이룹니다."}</GT>
       <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:7}}>
         {[
           {l:"태양 ☉",v:sunData.sun,meaning:a.sunMeaning,desc:sunData.sunDesc,bg:"#fff8e1",c:"#f57f17"},
@@ -1463,14 +1487,24 @@ function TabAstro({d}){
           <div key={i} style={{padding:"10px 13px",background:item.bg,borderRadius:10}}>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
               <span style={{fontSize:11,fontWeight:700,color:item.c,minWidth:72,flexShrink:0}}>{item.l}</span>
-              <span style={{fontSize:13,fontWeight:900,color:"#111"}}>{item.v}</span>
+              {loadingAstro
+                ? <Skel h={14} w="60%" r={4}/>
+                : <span style={{fontSize:13,fontWeight:900,color:"#111"}}>{item.v}</span>}
             </div>
             <div style={{fontSize:10,color:"#999",marginBottom:4}}>{item.meaning}</div>
-            <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.65,textAlign:"justify"}}>{item.desc}</p>
+            {loadingAstro
+              ? <><Skel h={11} w="100%"/><Skel h={11} w="80%"/></>
+              : <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.65,textAlign:"justify"}}>{item.desc}</p>}
           </div>
         ))}
       </div>
-      <div style={{marginTop:10,padding:"11px 13px",background:"#f3e5f5",borderRadius:10}}><div style={{fontSize:11,color:"#4a148c",fontWeight:700,marginBottom:4}}>삼각 핵심 분석</div><p style={{fontSize:13,color:"#444",margin:0,lineHeight:1.8,textAlign:"justify"}}>{astroAI?.triangle||a.triangle}</p></div>
+      <div style={{marginTop:10,padding:"11px 13px",background:"#f3e5f5",borderRadius:10}}>
+        <div style={{fontSize:11,color:"#4a148c",fontWeight:700,marginBottom:4}}>삼각 핵심 분석</div>
+        {loadingAstro
+          ? <><Skel h={12} w="100%"/><Skel h={12} w="90%"/><Skel h={12} w="70%"/></>
+          : <p style={{fontSize:13,color:"#444",margin:0,lineHeight:1.8,textAlign:"justify"}}>{astroAI?.triangle||a.triangle}</p>}
+      </div>
+      {errAstro&&<div style={{marginTop:8,padding:"9px 12px",background:"#fdecea",borderRadius:9,fontSize:12,color:"#b71c1c"}}>네이탈 차트 분석을 불러오지 못했어요. 잠시 후 다시 시도해주세요.</div>}
       {(a.yearTransit||[]).length>0&&<div style={{marginTop:12}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>주요 트랜짓 {CY}~{CY+4}</div>
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
           {a.yearTransit.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}><span style={{fontSize:13,fontWeight:900,color:"#111"}}>{y.year}년</span><span style={{fontSize:11,color:"#5e35b1",fontWeight:700}}>{y.planet}</span></div><div style={{fontSize:12,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
@@ -1501,11 +1535,12 @@ function TabAstro({d}){
         <div style={{flex:1,padding:"10px 11px",background:"#e8f5e0",borderRadius:10}}>
           <div style={{fontSize:10,color:"#2d6a2d",fontWeight:700,marginBottom:2}}>성취 카드(Achievement)</div>
           <div style={{fontSize:13,fontWeight:800,color:"#1b5e20"}}>{t.achieveCard}</div>
-          {!tarotAI&&<button onClick={fetchTarotAchieve} disabled={loadingTarot}
-            style={{marginTop:6,width:"100%",padding:"6px 0",borderRadius:8,border:"1.5px solid #2d6a2d",fontSize:11,fontWeight:700,cursor:loadingTarot?"not-allowed":"pointer",background:loadingTarot?"#f5f5f5":"#fff",color:loadingTarot?"#aaa":"#2d6a2d",fontFamily:"inherit"}}>
-            {loadingTarot?"분석 중...":"AI 성취 카드 분석"}
-          </button>}
-          <div style={{fontSize:11,color:"#555",marginTop:3,textAlign:"justify"}}>{achieveDesc}</div>
+          <div style={{fontSize:11,color:"#555",marginTop:3,textAlign:"justify",lineHeight:1.7}}>
+            {loadingTarot
+              ? <><Skel h={11} w="100%"/><Skel h={11} w="90%"/><Skel h={11} w="70%"/></>
+              : achieveDesc}
+          </div>
+          {errTarot&&<div style={{fontSize:11,color:"#b71c1c",marginTop:4}}>분석을 불러오지 못했어요.</div>}
         </div>
       </div>
       <div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>연도별 개인연도수 & 타로</div>
