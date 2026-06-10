@@ -434,13 +434,13 @@ const ILJU_CHAR = {
   무진:"戊辰 일주: 카리스마와 포용력을 겸비했어요. 대인 관계가 넓고 영향력이 커요.",
   무오:"戊午 일주: 열정적이고 강인해요. 어떤 상황에서도 포기하지 않는 강한 의지력이 있어요.",
   무신:"戊申 일주: 영리하고 임기응변이 탁월해요. 어떤 환경에서도 살아남는 적응력이 있어요.",
-  무술:"묵직하고 강인한 에너지예요. 한번 결심한 것은 산처럼 흔들리지 않아요. 겉으로는 과묵하지만 내면엔 강한 신념과 원칙이 있고, 시간이 오래 걸려도 끝까지 해내는 완주력이 있어요. 戌土의 지장간에 정화(丁火)가 숨겨져 있어 겉모습과 달리 내면이 뜨겁고, 가끔 전혀 예상치 못한 순간에 감정이 터져나오는 낙차가 있어요. 축술형(丑戌刑)이 발동하는 구조라, 믿었던 사람에게 뜻밖의 배신이나 실망을 겪는 경험이 인생에서 중요한 전환점이 돼요.",
+  무술:"묵직하고 강인한 에너지예요. 한번 결심한 것은 산처럼 흔들리지 않아요. 겉으로는 과묵하지만 내면엔 강한 신념과 원칙이 있고, 시간이 오래 걸려도 끝까지 해내는 완주력이 있어요. 술토(戌土)의 지장간에 정화(丁火)가 숨겨져 있어 겉모습과 달리 내면이 뜨겁고, 가끔 전혀 예상치 못한 순간에 감정이 터져나오는 낙차가 있어요. 축술형(丑戌刑)이 발동하는 구조라, 믿었던 사람에게 뜻밖의 배신이나 실망을 겪는 경험이 인생에서 중요한 전환점이 돼요.",
   기축:"己丑 일주: 성실하고 끈기 있어요. 천천히 하지만 가장 높은 곳까지 올라가는 타입이에요.",
   기묘:"己卯 일주: 유연하고 감성적이에요. 사람들 사이에서 자연스럽게 중심을 잡는 타입이에요.",
   기사:"己巳 일주: 지혜롭고 현실적이에요. 직관과 실용성이 조화를 이루는 타입이에요.",
   기미:"己未 일주: 따뜻하고 배려심이 깊어요. 주변을 편안하게 만드는 포용력이 있어요.",
   기유:"己酉 일주: 섬세하고 분석적이에요. 완벽을 추구하며 세부사항에 강한 타입이에요.",
-  기해:"직관적이고 포용력이 깊어요. 물처럼 유연하게 상황에 적응하면서도 흔들리지 않는 중심이 있어요. 亥水 위의 己土라 습기를 머금은 대지처럼, 타인의 감정을 자연스럽게 흡수하고 공감하는 능력이 탁월해요. 표면적으로는 온화하지만, 한번 결심하면 물이 낮은 곳으로 흐르듯 끝까지 방향을 잃지 않는 집요함이 있어요.",
+  기해:"직관적이고 포용력이 깊어요. 물처럼 유연하게 상황에 적응하면서도 흔들리지 않는 중심이 있어요. 해수(亥水) 위의 기토(己土)라 습기를 머금은 대지처럼, 타인의 감정을 자연스럽게 흡수하고 공감하는 능력이 탁월해요. 표면적으로는 온화하지만, 한번 결심하면 물이 낮은 곳으로 흐르듯 끝까지 방향을 잃지 않는 집요함이 있어요.",
   경자:"庚子 일주: 지적이고 활동적이에요. 빠른 판단력과 추진력이 강점이에요.",
   경인:"庚寅 일주: 도전적이고 강인해요. 두려움 없이 새로운 길을 개척하는 타입이에요.",
   경진:"庚辰 일주: 카리스마가 넘치고 통솔력이 있어요. 타고난 리더 기질이에요.",
@@ -878,11 +878,11 @@ function buildSajuData(input){
       persona,
       yearForecast,
       sixSystems:[
-        {system:"사주",key:`${ilju.hanja} 일주`,desc:ILGAN_PHILOSOPHY[ilgan]||ilganDB.core,insight:""},
-        {system:"토정비결",key:sajaDB.saja,desc:`${sajaDB.saja} 기운이에요.`,insight:sajaDB.desc},
+        {system:"사주",key:`${ilju.ko} 일주`,desc:ILGAN_PHILOSOPHY[ilgan]||ilganDB.core,insight:""},
+        {system:"토정비결",key:sajaDB.saja,desc:sajaDB.desc,insight:""},
         {system:"주역",key:ichingData.name,desc:ichingData.nature,insight:""},
-        {system:"당사주",key:dansajuPillars.map(p=>p.byeolseong.split("(")[0]).join("·"),desc:`뿌리(년)에 ${_dsName(dansajuPillars[0].byeolseong)}이 자리해 타고난 재능과 뿌리 에너지를 만들고, 성장기(월)에 ${_dsName(dansajuPillars[1].byeolseong)}이 들어 안정과 성장의 에너지를 더해요. 일주(나)에 ${_dsName(dansajuPillars[2].byeolseong)}이 있어 가장 가까운 관계에서 변수가 생기기 쉽고, 말년(시)에 ${_dsName(dansajuPillars[3].byeolseong)}이 들어 삶의 후반에 독특한 인연과 직관이 빛나요.`,insight:""},
-        {system:"점성술",key:"출생 차트",desc:"출생 시각 기반 행성 배치예요.",insight:""},
+        {system:"당사주",key:dansajuPillars.map(p=>p.byeolseong.split("(")[0]).join("·"),desc:`일주의 ${_dsName(dansajuPillars[2].byeolseong)}이 삶의 중심축이에요. ${dansajuPillars[0].desc.slice(0,20).replace(/\..*$/,"")}의 ${_dsName(dansajuPillars[0].byeolseong)}(년), ${dansajuPillars[1].desc.slice(0,18).replace(/\..*$/,"")}의 ${_dsName(dansajuPillars[1].byeolseong)}(월), ${dansajuPillars[3].desc.slice(0,18).replace(/\..*$/,"")}의 ${_dsName(dansajuPillars[3].byeolseong)}(시)이 뒷받침해요.`,insight:""},
+        {system:"점성술",key:d._astroAI?`태양 ${d._astroAI.sun}`:"출생 차트",desc:d._astroAI?`${d._astroAI.sunDesc} ${d._astroAI.triangle?.slice(0,40)}…`:"출생 시각 기반 행성 배치예요.",insight:""},
         {system:"타로수비학",key:`생명경로수 ${lp}`,desc:lifePathDesc,insight:""},
         {system:"MBTI",key:mbtiType,desc:mbtiDesc,insight:""},
       ],
@@ -1021,12 +1021,7 @@ function TabSummary({d,changeTab}){return <>
       </div>}</div>)}
     </div>
   </section>
-  <section style={S.card}>
-    <ST icon="🗂️" title="상세 분석 바로가기"/>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:12}}>
-      {[["사주","📋","명식·신살·대운·세운"],["낮과 밤","🌙","심층 심리·욕망"],["토정·주역","📜","토정비결·주역·당사주"],["별자리·타로","✨","점성술·타로수비학"],["MBTI","🧠","성격 분석"]].map(([t,ic,desc])=><button key={t} onClick={()=>changeTab(t)} style={{padding:"12px",background:"#fafafa",border:"1px solid #eee",borderRadius:12,cursor:"pointer",textAlign:"left",fontFamily:"inherit"}}><div style={{fontSize:18,marginBottom:4}}>{ic}</div><div style={{fontSize:13,fontWeight:800,color:"#111"}}>{t}</div><div style={{fontSize:11,color:"#888",marginTop:2}}>{desc}</div></button>)}
-    </div>
-  </section>
+
 </>;
 }
 
@@ -1082,26 +1077,35 @@ function Ohaeng({d}){
       </div>
     </div>
     <div style={{marginTop:10,padding:"10px 14px",background:"#e3f2fd",borderRadius:10,fontSize:13,color:"#0d47a1",lineHeight:1.75}}>{d.ohaengNote||""}</div>
-    <div style={{marginTop:8,padding:"9px 12px",background:"#fafafa",borderRadius:10,display:"flex",alignItems:"center",gap:8,border:"1px solid #eee",marginBottom:8,flexWrap:"nowrap"}}><span style={{fontSize:11,color:"#aaa",whiteSpace:"nowrap"}}>신강·신약</span><span style={{fontSize:13,fontWeight:900,color:"#1565c0",whiteSpace:"nowrap"}}>{d.singang}</span><span style={{fontSize:11,color:"#888"}}>: {d.singang==="신강(身强)"?"일간을 돕는 기운이 넉넉한 구조":"사주 8글자 중 나를 도와주는 기운보다 소모시키는 기운이 더 많은 구조예요. 에너지를 쓰는 만큼 채우는 것이 중요한 체질"}</span></div>
+    <div style={{marginTop:8,padding:"10px 12px",background:"#f0f4ff",borderRadius:10,border:"1px solid #c5cae9",marginBottom:8}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,flexWrap:"nowrap"}}>
+        <span style={{fontSize:11,color:"#5c6bc0",fontWeight:700,whiteSpace:"nowrap"}}>신강·신약</span>
+        <span style={{fontSize:13,fontWeight:900,color:"#1565c0",whiteSpace:"nowrap"}}>{d.singang}</span>
+      </div>
+      <div style={{fontSize:11,color:"#555",lineHeight:1.7}}>{d.singang==="신강(身强)"?"일간을 돕는 기운이 넉넉한 구조예요.":"사주 8글자 중 나를 도와주는 기운보다 소모시키는 기운이 더 많은 구조예요. 에너지를 쓰는 만큼 채우는 것이 중요한 체질이에요."}</div>
+    </div>
     <div style={{display:"flex",flexDirection:"column",gap:7}}>
       {[
         {label:"A명식 기준 (자정)",bg:"#f1f8e9",border:"#c5e1a5",items:[
-          {name:"용신",val:d.yongsinA,pillBg:"#33691e",pillTc:"#fff",valC:"#333"},
-          {name:"희신",val:d.huisinA,pillBg:"#e8f5e0",pillTc:"#2d6a2d",valC:"#444"},
-          {name:"기신",val:d.gisinA,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
+          {name:"용신",sub:"도움되는 기운",val:d.yongsinA,pillBg:"#33691e",pillTc:"#fff",valC:"#333"},
+          {name:"희신",sub:"간접 도움",val:d.huisinA,pillBg:"#e8f5e0",pillTc:"#2d6a2d",valC:"#444"},
+          {name:"기신",sub:"피할 기운",val:d.gisinA,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
         ]},
         ...(d.yongsinB&&d.yongsinB!=="분석 중"?[{label:"B명식 기준 (야자시)",bg:"#fff8e1",border:"#ffe082",items:[
-          {name:"용신",val:d.yongsinB,pillBg:"#e65100",pillTc:"#fff",valC:"#333"},
-          {name:"희신",val:d.huisinB,pillBg:"#fff3e0",pillTc:"#7b5800",valC:"#444"},
-          {name:"기신",val:d.gisinB,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
+          {name:"용신",sub:"도움되는 기운",val:d.yongsinB,pillBg:"#e65100",pillTc:"#fff",valC:"#333"},
+          {name:"희신",sub:"간접 도움",val:d.huisinB,pillBg:"#fff3e0",pillTc:"#7b5800",valC:"#444"},
+          {name:"기신",sub:"피할 기운",val:d.gisinB,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
         ]}]:[]),
       ].map(({label,bg,border,items})=>(
         <div key={label} style={{padding:"10px 12px",background:bg,borderRadius:10,border:`1px solid ${border}`}}>
           <div style={{fontSize:10,color:"#888",fontWeight:600,marginBottom:8}}>{label}</div>
           <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-            {items.map(({name,val,pillBg,pillTc,valC})=>(
+            {items.map(({name,sub,val,pillBg,pillTc,valC})=>(
               <div key={name} style={{display:"flex",alignItems:"center",gap:6}}>
-                <span style={{background:pillBg,color:pillTc,fontSize:11,fontWeight:800,padding:"5px 11px",borderRadius:99}}>{name}</span>
+                <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
+                  <span style={{background:pillBg,color:pillTc,fontSize:11,fontWeight:800,padding:"4px 10px",borderRadius:8}}>{name}</span>
+                  <span style={{fontSize:9,color:"#999",fontWeight:500}}>{sub}</span>
+                </div>
                 <span style={{fontSize:12,fontWeight:900,color:valC}}>{val}</span>
               </div>
             ))}
@@ -1109,7 +1113,6 @@ function Ohaeng({d}){
         </div>
       ))}
     </div>
-    <div style={{fontSize:10,color:"#aaa",fontWeight:600,marginTop:6,letterSpacing:.5}}>용신(도움되는 기운) · 희신(간접 도움) · 기신(피할 기운)</div>
   </section>;
 }
 
@@ -1137,7 +1140,7 @@ function getMonthMemo_dynamic(ganKo, jiKo, reportData){
     const gi=reportData.gisinA||"";
     const isYong=yon.includes(ganO)||yon.includes(jiO);
     const isGi=gi.includes(ganO)||gi.includes(jiO);
-    if(isYong) return `${reportData.name||""}님 용신 활성: 적극적으로 움직이기 좋은 달이에요.`;
+    if(isYong) return "용신 활성: 적극적으로 움직이기 좋은 달이에요.";
     if(isGi) return `기신 에너지 주의: 무리하지 않고 내실을 다지는 게 좋겠네요.`;
     return "흐름이 무난한 달이에요. 꾸준히 나아가는 것이 중요해요.";
   }catch{return "이 달의 에너지를 타고 유연하게 움직이는 게 좋겠네요.";}
@@ -1433,16 +1436,22 @@ function TabTojung({d}){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function TabAstro({d}){
   const a=d.astro,t=d.tarot;
-  const [astroAI,setAstroAI]=React.useState(null);
-  const [tarotAI,setTarotAI]=React.useState(null);
-  const [loadingAstro,setLoadingAstro]=React.useState(true);
-  const [loadingTarot,setLoadingTarot]=React.useState(true);
+  // 로딩 중 미리 받아온 데이터 우선 사용
+  const preAstro=d._astroAI||null;
+  const preTarot=d._tarotAI||null;
+
+  const [astroAI,setAstroAI]=React.useState(preAstro);
+  const [tarotAI,setTarotAI]=React.useState(preTarot);
+  const [loadingAstro,setLoadingAstro]=React.useState(!preAstro);
+  const [loadingTarot,setLoadingTarot]=React.useState(!preTarot);
   const [errAstro,setErrAstro]=React.useState(false);
   const [errTarot,setErrTarot]=React.useState(false);
   const fetchNatalRef=React.useRef(null);
   const fetchTarotRef=React.useRef(null);
 
   React.useEffect(()=>{
+    // 이미 데이터 있으면 API 재호출 불필요
+    if(preAstro && preTarot) return;
     let cancelled=false;
     async function fetchNatal(){
       setLoadingAstro(true);
@@ -1695,11 +1704,11 @@ function TabMBTI({d}){
 // 로딩 화면 컴포넌트
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const OHAENG_LOADING=[
-  {symbol:"木",color:"#66bb6a",bg:"#e8f5e0",name:"목"},
-  {symbol:"火",color:"#ef5350",bg:"#fdecea",name:"화"},
-  {symbol:"土",color:"#ffb300",bg:"#fff8e1",name:"토"},
-  {symbol:"金",color:"#90a4ae",bg:"#f3f3f3",name:"금"},
-  {symbol:"水",color:"#42a5f5",bg:"#e3f2fd",name:"수"},
+  {img:"/characters/wood.png",  color:"#4caf50", bg:"#e8f5e0", name:"목", char:"청룡"},
+  {img:"/characters/fire.png",  color:"#ef5350", bg:"#fdecea", name:"화", char:"주작"},
+  {img:"/characters/earth.png", color:"#ffb300", bg:"#fff8e1", name:"토", char:"기린"},
+  {img:"/characters/metal.png", color:"#78909c", bg:"#f3f3f3", name:"금", char:"백호"},
+  {img:"/characters/water.png", color:"#5c6bc0", bg:"#e8eaf6", name:"수", char:"현무"},
 ];
 
 function LoadingScreen({name}){
@@ -1709,27 +1718,42 @@ function LoadingScreen({name}){
     const iv=setInterval(()=>{
       setVisible(false);
       setTimeout(()=>{setIdx(i=>(i+1)%OHAENG_LOADING.length);setVisible(true);},300);
-    },900);
+    },1200);
     return()=>clearInterval(iv);
   },[]);
   const cur=OHAENG_LOADING[idx];
   return(
-    <div style={{position:"fixed",inset:0,background:"#f4f4f6",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:50}}>
+    <div style={{position:"fixed",inset:0,background:"#fafafa",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:50}}>
       <div style={{
-        width:120,height:120,borderRadius:32,background:cur.bg,
+        width:160,height:160,borderRadius:40,
         display:"flex",alignItems:"center",justifyContent:"center",
-        marginBottom:24,
-        transition:"opacity 0.3s, transform 0.3s",
+        marginBottom:20,
+        transition:"opacity 0.35s, transform 0.35s",
         opacity:visible?1:0,
-        transform:visible?"scale(1)":"scale(0.9)",
-        boxShadow:`0 8px 32px ${cur.color}40`,
+        transform:visible?"scale(1)":"scale(0.88)",
       }}>
-        <span style={{fontSize:56,fontWeight:900,color:cur.color,fontFamily:"serif"}}>{cur.symbol}</span>
+        <img
+          src={cur.img}
+          alt={cur.char}
+          style={{width:150,height:150,objectFit:"contain",filter:`drop-shadow(0 8px 24px ${cur.color}55)`}}
+        />
       </div>
-      <div style={{fontSize:14,color:"#888",fontWeight:600,marginBottom:6}}>{name||""}님의 사주를 분석하고 있어요</div>
-      <div style={{display:"flex",gap:6,marginTop:4}}>
-        {OHAENG_LOADING.map((_,i)=>(
-          <div key={i} style={{width:6,height:6,borderRadius:99,background:i===idx?OHAENG_LOADING[i].color:"#ddd",transition:"background 0.3s"}}/>
+      <div style={{
+        fontSize:18,fontWeight:900,color:cur.color,
+        marginBottom:4,
+        transition:"opacity 0.35s",
+        opacity:visible?1:0,
+      }}>{cur.char}</div>
+      <div style={{fontSize:12,color:"#aaa",marginBottom:16}}>{cur.name}(오행) 기운을 불러오는 중이에요</div>
+      <div style={{fontSize:13,color:"#888",fontWeight:600,marginBottom:4}}>{name||""}님의 사주를 분석하고 있어요</div>
+      <div style={{fontSize:11,color:"#bbb",marginBottom:16}}>별자리·타로까지 모두 준비할게요</div>
+      <div style={{display:"flex",gap:8,marginTop:4}}>
+        {OHAENG_LOADING.map((o,i)=>(
+          <div key={i} style={{
+            width:i===idx?20:6,height:6,borderRadius:99,
+            background:i===idx?OHAENG_LOADING[i].color:"#ddd",
+            transition:"all 0.3s"
+          }}/>
         ))}
       </div>
     </div>
@@ -1762,7 +1786,7 @@ export default function SajuReport(){
 
   function handleFormSubmit(formInput){
     setOpacity(0);
-    setTimeout(()=>{
+    setTimeout(async()=>{
       // 1. 사주 계산
       let data;
       try{
@@ -1775,38 +1799,97 @@ export default function SajuReport(){
         return;
       }
       setReportData(data);
-      try{
-        sessionStorage.setItem("fy_report",JSON.stringify(data));
-        sessionStorage.setItem("fy_tab","요약");
-      }catch{}
-
-      // 2. 로딩화면 즉시 시작
       setPhase("loading");
       setOpacity(1);
 
-      // 3. 로딩 1.8초 타이머 (Supabase와 독립)
-      setTimeout(()=>{
-        setOpacity(0);
-        setTimeout(()=>{
-          setPhase("report");
-          setTab("요약");
-          setOpacity(1);
-          window.scrollTo({top:0});
-        },300);
-      },1800);
-
-      // 4. Supabase 저장 (완전 백그라운드, 로딩 블로킹 안 함)
+      // 2. Supabase 저장 (백그라운드)
       (async()=>{
         try{
-          setSaveStatus("saving");
           const {userId}=await saveUser(formInput);
           await saveReport(userId, data);
-          setSaveStatus("saved");
-        }catch(e){
-          console.warn("저장 실패:", e.message);
-          setSaveStatus("error");
-        }
+        }catch(e){console.warn("저장 실패:", e.message);}
       })();
+
+      // 3. 네이탈차트 + 성취카드 API 병렬 호출 (로딩 중)
+      const cacheKey=`fy_astro_${data.birth}`;
+      const cacheTarotKey=`fy_tarot_${data.birth}`;
+      let astroResult=null, tarotResult=null;
+
+      // sessionStorage 캐시 확인
+      try{
+        const ca=sessionStorage.getItem(cacheKey);
+        const ct=sessionStorage.getItem(cacheTarotKey);
+        if(ca) astroResult=JSON.parse(ca);
+        if(ct) tarotResult=JSON.parse(ct);
+      }catch{}
+
+      const pillarsStr=data.pillars?.map(p=>`${p.name} ${p.gan.hanja}${p.ji.hanja}`).join(", ")||"";
+      const ilganKo=data.pillars?.[2]?.gan?.ko||"무";
+      const ilganHanja=data.pillars?.[2]?.gan?.hanja||"戊";
+      const t=data.tarot;
+
+      const apiCall=async(body)=>{
+        const res=await fetch("/.netlify/functions/claude",{
+          method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify(body)
+        });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const d2=await res.json();
+        if(d2.error) throw new Error(d2.error.message);
+        return d2.content?.map(c=>c.text||"").join("").replace(/```json|```/g,"").trim();
+      };
+
+      const fetchAstro=async()=>{
+        if(astroResult) return; // 캐시 있으면 스킵
+        try{
+          const prompt=`사주 명식: ${pillarsStr}. 일간: ${ilganKo}(${ilganHanja}). 생년월일: ${data.birth}.
+이 사람의 서양 점성술 네이탈 차트를 사주 오행 에너지와 교차 분석해줘.
+출생 데이터를 기반으로 가장 가능성 높은 행성 위치를 추정하고, 각 행성이 사주 일간의 기질과 어떻게 공명하는지 설명해줘.
+각 행성 설명은 2~3문장. 삼각 핵심 분석(태양·달·ASC 관계)은 3~4문장.
+반드시 ~이에요, ~해요 체로 작성해줘. 한자는 반드시 한글(한자) 형식으로 병기해줘.
+JSON만 응답: {"sun":"궁도","sunDesc":"..","moon":"궁도","moonDesc":"..","asc":"궁도","ascDesc":"..","mercury":"궁도","mercuryDesc":"..","venus":"궁도","venusDesc":"..","mars":"궁도","marsDesc":"..","triangle":".."}`;
+          const text=await apiCall({model:"claude-haiku-4-5-20251001",max_tokens:1200,messages:[{role:"user",content:prompt}]});
+          astroResult=JSON.parse(text);
+          try{sessionStorage.setItem(cacheKey,JSON.stringify(astroResult));}catch{}
+        }catch(e){console.warn("astro API:", e);}
+      };
+
+      const fetchTarot=async()=>{
+        if(tarotResult) return; // 캐시 있으면 스킵
+        try{
+          const prompt=`생명경로수: ${t?.lifePath}. 본명 타로 카드: ${t?.lifePathCard}. 영혼 카드: ${t?.soulCard}. 성취 카드: ${t?.achieveCard}. 사주 일간: ${ilganKo}(${ilganHanja}).
+이 사람이 인생에서 실현해야 할 성취의 에너지를 사주 일간의 기질과 타로 성취 카드의 원형 에너지를 연결해서 2문장으로 요약해줘.
+반드시 ~이에요, ~해요 체로 작성해줘.
+JSON만 응답: {"achieveDesc":"..."}`;
+          const text=await apiCall({model:"claude-haiku-4-5-20251001",max_tokens:250,messages:[{role:"user",content:prompt}]});
+          tarotResult=JSON.parse(text);
+          try{sessionStorage.setItem(cacheTarotKey,JSON.stringify(tarotResult));}catch{}
+        }catch(e){console.warn("tarot API:", e);}
+      };
+
+      // API 병렬 실행 (로딩 화면 유지 중)
+      await Promise.all([fetchAstro(), fetchTarot()]);
+
+      // 4. API 결과를 reportData에 합쳐서 저장
+      const enrichedData={
+        ...data,
+        _astroAI: astroResult,
+        _tarotAI: tarotResult,
+      };
+      setReportData(enrichedData);
+      try{
+        sessionStorage.setItem("fy_report",JSON.stringify(enrichedData));
+        sessionStorage.setItem("fy_tab","요약");
+      }catch{}
+
+      // 5. 로딩 종료 → 요약 탭
+      setOpacity(0);
+      setTimeout(()=>{
+        setPhase("report");
+        setTab("요약");
+        setOpacity(1);
+        window.scrollTo({top:0});
+      },300);
     },350);
   }
 
@@ -1828,14 +1911,9 @@ export default function SajuReport(){
 
   return <div style={{...wrapStyle,...S.root}}>
     <div style={S.header}>
-      <button style={S.navBtn} onClick={goToForm}>‹</button>
+      <button style={S.navBtn} onClick={()=>changeTab("요약")}>‹</button>
       <div style={S.headerTitle}>Fortuneyam</div>
-      <div style={{display:"flex",alignItems:"center",gap:6}}>
-        {saveStatus==="saving"&&<span style={{fontSize:10,color:"#aaa"}}>저장 중…</span>}
-        {saveStatus==="saved"&&<span style={{fontSize:10,color:"#4caf50"}}>✓ 저장됨</span>}
-        {saveStatus==="error"&&<span style={{fontSize:10,color:"#ef5350"}}>저장 실패</span>}
-        <button style={S.navBtn} onClick={()=>changeTab("요약")}>⌂</button>
-      </div>
+      <button style={S.navBtn} onClick={goToForm}>🏠</button>
     </div>
     <div style={S.profileBar}>
       <div>
