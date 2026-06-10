@@ -6,6 +6,40 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 이름 없이 생년월일+시간+성별+도시로 기존 레포트 조회 (1년 유효기간)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export async function findCachedReport(formInput) {
+  const { year, month, day, hour, minute, gender, city } = formInput
+  const birth_date = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`
+  const birth_time = `${String(hour).padStart(2,'0')}:${String(minute||'0').padStart(2,'0')}`
+  const one_year_ago = new Date()
+  one_year_ago.setFullYear(one_year_ago.getFullYear() - 1)
+
+  try {
+    // birth_date + birth_time + gender + city 조합으로 가장 최근 레포트 조회
+    const { data, error } = await supabase
+      .from('reports')
+      .select(`
+        id, full_data_json, created_at,
+        users!inner (birth_date, birth_time, gender, city)
+      `)
+      .eq('users.birth_date', birth_date)
+      .eq('users.birth_time', birth_time)
+      .eq('users.gender', gender)
+      .eq('users.city', city)
+      .gte('created_at', one_year_ago.toISOString())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (error || !data) return null
+    return data.full_data_json
+  } catch {
+    return null
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 사용자 저장 또는 기존 사용자 찾기
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export async function saveUser(formInput) {
