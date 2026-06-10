@@ -60,11 +60,13 @@ const BASE=2451551;
 const JASI_START=22*60+50; // 야자시 시작 (22:50)
 const JASI_END=23*60+59;   // 야자시 끝 (23:59)
 function toJDN(y,m,d){const a=Math.floor((14-m)/12),yr=y+4800-a,mo=m+12*a-3;return d+Math.floor((153*mo+2)/5)+365*yr+Math.floor(yr/4)-Math.floor(yr/100)+Math.floor(yr/400)-32045;}
-function calcIlju(y,m,d){let i=(toJDN(y,m,d)-BASE)%60;if(i<0)i+=60;return{idx:i,ko:GL[i%10]+JL[i%12],hanja:GH[i%10]+JH[i%12],gan:{ko:GL[i%10],hanja:GH[i%10]},ji:{ko:JL[i%12],hanja:JH[i%12]}};}
-function calcBnd(y,m,d,h,min){const std=calcIlju(y,m,d),nd=new Date(y,m-1,d+1),mid=calcIlju(nd.getFullYear(),nd.getMonth()+1,nd.getDate()),tm=h*60+min,inB=tm>=22*60+50&&tm<=23*60+59;return{std,mid,inBoundary:inB&&std.ko!==mid.ko};}
+// 60갑자 인덱스 → 간지 객체 (공통 헬퍼)
+function idxToGJ(i){const n=((i%60)+60)%60;return{ko:GL[n%10]+JL[n%12],hanja:GH[n%10]+JH[n%12],gan:{ko:GL[n%10],hanja:GH[n%10]},ji:{ko:JL[n%12],hanja:JH[n%12]}};}
+function calcIlju(y,m,d){const i=toJDN(y,m,d)-BASE;return{idx:((i%60)+60)%60,...idxToGJ(i)};}
+function calcBnd(y,m,d,h,min){const std=calcIlju(y,m,d),nd=new Date(y,m-1,d+1),mid=calcIlju(nd.getFullYear(),nd.getMonth()+1,nd.getDate()),tm=h*60+min,inB=tm>=JASI_START&&tm<=JASI_END;return{std,mid,inBoundary:inB&&std.ko!==mid.ko};}
 
 // 세운 계산
-function yearToGJ(y){let i=(y-1984)%60;if(i<0)i+=60;return{ko:GL[i%10]+JL[i%12],hanja:GH[i%10]+JH[i%12],gan:{ko:GL[i%10],hanja:GH[i%10]},ji:{ko:JL[i%12],hanja:JH[i%12]}};}
+function yearToGJ(y){return idxToGJ(y-1984);}
 const WB=[2,4,6,8,0,2,4,6,8,0];
 function mToGJ(y,m){const yg=yearToGJ(y),b=WB[GL.indexOf(yg.gan.ko)],ji=(m+1)%12,mm=(ji-2+12)%12,g=(b+mm)%10;return{ko:GL[g]+JL[ji],hanja:GH[g]+JH[ji],gan:{ko:GL[g],hanja:GH[g]},ji:{ko:JL[ji],hanja:JH[ji]}};}
 function getToday(){const t=new Date();return{CY:t.getFullYear(),CM:t.getMonth()+1,CD:t.getDate()};}
@@ -75,36 +77,58 @@ const bMS=()=>Array.from({length:12},(_,i)=>{const r=CM-1+i,m=(r%12)+1,y=CY+Math
 // ━━ 세운 점수 (사주 용신/희신/기신 + 대운 + 삼합·충 기반, 전 탭 공유) ━━
 const _GANO={갑:"목",을:"목",병:"화",정:"화",무:"토",기:"토",경:"금",신:"금",임:"수",계:"수"};
 const _JIO={자:"수",축:"토",인:"목",묘:"목",진:"토",사:"화",오:"화",미:"토",신:"금",유:"금",술:"토",해:"수"};
+// 세운 점수 가중치 상수
+const SS={
+  BASE:72,          // 기본 점수
+  YONG_GAN:12,      // 용신 천간 +
+  YONG_JI:10,       // 용신 지지 +
+  HUI_GAN:6,        // 희신 천간 +
+  HUI_JI:5,         // 희신 지지 +
+  GI_GAN:-13,       // 기신 천간 -
+  GI_JI:-10,        // 기신 지지 -
+  DAEUN_YONG:7,     // 대운 용신 조화 +
+  DAEUN_GI:-5,      // 대운 기신 불화 -
+  CHUNG:-6,         // 일지 충 -
+  SAMHAP:5,         // 일지 삼합 +
+  YUKHAP:4,         // 일지 육합 +
+  MONTH_DAMP:0.7,   // 월별 변동폭 축소 계수
+  SCORE_MIN:48,     // 최저 점수
+  SCORE_MAX:97,     // 최고 점수
+  AREA_MIN:45,      // 영역 점수 최저
+  AREA_MAX:96,      // 영역 점수 최고
+  AREA_SEED_Y:13,   // 영역 시드 연도 계수
+  AREA_SEED_M:7,    // 영역 시드 월 계수
+  AREA_MOD:15,      // 영역 점수 변동 범위
+  AREA_OFFSET:7,    // 영역 점수 중심 오프셋
+};
 function calcSeunScore(yr,month,meta){
-  if(!meta) return 72;
+  if(!meta) return SS.BASE;
   const gj=month?mToGJ(yr,month):yearToGJ(yr);
   const ganO=_GANO[gj.gan.ko]||"",jiO=_JIO[gj.ji.ko]||"",ji=gj.ji.ko;
-  let s=72;
-  if(meta.yongsinO.includes(ganO))s+=12;
-  if(meta.yongsinO.includes(jiO))s+=10;
-  if(meta.huisinO.includes(ganO))s+=6;
-  if(meta.huisinO.includes(jiO))s+=5;
-  if(meta.gisinO.includes(ganO))s-=13;
-  if(meta.gisinO.includes(jiO))s-=10;
-  // 대운 조화
+  let s=SS.BASE;
+  if(meta.yongsinO.includes(ganO))s+=SS.YONG_GAN;
+  if(meta.yongsinO.includes(jiO))s+=SS.YONG_JI;
+  if(meta.huisinO.includes(ganO))s+=SS.HUI_GAN;
+  if(meta.huisinO.includes(jiO))s+=SS.HUI_JI;
+  if(meta.gisinO.includes(ganO))s+=SS.GI_GAN;
+  if(meta.gisinO.includes(jiO))s+=SS.GI_JI;
   if(meta.daeunO){
-    if(meta.yongsinO.includes(meta.daeunO))s+=7;
-    else if(meta.gisinO.includes(meta.daeunO))s-=5;
+    if(meta.yongsinO.includes(meta.daeunO))s+=SS.DAEUN_YONG;
+    else if(meta.gisinO.includes(meta.daeunO))s+=SS.DAEUN_GI;
   }
-  // 세운 지지와 일지의 삼합·육합(+) / 충(-)
   if(meta.dayJi){
-    if(CHUNG[meta.dayJi]===ji)s-=6;
-    else if((SAMHAP[meta.dayJi]||[]).includes(ji))s+=5;
-    else if(YUKHAP[meta.dayJi]===ji)s+=4;
+    if(CHUNG[meta.dayJi]===ji)s+=SS.CHUNG;
+    else if((SAMHAP[meta.dayJi]||[]).includes(ji))s+=SS.SAMHAP;
+    else if(YUKHAP[meta.dayJi]===ji)s+=SS.YUKHAP;
   }
-  if(month)s=72+Math.round((s-72)*0.7); // 월별은 변동폭 축소
-  return Math.max(48,Math.min(97,Math.round(s)));
+  if(month)s=SS.BASE+Math.round((s-SS.BASE)*SS.MONTH_DAMP);
+  return Math.max(SS.SCORE_MIN,Math.min(SS.SCORE_MAX,Math.round(s)));
 }
 const SEUN_AREAS=["건강","재물","커리어","관계","애정"];
 function calcSeunAreas(yr,month,meta){
   const base=calcSeunScore(yr,month,meta);
-  const seed=yr*13+(month||0)*7;
-  return Object.fromEntries(SEUN_AREAS.map((k,i)=>[k,Math.max(45,Math.min(96,base+(((seed*(i+5))%15)-7)))]));
+  const seed=yr*SS.AREA_SEED_Y+(month||0)*SS.AREA_SEED_M;
+  return Object.fromEntries(SEUN_AREAS.map((k,i)=>[k,Math.max(SS.AREA_MIN,Math.min(SS.AREA_MAX,base+(((seed*(i+5))%SS.AREA_MOD)-SS.AREA_OFFSET)))]));
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -197,7 +221,7 @@ const ILGAN_DESC = {
     core: "정화(丁火): 촛불처럼 작지만 꾸준하고 따뜻한 빛을 내는 타입이에요. 섬세함과 집중력이 강해요.",
     strong: "신강(身强) 정화(丁火): 자기만의 세계가 뚜렷하고 창의성이 풍부해요. 에너지가 강할 때는 수·토로 방향을 잡아주면 더 빛나요. 한 가지에 깊이 몰입하는 전문가 기질이에요.",
     weak: "신약(身弱) 정화(丁火): 감수성과 직관이 예민해요. 목·화를 통해 에너지를 채우는 것이 중요해요. 예술·음악·글쓰기 등 창작 영역에서 남다른 재능을 보여요.",
-    strengths: ["한 가지에 몰입하면 누구도 따라올 수 없는 깊이가 나와요. 전문가로 성장하는 데 최고의 구조예요.", "섬세하고 따뜻한 감성으로 사람들의 마음을 움직여요. 작은 것에서 큰 의미를 찾는 능력이 있어요.", "꾸준함이 강점이에요. 華(화려함)보다 지속적인 빛을 내는 타입으로 오래 기억에 남아요."],
+    strengths: ["한 가지에 몰입하면 누구도 따라올 수 없는 깊이가 나와요. 전문가로 성장하는 데 최고의 구조예요.", "섬세하고 따뜻한 감성으로 사람들의 마음을 움직여요. 작은 것에서 큰 의미를 찾는 능력이 있어요.", "꾸준함이 강점이에요. 화려함보다 지속적인 빛을 내는 타입으로 오래 기억에 남아요."],
     challenges: ["너무 깊이 몰입해서 주변을 놓치는 경우가 있어요. 숲을 못 보고 나무만 보는 패턴이에요.", "감수성이 예민해서 상처를 깊게 받아요. 오랫동안 기억하고 곱씹는 경향이 있어요.", "자신의 세계에 빠지면 소통이 줄어요. 외부와 연결을 의식적으로 유지해야 해요."],
     bestEnv: "깊이 몰입할 수 있는 전문 분야예요. 연구, 창작, 작곡, 글쓰기, 치료사, 상담가처럼 한 사람 또는 한 주제와 깊게 연결되는 환경에서 빛나요. 시끄럽고 산만한 환경은 에너지를 소진시켜요.",
     recovery: "혼자만의 고요한 시간이 필수예요. 독서, 음악 감상, 캔들 켜놓고 글쓰기처럼 집중과 감성이 함께하는 활동이 충전이에요. 좋아하는 사람 한두 명과의 깊은 대화도 에너지를 채워줘요.",
@@ -410,13 +434,13 @@ const ILJU_CHAR = {
   무진:"戊辰 일주: 카리스마와 포용력을 겸비했어요. 대인 관계가 넓고 영향력이 커요.",
   무오:"戊午 일주: 열정적이고 강인해요. 어떤 상황에서도 포기하지 않는 강한 의지력이 있어요.",
   무신:"戊申 일주: 영리하고 임기응변이 탁월해요. 어떤 환경에서도 살아남는 적응력이 있어요.",
-  무술:"묵직하고 강인한 에너지예요. 한번 결심한 것은 산처럼 흔들리지 않아요. 겉으로는 과묵하지만 내면엔 강한 신념과 원칙이 있고, 시간이 오래 걸려도 끝까지 해내는 완주력이 있어요. 술토(戌土)의 지장간에 정화(丁火)가 숨겨져 있어 겉모습과 달리 내면이 뜨겁고, 가끔 전혀 예상치 못한 순간에 감정이 터져나오는 낙차가 있어요. 축술형(丑戌刑)이 발동하는 구조라, 믿었던 사람에게 뜻밖의 배신이나 실망을 겪는 경험이 인생에서 중요한 전환점이 돼요.",
+  무술:"묵직하고 강인한 에너지예요. 한번 결심한 것은 산처럼 흔들리지 않아요. 겉으로는 과묵하지만 내면엔 강한 신념과 원칙이 있고, 시간이 오래 걸려도 끝까지 해내는 완주력이 있어요. 戌土의 지장간에 정화(丁火)가 숨겨져 있어 겉모습과 달리 내면이 뜨겁고, 가끔 전혀 예상치 못한 순간에 감정이 터져나오는 낙차가 있어요. 축술형(丑戌刑)이 발동하는 구조라, 믿었던 사람에게 뜻밖의 배신이나 실망을 겪는 경험이 인생에서 중요한 전환점이 돼요.",
   기축:"己丑 일주: 성실하고 끈기 있어요. 천천히 하지만 가장 높은 곳까지 올라가는 타입이에요.",
   기묘:"己卯 일주: 유연하고 감성적이에요. 사람들 사이에서 자연스럽게 중심을 잡는 타입이에요.",
   기사:"己巳 일주: 지혜롭고 현실적이에요. 직관과 실용성이 조화를 이루는 타입이에요.",
   기미:"己未 일주: 따뜻하고 배려심이 깊어요. 주변을 편안하게 만드는 포용력이 있어요.",
   기유:"己酉 일주: 섬세하고 분석적이에요. 완벽을 추구하며 세부사항에 강한 타입이에요.",
-  기해:"직관적이고 포용력이 깊어요. 물처럼 유연하게 상황에 적응하면서도 흔들리지 않는 중심이 있어요. 해수(亥水) 위의 기토(己土)라 습기를 머금은 대지처럼, 타인의 감정을 자연스럽게 흡수하고 공감하는 능력이 탁월해요. 표면적으로는 온화하지만, 한번 결심하면 물이 낮은 곳으로 흐르듯 끝까지 방향을 잃지 않는 집요함이 있어요.",
+  기해:"직관적이고 포용력이 깊어요. 물처럼 유연하게 상황에 적응하면서도 흔들리지 않는 중심이 있어요. 亥水 위의 己土라 습기를 머금은 대지처럼, 타인의 감정을 자연스럽게 흡수하고 공감하는 능력이 탁월해요. 표면적으로는 온화하지만, 한번 결심하면 물이 낮은 곳으로 흐르듯 끝까지 방향을 잃지 않는 집요함이 있어요.",
   경자:"庚子 일주: 지적이고 활동적이에요. 빠른 판단력과 추진력이 강점이에요.",
   경인:"庚寅 일주: 도전적이고 강인해요. 두려움 없이 새로운 길을 개척하는 타입이에요.",
   경진:"庚辰 일주: 카리스마가 넘치고 통솔력이 있어요. 타고난 리더 기질이에요.",
@@ -1415,10 +1439,14 @@ function TabAstro({d}){
   const [loadingTarot,setLoadingTarot]=React.useState(true);
   const [errAstro,setErrAstro]=React.useState(false);
   const [errTarot,setErrTarot]=React.useState(false);
+  const fetchNatalRef=React.useRef(null);
+  const fetchTarotRef=React.useRef(null);
 
   React.useEffect(()=>{
     let cancelled=false;
     async function fetchNatal(){
+      setLoadingAstro(true);
+      setErrAstro(false);
       try{
         const pillarsStr=d.pillars?.map(p=>`${p.name} ${p.gan.hanja}${p.ji.hanja}`).join(", ")||"";
         const ilganKo=d.pillars?.[2]?.gan?.ko||"무";
@@ -1432,15 +1460,20 @@ JSON만 응답 (다른 텍스트 없음):
         const res=await fetch("/.netlify/functions/claude",{
           method:"POST",
           headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1200,messages:[{role:"user",content:prompt}]})
+          body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:1200,messages:[{role:"user",content:prompt}]})
         });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
         const data=await res.json();
+        if(data.error) throw new Error(data.error.message||"API 오류");
         const text=data.content?.map(c=>c.text||"").join("").replace(/```json|```/g,"").trim();
-        if(!cancelled) setAstroAI(JSON.parse(text));
+        const parsed=JSON.parse(text);
+        if(!cancelled) setAstroAI(parsed);
       }catch(e){console.error("astro:",e);if(!cancelled)setErrAstro(true);}
       if(!cancelled) setLoadingAstro(false);
     }
     async function fetchTarot(){
+      setLoadingTarot(true);
+      setErrTarot(false);
       try{
         const ilganKo=d.pillars?.[2]?.gan?.ko||"무";
         const ilganHanja=d.pillars?.[2]?.gan?.hanja||"戊";
@@ -1450,18 +1483,22 @@ JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
         const res=await fetch("/.netlify/functions/claude",{
           method:"POST",
           headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:500,messages:[{role:"user",content:prompt}]})
+          body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:500,messages:[{role:"user",content:prompt}]})
         });
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
         const data=await res.json();
+        if(data.error) throw new Error(data.error.message||"API 오류");
         const text=data.content?.map(c=>c.text||"").join("").replace(/```json|```/g,"").trim();
-        if(!cancelled) setTarotAI(JSON.parse(text));
+        const parsed=JSON.parse(text);
+        if(!cancelled) setTarotAI(parsed);
       }catch(e){console.error("tarot:",e);if(!cancelled)setErrTarot(true);}
       if(!cancelled) setLoadingTarot(false);
     }
-    fetchNatal();
-    fetchTarot();
+    fetchNatalRef.current=fetchNatal;
+    fetchTarotRef.current=fetchTarot;
+    Promise.all([fetchNatal(), fetchTarot()]);
     return()=>{cancelled=true;};
-  },[]);
+  },[d.birth]);
 
   const sunData=astroAI||a;
   const achieveDesc=tarotAI?.achieveDesc||t.achieveDesc;
@@ -1504,7 +1541,10 @@ JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
           ? <><Skel h={12} w="100%"/><Skel h={12} w="90%"/><Skel h={12} w="70%"/></>
           : <p style={{fontSize:13,color:"#444",margin:0,lineHeight:1.8,textAlign:"justify"}}>{astroAI?.triangle||a.triangle}</p>}
       </div>
-      {errAstro&&<div style={{marginTop:8,padding:"9px 12px",background:"#fdecea",borderRadius:9,fontSize:12,color:"#b71c1c"}}>네이탈 차트 분석을 불러오지 못했어요. 잠시 후 다시 시도해주세요.</div>}
+      {errAstro&&<div style={{marginTop:8,padding:"11px 12px",background:"#fdecea",borderRadius:10,fontSize:12,color:"#b71c1c",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <span>네이탈 차트 분석을 불러오지 못했어요.</span>
+        <button onClick={()=>fetchNatalRef.current&&fetchNatalRef.current()} style={{fontSize:11,fontWeight:700,color:"#b71c1c",background:"none",border:"1px solid #b71c1c",borderRadius:6,padding:"3px 8px",cursor:"pointer",fontFamily:"inherit"}}>다시 시도</button>
+      </div>}
       {(a.yearTransit||[]).length>0&&<div style={{marginTop:12}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>주요 트랜짓 {CY}~{CY+4}</div>
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
           {a.yearTransit.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}><span style={{fontSize:13,fontWeight:900,color:"#111"}}>{y.year}년</span><span style={{fontSize:11,color:"#5e35b1",fontWeight:700}}>{y.planet}</span></div><div style={{fontSize:12,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
@@ -1540,7 +1580,10 @@ JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
               ? <><Skel h={11} w="100%"/><Skel h={11} w="90%"/><Skel h={11} w="70%"/></>
               : achieveDesc}
           </div>
-          {errTarot&&<div style={{fontSize:11,color:"#b71c1c",marginTop:4}}>분석을 불러오지 못했어요.</div>}
+          {errTarot&&<div style={{fontSize:11,color:"#b71c1c",marginTop:4,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <span>분석 실패</span>
+            <button onClick={()=>fetchTarotRef.current&&fetchTarotRef.current()} style={{fontSize:10,fontWeight:700,color:"#b71c1c",background:"none",border:"1px solid #b71c1c",borderRadius:5,padding:"2px 6px",cursor:"pointer",fontFamily:"inherit"}}>재시도</button>
+          </div>}
         </div>
       </div>
       <div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>연도별 개인연도수 & 타로</div>
