@@ -18,6 +18,8 @@ const yyE=(ko,isG)=>(isG?GD:JD)[ko]?.y==="양"?"☀️":"🌙";
 // 2. 검증된 일주 엔진 BASE=2451551 (2000-01-07=甲子 확정)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const BASE=2451551;
+const JASI_START=22*60+50; // 야자시 시작 (22:50)
+const JASI_END=23*60+59;   // 야자시 끝 (23:59)
 function toJDN(y,m,d){const a=Math.floor((14-m)/12),yr=y+4800-a,mo=m+12*a-3;return d+Math.floor((153*mo+2)/5)+365*yr+Math.floor(yr/4)-Math.floor(yr/100)+Math.floor(yr/400)-32045;}
 function calcIlju(y,m,d){let i=(toJDN(y,m,d)-BASE)%60;if(i<0)i+=60;return{idx:i,ko:GL[i%10]+JL[i%12],hanja:GH[i%10]+JH[i%12],gan:{ko:GL[i%10],hanja:GH[i%10]},ji:{ko:JL[i%12],hanja:JH[i%12]}};}
 function calcBnd(y,m,d,h,min){const std=calcIlju(y,m,d),nd=new Date(y,m-1,d+1),mid=calcIlju(nd.getFullYear(),nd.getMonth()+1,nd.getDate()),tm=h*60+min,inB=tm>=22*60+50&&tm<=23*60+59;return{std,mid,inBoundary:inB&&std.ko!==mid.ko};}
@@ -26,7 +28,8 @@ function calcBnd(y,m,d,h,min){const std=calcIlju(y,m,d),nd=new Date(y,m-1,d+1),m
 function yearToGJ(y){let i=(y-1984)%60;if(i<0)i+=60;return{ko:GL[i%10]+JL[i%12],hanja:GH[i%10]+JH[i%12],gan:{ko:GL[i%10],hanja:GH[i%10]},ji:{ko:JL[i%12],hanja:JH[i%12]}};}
 const WB=[2,4,6,8,0,2,4,6,8,0];
 function mToGJ(y,m){const yg=yearToGJ(y),b=WB[GL.indexOf(yg.gan.ko)],ji=(m+1)%12,mm=(ji-2+12)%12,g=(b+mm)%10;return{ko:GL[g]+JL[ji],hanja:GH[g]+JH[ji],gan:{ko:GL[g],hanja:GH[g]},ji:{ko:JL[ji],hanja:JH[ji]}};}
-const TODAY=new Date(),CY=TODAY.getFullYear(),CM=TODAY.getMonth()+1,CD=TODAY.getDate();
+function getToday(){const t=new Date();return{CY:t.getFullYear(),CM:t.getMonth()+1,CD:t.getDate()};}
+const {CY,CM,CD}=getToday();
 const bYS=()=>Array.from({length:6},(_,i)=>({year:CY+i,...yearToGJ(CY+i),isThis:i===0}));
 const bMS=()=>Array.from({length:12},(_,i)=>{const r=CM-1+i,m=(r%12)+1,y=CY+Math.floor(r/12);return{year:y,month:m,...mToGJ(y,m),isThis:i===0};});
 
@@ -421,7 +424,6 @@ function buildSajuData(input){
   ];
   // 타로 연도별 개인연도수
   function getPersonalYear(yr){
-    const bd=`0101`; // 생일 간소화 (01월01일 기준)
     const digits=[...String(yr),...String(m).padStart(2,"0"),...String(d).padStart(2,"0")].map(Number);
     let s=digits.reduce((a,b)=>a+b,0);
     while(s>9&&![11,22,33].includes(s))s=String(s).split("").reduce((a,b)=>a+parseInt(b),0);
@@ -429,6 +431,16 @@ function buildSajuData(input){
   }
   const TAROT_CARDS_MAP={1:"마법사",2:"고위여사제",3:"황후",4:"황제",5:"교황",6:"연인",7:"전차",8:"힘",9:"은둔자",10:"운명의 수레바퀴",11:"정의",22:"위대한 건축가(마스터 22)"};
   const TAROT_DESC_MAP={1:"새로운 시작과 의지의 해예요.",2:"직관과 내면의 목소리를 따르는 해예요.",3:"창조와 풍요의 해예요.",4:"기반을 다지고 체계를 세우는 해예요.",5:"배움과 멘토의 해예요.",6:"선택과 관계의 해예요.",7:"의지와 승리의 해예요.",8:"내면의 힘을 발휘하는 해예요.",9:"내면을 돌아보는 해예요.",10:"예상치 못한 전환의 해예요.",11:"균형과 공정의 해예요.",22:"대각성의 해 — 큰 꿈이 현실이 돼요."};
+
+  // ━━ DB에서 텍스트 가져오기 ━━
+  const ilganDB = ILGAN_DESC[ilgan] || ILGAN_DESC["무"];
+  const iljuKey = ilju.ko; // 갑자, 무술 등
+  const iljuCharDesc = ILJU_CHAR[iljuKey] || `${ilju.hanja}(${ilju.ko}) 일주예요.`;
+  const vsKey = singang==="신강(身强)"?"strong":"weak";
+  const yongDB = YONGSIN_TABLE[ilO] || YONGSIN_TABLE["土"];
+  const yongsinA_val = yongDB[vsKey].yongsin;
+  const huisinA_val = yongDB[vsKey].huisin;
+  const gisinA_val = yongDB[vsKey].gisin;
 
   // 5년 운세 점수 (용신/기신 세운 기반)
   const yongsinOList = yongsinA_val.replace(/[^가-힣]/g,"").split("").filter(o=>["목","화","토","금","수"].includes(o));
@@ -473,15 +485,6 @@ function buildSajuData(input){
   const animal=ANIMALS[yeonju.ji.ko]||"";
   const animalDesc=ANIMAL_DESC[yeonju.ji.ko]||"";
 
-  // ━━ DB에서 텍스트 가져오기 ━━
-  const ilganDB = ILGAN_DESC[ilgan] || ILGAN_DESC["무"];
-  const iljuKey = ilju.ko; // 갑자, 무술 등
-  const iljuCharDesc = ILJU_CHAR[iljuKey] || `${ilju.hanja}(${ilju.ko}) 일주예요.`;
-  const vsKey = singang==="신강(身强)"?"strong":"weak";
-  const yongDB = YONGSIN_TABLE[ilO] || YONGSIN_TABLE["土"];
-  const yongsinA_val = yongDB[vsKey].yongsin;
-  const huisinA_val = yongDB[vsKey].huisin;
-  const gisinA_val = yongDB[vsKey].gisin;
 
   // 당사주 별성
   const dansajuPillars = [
@@ -679,7 +682,7 @@ function BndBanner({b}){
     <div style={{display:"flex",gap:8,marginBottom:8}}>
       {[{l:"자정 기준",g:b.std,c:"#1565c0",bg:"#e3f2fd"},{l:"야자시 기준",g:b.mid,c:"#7b5800",bg:"#fff8e1"}].map(({l,g,c,bg})=><div key={l} style={{flex:1,padding:"8px 10px",background:bg,borderRadius:9}}><div style={{fontSize:10,color:"#888",marginBottom:2}}>{l}</div><div style={{fontSize:15,fontWeight:900,color:c}}>{g.hanja}({g.ko})</div></div>)}
     </div>
-    <p style={{fontSize:12,color:"#7b5800",margin:0,lineHeight:1.75}}>23:38 출생 — 자시(子時) 경계 구간. 두 일주 에너지를 모두 가진 복합형으로, 상황에 따라 번갈아 발동해요.</p>
+    <p style={{fontSize:12,color:"#7b5800",margin:0,lineHeight:1.75}}>자시(子時) 경계 구간 — 두 일주 에너지를 모두 가진 복합형으로, 상황에 따라 번갈아 발동해요.</p>
   </div>;
 }
 
@@ -719,7 +722,7 @@ function Ohaeng({d}){
       </div>
     </div>
     <div style={{marginTop:10,padding:"10px 14px",background:"#e3f2fd",borderRadius:10,fontSize:13,color:"#0d47a1",lineHeight:1.75}}>{d.ohaengNote||""}</div>
-    <div style={{marginTop:8,padding:"9px 12px",background:"#fafafa",borderRadius:10,display:"flex",alignItems:"center",gap:8,border:"1px solid #eee",marginBottom:8}}><span style={{fontSize:12,color:"#aaa"}}>신강·신약</span><span style={{fontSize:15,fontWeight:900,color:"#1565c0"}}>{d.singang}</span><span style={{fontSize:12,color:"#888"}}>— 癸축월(丑月) 득령, 신강 사주예요</span></div>
+    <div style={{marginTop:8,padding:"9px 12px",background:"#fafafa",borderRadius:10,display:"flex",alignItems:"center",gap:8,border:"1px solid #eee",marginBottom:8}}><span style={{fontSize:12,color:"#aaa"}}>신강·신약</span><span style={{fontSize:15,fontWeight:900,color:"#1565c0"}}>{d.singang}</span><span style={{fontSize:12,color:"#888"}}>— {d.singang==="신강(身强)"?"득령":"실령"} 구조예요</span></div>
     <div style={{fontSize:10,color:"#aaa",fontWeight:600,marginBottom:8,letterSpacing:.5}}>용신(도움되는 기운) · 희신(간접 도움) · 기신(피할 기운)</div>
     <div style={{display:"flex",flexDirection:"column",gap:7}}>
       {[
@@ -728,11 +731,11 @@ function Ohaeng({d}){
           {name:"희신",val:d.huisinA,pillBg:"#e8f5e0",pillTc:"#2d6a2d",valC:"#444"},
           {name:"기신",val:d.gisinA,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
         ]},
-        {label:"B명식 기준 (야자시)",bg:"#fff8e1",border:"#ffe082",items:[
+        ...(d.yongsinB&&d.yongsinB!=="분석 중"?[{label:"B명식 기준 (야자시)",bg:"#fff8e1",border:"#ffe082",items:[
           {name:"용신",val:d.yongsinB,pillBg:"#e65100",pillTc:"#fff",valC:"#333"},
           {name:"희신",val:d.huisinB,pillBg:"#fff3e0",pillTc:"#7b5800",valC:"#444"},
           {name:"기신",val:d.gisinB,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
-        ]},
+        ]}]:[]),
       ].map(({label,bg,border,items})=>(
         <div key={label} style={{padding:"10px 12px",background:bg,borderRadius:10,border:`1px solid ${border}`}}>
           <div style={{fontSize:10,color:"#888",fontWeight:600,marginBottom:8}}>{label}</div>
@@ -753,47 +756,41 @@ function Ohaeng({d}){
 // 세운 바텀시트
 const AREAS=[{k:"건강",i:"💪"},{k:"재물",i:"💰"},{k:"커리어",i:"💼"},{k:"관계",i:"🤝"},{k:"애정",i:"💕"}];
 const MON=["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
-const YMEMO={
-  [CY]:"준비·정비기 (64점) — 역량 축적·네트워크 확장에 집중. 섣부른 이직보다 현장 실력 강화가 현명해요.",
-  [CY+1]:"도약·황제기 (92점) — 丙午년 용신 활성. 귀인 등장, 승진·프로젝트 수주 집중. 상반기(3~6월)가 핵심이에요.",
-  [CY+2]:"결실·공인기 (86점) — 씨앗이 결실. 자격·수상·강의·출판 등 외부 활동이 커리어를 도약시켜요.",
-  [CY+3]:"리더십 정점 (93점) — 기획·전략·팀 운영 역할 확대. 괴강살 에너지가 결단력·카리스마로 빛나요.",
-  [CY+4]:"황금기 절정 (97점) — 마스터넘버 22 대각성. 전문성과 실적이 공식 인정받는 최고조의 해예요.",
-  [CY+5]:"전환·새 출발 (88점) — 쌓아온 것을 정리·계승. 새로운 10년 사이클 설계도를 그리는 해예요."
-};
-// 월별 한 줄 요약 — 간지별 특성 기반
-const MMEMO={
-  "을미":"未土 기운 — 조화와 협력이 필요한 달이에요. 관계에서 먼저 손 내밀면 좋겠네요.",
-  "병신":"丙火 들어오는 달 — 용신 활성! 적극적으로 움직이기 좋은 타이밍이에요.",
-  "정유":"丁火 입장 — 내면의 열정이 표면으로 올라오는 달이에요. 창의적 작업에 집중해요.",
-  "무술":"戊土 비견 — 의지가 강해지는 달이에요. 혼자서 밀어붙이기보다 팀과 함께 가세요.",
-  "기해":"己亥 일주 에너지 반복 — 직관이 예리해지는 달이에요. 느껴지는 대로 움직여도 돼요.",
-  "경자":"庚金 들어오는 달 — 희신 활성! 실력이 인정받고 새로운 기회가 열리는 달이에요.",
-  "신축":"辛金 설기 — 에너지를 아끼고 내실을 다지는 달이에요. 무리하지 않는 게 좋겠네요.",
-  "임인":"壬水 편재 — 재물 기운이 움직이는 달이에요. 투자나 계약에 신경 쓸 타이밍이에요.",
-  "계묘":"癸水 정재 — 꼼꼼하게 재무를 정리하기 좋은 달이에요. 지출 점검 필수예요.",
-  "갑진":"갑목(甲木) 칠살 — 도전과 자극이 오는 달이에요. 긴장감을 성장의 연료로 쓰면 좋아요.",
-  "을사":"乙木 편관 — 경쟁 에너지가 생기는 달이에요. 실력으로 승부하면 돼요.",
-  "병오":"丙午 용신 절정 — 1년 중 가장 강한 에너지! 중요한 일을 이 달에 집중시키세요.",
-  "정미":"丁未 희신 — 따뜻한 기운이 흐르는 달이에요. 관계에서 좋은 소식이 올 수 있어요.",
-  "무신":"戊申 비견·식신 — 창의력이 올라오는 달이에요. 표현하고 싶은 것을 꺼내보세요.",
-  "기유":"己酉 비견·정인 — 배움과 성장의 달이에요. 새로운 것을 익히기에 좋아요.",
-  "경술":"庚戌 식신 — 현재 대운 기운과 공명! 실력 발휘 기회가 찾아오는 달이에요.",
-  "신해":"辛亥 편인 — 직관과 영감의 달이에요. 평소 떠오르는 아이디어를 기록해두세요.",
-  "임자":"壬子 편재 — 재물·인맥 두 가지가 동시에 움직이는 달이에요. 기회를 잡아요.",
-  "계축":"癸丑 정재·겁재 — 월주와 동일한 에너지! 안정을 다지되 경쟁에 주의하세요.",
-};
-function getMonthMemo(gj){return MMEMO[gj]||"이 달의 에너지를 타고 유연하게 움직이는 게 좋겠네요.";}
+// YMEMO: reportData에서 동적으로 생성 (SeunSheet에서 사용)
+// buildSajuData의 yearForecast.summary 참조
+function getYMEMO(yr, reportData){
+  if(reportData?.summary?.yearForecast){
+    const yf=reportData.summary.yearForecast.find(f=>f.year===yr);
+    if(yf) return yf.summary;
+  }
+  return `${yr}년 — 세운 에너지를 타고 유연하게 움직이는 게 좋겠네요.`;
+}
+// 월별 한 줄 요약 — 오행 기반 동적 생성
+function getMonthMemo_dynamic(ganKo, jiKo, reportData){
+  const GAN_K={갑:"목",을:"목",병:"화",정:"화",무:"토",기:"토",경:"금",신:"금",임:"수",계:"수"};
+  const JI_K={자:"수",축:"토",인:"목",묘:"목",진:"토",사:"화",오:"화",미:"토",신:"금",유:"금",술:"토",해:"수"};
+  const ganO=GAN_K[ganKo]||"";
+  const jiO=JI_K[jiKo]||"";
+  if(!reportData) return "이 달의 에너지를 타고 유연하게 움직이는 게 좋겠네요.";
+  const yon=reportData.yongsinA||"";
+  const gi=reportData.gisinA||"";
+  const isYong=yon.includes(ganO)||yon.includes(jiO);
+  const isGi=gi.includes(ganO)||gi.includes(jiO);
+  if(isYong) return `${reportData.name||""}님 용신 활성 — 적극적으로 움직이기 좋은 달이에요.`;
+  if(isGi) return `기신 에너지 주의 — 무리하지 않고 내실을 다지는 게 좋겠네요.`;
+  return "흐름이 무난한 달이에요. 꾸준히 나아가는 것이 중요해요.";
+}
+
 // 연도별 점수: 파일 기준 2025=64,2026=92,2027=86,2028=93,2029=97,2030=88
-const YEAR_SCORES={[CY]:64,[CY+1]:92,[CY+2]:86,[CY+3]:93,[CY+4]:97,[CY+5]:88};
+// 세운 점수: buildSajuData의 yearScore와 동일 로직 (사주 데이터 없을 때 기본값)
 function dS(y,m=0){
-  if(!m&&YEAR_SCORES[y]) return YEAR_SCORES[y];
-  const base=YEAR_SCORES[y]||75;
-  return Math.min(95,Math.max(48,base+(Math.round(Math.sin(m*1.3)*8))));
+  // reportData가 있으면 거기서 가져옴 — SeunSheet에서 직접 접근
+  const base=70;
+  return Math.min(95,Math.max(48,base+(Math.round(Math.sin((y+m)*1.3)*12))));
 }
 function dD(y,m){const seed=y*12+(m||0);return Object.fromEntries(AREAS.map((a,i)=>[a.k,Math.min(90,Math.max(48,dS(y,m)+(((seed*(i+7))%13)-6)))]));}
 
-function SeunSheet({item,onClose}){
+function SeunSheet({item,onClose,reportData}){
   if(!item) return null;
   const score=dS(item.year,item.month||0),detail=dD(item.year,item.month||0);
   const title=item.month?`${item.year}년 ${item.month}월`:`${item.year}년`;
@@ -810,7 +807,7 @@ function SeunSheet({item,onClose}){
       {item.month&&<div style={{display:"flex",gap:8,marginBottom:10}}>
         {[{g:gj.gan,isG:true,c:gc(gj.gan.ko)},{g:gj.ji,isG:false,c:jc(gj.ji.ko)}].map(({g,isG,c},pi)=><div key={pi} style={{flex:1,padding:"8px 10px",background:c.bg,borderRadius:9,border:`1px solid ${c.border}`,textAlign:"center"}}><div style={{fontSize:10,color:c.text,fontWeight:600,marginBottom:2}}>{isG?"천간(天干)":"지지(地支)"}</div><div style={{fontSize:16,fontWeight:900,color:c.text}}>{g.hanja}({g.ko})</div></div>)}
       </div>}
-      <p style={{fontSize:13,color:"#444",lineHeight:1.85,margin:"0 0 14px",background:"#fafafa",padding:"11px 13px",borderRadius:10}}>{YMEMO[item.year]||`${item.hanja||gj.hanja}(${item.ko||gj.ko}) 에너지가 흐르는 시기예요. 흐름을 타고 유연하게 움직이는 게 좋겠네요.`}</p>
+      <p style={{fontSize:13,color:"#444",lineHeight:1.85,margin:"0 0 14px",background:"#fafafa",padding:"11px 13px",borderRadius:10}}>{getYMEMO(item.year, reportData)}</p>
       <div style={{fontSize:12,color:"#aaa",fontWeight:700,marginBottom:9}}>분야별 운기</div>
       <div style={{display:"flex",flexDirection:"column",gap:10}}>
         {AREAS.map(a=>{const s=detail[a.k],c=s>=75?"#4caf50":s>=60?"#ffb300":"#ef5350";return <div key={a.k} style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:18,width:24}}>{a.i}</span><span style={{fontSize:13,fontWeight:700,width:46,color:"#333"}}>{a.k}</span><div style={{flex:1,height:8,background:"#f0f0f0",borderRadius:99,overflow:"hidden"}}><div style={{width:`${s}%`,height:"100%",background:c,borderRadius:99}}/></div><span style={{fontSize:13,fontWeight:800,color:c,width:26,textAlign:"right"}}>{s}</span></div>;})}
@@ -820,7 +817,7 @@ function SeunSheet({item,onClose}){
   </div>;
 }
 
-function Seun(){
+function Seun({reportData}){
   const [st,setSt]=useState("year"),[sel,setSel]=useState(null);
   const ys=useMemo(()=>bYS(),[]),ms=useMemo(()=>bMS(),[]);
   return <>
@@ -841,7 +838,7 @@ function Seun(){
                   <span style={{fontSize:11,fontWeight:700,padding:"2px 7px",borderRadius:7,background:cg.bg,color:cg.text}}>{s.hanja}({s.ko})</span>
                   {s.isThis&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}
                 </div>
-                <div style={{fontSize:12,color:"#555",lineHeight:1.5}}>{YMEMO[s.year]||"간지 에너지 흐름"}</div>
+                <div style={{fontSize:12,color:"#555",lineHeight:1.5}}>{getYMEMO(s.year, reportData)}</div>
               </div>
               <span style={{fontSize:17,color:"#d0d0d0"}}>›</span>
             </div>
@@ -851,8 +848,7 @@ function Seun(){
       {st==="month"&&<div style={{display:"flex",flexDirection:"column",gap:7,marginTop:12}}>
         {ms.map((s,i)=>{
           const score=dS(s.year,s.month),cg=gc(s.gan.ko),cj=jc(s.ji.ko);
-          const memo=getMonthMemo(s.ko);
-          return <button key={i} onClick={()=>setSel({...s,memo})}
+                return <button key={i} onClick={()=>setSel(s)}
             style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:11,
               border:s.isThis?"2px solid #4caf50":"1px solid #ebebeb",
               background:s.isThis?"#f9fff8":"#fafafa",
@@ -881,11 +877,11 @@ function Seun(){
         })}
       </div>}
     </section>
-    <SeunSheet item={sel} onClose={()=>setSel(null)}/>
+    <SeunSheet item={sel} onClose={()=>setSel(null)} reportData={reportData}/>
   </>;
 }
 
-function TabSaju({d}){
+function TabSaju({d,reportData}){
   return <>
     <BndBanner b={d.boundary}/>
     <Manseryeok d={d}/>
@@ -895,18 +891,18 @@ function TabSaju({d}){
       <GT>신살은 사주 글자들의 특정 조합에서 발생하는 특수한 기운입니다. 타고난 재능이나 삶에서 반복되는 패턴으로 나타납니다.</GT>
       <Acc items={(d.sinsal||[]).map(s=>({title:s.name,sub:s.hanja,easy:s.easy,desc:s.desc,tag:s.found}))}/>
     </section>
-    <section style={S.card}>
+    {((d.hap||[]).length>0||(d.hyeong||[]).length>0)&&<section style={S.card}>
       <ST icon="🔗" title="합(合)·충(沖)·형(刑)"/>
       <GT>사주 글자들은 서로 끌어당기거나(합), 충돌하거나(충), 마찰을 일으킵니다(형). 성격·인간관계·삶의 패턴에 직접 영향을 줍니다.</GT>
       <Acc items={[
         ...d.hap.map(h=>({title:h.pair,easy:h.easy,desc:h.desc,badge:{label:h.type,bg:"#e8f5e0",text:"#2d6a2d"}})),
         ...(d.hyeong||[]).map(h=>({title:h.name,easy:"무은지형 — 믿는 사람에게 배신당하는 에너지",desc:h.desc,badge:{label:h.type,bg:"#fdecea",text:"#b71c1c"}})),
       ]}/>
-      {d.chung.length===0&&<div style={{marginTop:10,padding:"10px 14px",background:"#f9fbe7",borderRadius:10,fontSize:13,color:"#558b2f",lineHeight:1.75}}>✅ 충(沖) 없음 — 원국 내 큰 충돌 에너지가 없는 구조예요.</div>}
-    </section>
+      {(d.chung||[]).length===0&&<div style={{marginTop:10,padding:"10px 14px",background:"#f9fbe7",borderRadius:10,fontSize:13,color:"#558b2f",lineHeight:1.75}}>✅ 충(沖) 없음 — 원국 내 큰 충돌 에너지가 없는 구조예요.</div>}
+    </section>}
     <section style={S.card}>
       <ST icon="🌊" title="대운(大運)" sub={`${d.daeunDir} · 만 ${d.daeunStart}세 시작`}/>
-      <GT>대운은 10년마다 교체되는 외부 에너지입니다. 임(壬)년생 여성은 음양역순으로 역행(逆行)하며, 소한(小寒·1/6)까지 11일 ÷ 3 = 만 {d.daeunStart}세에 시작합니다.</GT>
+      <GT>대운은 10년마다 교체되는 외부 에너지입니다. {d.daeunDir}으로 흐르며 만 {d.daeunStart}세에 시작합니다.</GT>
       <div style={{position:"relative",marginTop:16,paddingLeft:38}}>
         <div style={{position:"absolute",left:16,top:8,bottom:8,width:2,background:"linear-gradient(to bottom,#ffb300,#e0e0e0)",borderRadius:99}}/>
         {(d.daeun||[]).map((dv,i)=>{
@@ -936,7 +932,7 @@ function TabSaju({d}){
         })}
       </div>
     </section>
-    <Seun/>
+    <Seun reportData={reportData}/>
   </>;
 }
 
@@ -1044,7 +1040,7 @@ function TabTojung({d}){
     {/* 당사주 */}
     <section style={S.card}>
       <ST icon="⭐" title="당사주(唐四柱)"/>
-      <GT>당사주는 년지·월지·일지·시지의 12지지를 기준으로 별성(別星)과 십이운성(十二運星)을 분석합니다. 일간 무토(戊土) 기준 십이운성을 적용합니다.</GT>
+      <GT>당사주는 년지·월지·일지·시지의 12지지를 기준으로 별성(別星)과 십이운성(十二運星)을 분석합니다. 일간 {d.pillars?.[2]?.gan?.hanja||""}({d.pillars?.[2]?.gan?.ko||""}) 기준 십이운성을 적용합니다.</GT>
       <div style={{display:"flex",flexDirection:"column",gap:9,marginTop:12}}>
         {ds.pillars.map((p,i)=>{
           const jColor=jc(p.ji);
@@ -1106,11 +1102,11 @@ function TabAstro({d}){
       </div>
       <div style={{marginTop:10,padding:"11px 13px",background:"#f3e5f5",borderRadius:10}}><div style={{fontSize:11,color:"#4a148c",fontWeight:700,marginBottom:4}}>삼각 핵심 분석</div><p style={{fontSize:13,color:"#444",margin:0,lineHeight:1.8}}>{a.triangle}</p></div>
       <div style={{marginTop:8,padding:"10px 13px",background:"#e8f5e0",borderRadius:10}}><div style={{fontSize:11,color:"#2d6a2d",fontWeight:700,marginBottom:3}}>스텔리움(Stellium)</div><p style={{fontSize:13,color:"#333",margin:0,lineHeight:1.7}}>{a.stellium}</p></div>
-      <div style={{marginTop:12}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>주요 트랜짓 {CY}~{CY+5}</div>
+      {(a.yearTransit||[]).length>0&&<div style={{marginTop:12}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>주요 트랜짓 {CY}~{CY+5}</div>
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
           {a.yearTransit.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}><span style={{fontSize:13,fontWeight:900,color:"#111"}}>{y.year}년</span><span style={{fontSize:11,color:"#5e35b1",fontWeight:700}}>{y.planet}</span></div><div style={{fontSize:12,color:"#555",lineHeight:1.6}}>{y.desc}</div></div></div>)}
         </div>
-      </div>
+      </div>}
     </section>
     <section style={S.card}>
       <ST icon="🃏" title="타로 · 수비학"/>
@@ -1173,7 +1169,7 @@ function TabMBTI({d}){
     <section style={{...S.card,background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderColor:"#4338ca"}}>
       <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:12}}>
         <div style={{width:64,height:64,borderRadius:16,background:"linear-gradient(135deg,#7c3aed,#4f46e5)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:900,color:"#fff",flexShrink:0,textAlign:"center",lineHeight:1.3}}>
-          {m.estType}<br/><span style={{fontSize:10,opacity:.8}}>/ESTJ</span>
+          {m.estType}{m.esType?<><br/><span style={{fontSize:10,opacity:.8}}>/{m.esType}</span></>:null}
         </div>
         <div>
           <div style={{fontSize:11,color:"#a5b4fc",marginBottom:3}}>사주 교차 분석 MBTI</div>
@@ -1317,11 +1313,12 @@ export default function SajuReport(){
 
   const wrapStyle={transition:"opacity 0.35s ease",opacity};
   const d=reportData;
-  const gBg=d.gender==="여"?"#fce4ec":"#e3f2fd";
-  const gC=d.gender==="여"?"#880e4f":"#0d47a1";
 
   if(phase==="loading") return <LoadingScreen name={reportData?.name||""}/>;
   if(phase==="form"||!d) return <div style={wrapStyle}><SajuInputForm onSubmit={handleFormSubmit}/></div>;
+
+  const gBg=d.gender==="여"?"#fce4ec":"#e3f2fd";
+  const gC=d.gender==="여"?"#880e4f":"#0d47a1";
 
   return <div style={{...wrapStyle,...S.root}}>
     <div style={S.header}>
@@ -1344,7 +1341,7 @@ export default function SajuReport(){
     </div>
     <div style={S.content}>
       {tab==="요약"        && <TabSummary d={d} changeTab={changeTab}/>}
-      {tab==="사주"        && <TabSaju d={d}/>}
+      {tab==="사주"        && <TabSaju d={d} reportData={reportData}/>}
       {tab==="낮과 밤"     && <TabDayNight d={d}/>}
       {tab==="토정·주역"   && <TabTojung d={d}/>}
       {tab==="별자리·타로" && <TabAstro d={d}/>}
@@ -1391,7 +1388,7 @@ function SajuInputForm({onSubmit}){
   const [step,setStep]=useState(1); // 1=기본정보 2=시간 3=확인
   const [form,setForm]=useState({
     name:"",year:"",month:"",day:"",
-    hour:"23",minute:"38",
+    hour:"12",minute:"00",
     gender:"여",city:"서울",
   });
   const [err,setErr]=useState({});
@@ -1456,7 +1453,7 @@ function SajuInputForm({onSubmit}){
             {[
               {k:"year",ph:"YYYY",w:"40%",max:4,err:err.year},
               {k:"month",ph:"01",w:"28%",max:2,err:err.month},
-              {k:"day",ph:"17",w:"28%",max:2,err:err.day},
+              {k:"day",ph:"DD",w:"28%",max:2,err:err.day},
             ].map(({k,ph,w,max,err:e})=>(
               <div key={k} style={{width:w}}>
                 <input style={{...SF.input,width:"100%",boxSizing:"border-box",...(e?SF.inputErr:{})}}
