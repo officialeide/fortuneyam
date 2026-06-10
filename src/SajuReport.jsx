@@ -16,6 +16,15 @@ const jc=ko=>OC[JD[ko]?.o||"土"];
 const yyE=(ko,isG)=>(isG?GD:JD)[ko]?.y==="양"?"☀️":"🌙";
 // 오행 한자→한글 (화면 표기는 한글만)
 const OHK={木:"목",火:"화",土:"토",金:"금",水:"수"};
+// 설명 문장 앞의 "○○ 일주:" / "갑목(甲木):" / "신약(身弱) 갑목(甲木):" 같은 머리말 제거
+// (제목에 이미 일주/일간이 표기되므로 본문에서는 설명 문장만 남김)
+const stripLead=(s)=>(s||"").replace(/^\s*[^:：]{1,40}[:：]\s*/,"").trim();
+// AI 응답에서 깨진 문자(replacement char), 마름모(◇/�), 이모지·잡기호 제거
+const cleanText=(s)=>(s||"")
+  .replace(/[\uFFFD\u25C6\u25C7\u2753\u2754\uFE0F]/g,"")
+  .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,"")
+  .replace(/ {2,}/g," ")
+  .trim();
 // 관성(官星) 오행 = 일간을 극(剋)하는 오행
 const GWAN_O={목:"금",화:"수",토:"목",금:"화",수:"토"};
 // 일간별 인물 키워드 (자연 비유, 동물 X)
@@ -469,18 +478,18 @@ const ILJU_CHAR = {
 
 // ━━ 당사주 별성 (전통 표준) ━━
 const BYEOLSEONG = {
-  자:{name:"귀문성(貴門星)",desc:"총명하고 귀인과 연결되는 문(門)의 별이에요. 사교성이 뛰어나고 도화 기운으로 자연스럽게 인연이 찾아와요."},
-  축:{name:"안명성(安命星)",desc:"성실·인내·우직함의 별이에요. 한 우물을 깊이 파는 지구력으로 묵묵히 일하고 천천히 성공하는 기운이에요."},
-  인:{name:"천인성(天印星)",desc:"하늘의 도장처럼 권위와 인정을 상징해요. 학문·자격·명예 분야에서 두각을 나타내는 기운이에요."},
-  묘:{name:"복성(福星)",desc:"복이 많은 별이에요. 귀인의 도움이 끊이지 않고, 예상치 못한 행운이 찾아오는 기운이에요."},
-  진:{name:"문창성(文昌星)",desc:"글과 학문의 별이에요. 언어·글쓰기·공부에서 두각을 나타내고 시험운이 강해요."},
-  사:{name:"역마성(驛馬星)",desc:"이동·변화·역동성의 별이에요. 한 곳에 오래 머물기보다 움직이며 성장하는 기운이에요."},
-  오:{name:"도화성(桃花星)",desc:"매력과 인기의 별이에요. 타고난 흡인력으로 주변 사람들을 자연스럽게 끌어당기는 기운이에요."},
-  미:{name:"화개성(華蓋星)",desc:"예술·종교·철학의 별이에요. 창의적 감성과 영적 직관이 뛰어난 기운이에요."},
-  신:{name:"총명성(聰明星)",desc:"뛰어난 지혜와 임기응변, 다재다능함의 별이에요. 손재주와 창의적 문제 해결력이 탁월해요."},
-  유:{name:"고독성(孤獨星)",desc:"독립과 자립의 별이에요. 혼자만의 시간에서 에너지를 얻고, 전문성을 쌓는 기운이에요."},
-  술:{name:"망신성(亡神星)",desc:"변동·관재·이동의 에너지예요. 예상치 못한 변화가 생기기 쉬운 구조이지만, 그 변화가 성장으로 이어져요."},
-  해:{name:"복덕성(福德星)",desc:"가장 복이 많은 별이에요. 순수하고 선량하며 풍요를 가져오는 기운으로, 주변을 이롭게 하는 사람이에요."},
+  자:{name:"귀문성(貴門星)",kw:"총명·사교·인연",desc:"총명하고 귀인과 연결되는 문(門)의 별이에요. 사교성이 뛰어나고 도화 기운으로 자연스럽게 인연이 찾아와요."},
+  축:{name:"안명성(安命星)",kw:"성실·인내·우직함",desc:"성실·인내·우직함의 별이에요. 한 우물을 깊이 파는 지구력으로 묵묵히 일하고 천천히 성공하는 기운이에요."},
+  인:{name:"천인성(天印星)",kw:"권위·학문·명예",desc:"하늘의 도장처럼 권위와 인정을 상징해요. 학문·자격·명예 분야에서 두각을 나타내는 기운이에요."},
+  묘:{name:"복성(福星)",kw:"복·귀인·행운",desc:"복이 많은 별이에요. 귀인의 도움이 끊이지 않고, 예상치 못한 행운이 찾아오는 기운이에요."},
+  진:{name:"문창성(文昌星)",kw:"글·학문·시험운",desc:"글과 학문의 별이에요. 언어·글쓰기·공부에서 두각을 나타내고 시험운이 강해요."},
+  사:{name:"역마성(驛馬星)",kw:"이동·변화·역동",desc:"이동·변화·역동성의 별이에요. 한 곳에 오래 머물기보다 움직이며 성장하는 기운이에요."},
+  오:{name:"도화성(桃花星)",kw:"매력·인기·흡인력",desc:"매력과 인기의 별이에요. 타고난 흡인력으로 주변 사람들을 자연스럽게 끌어당기는 기운이에요."},
+  미:{name:"화개성(華蓋星)",kw:"예술·영성·창의",desc:"예술·종교·철학의 별이에요. 창의적 감성과 영적 직관이 뛰어난 기운이에요."},
+  신:{name:"총명성(聰明星)",kw:"지혜·임기응변·다재다능",desc:"뛰어난 지혜와 임기응변, 다재다능함의 별이에요. 손재주와 창의적 문제 해결력이 탁월해요."},
+  유:{name:"고독성(孤獨星)",kw:"독립·자립·전문성",desc:"독립과 자립의 별이에요. 혼자만의 시간에서 에너지를 얻고, 전문성을 쌓는 기운이에요."},
+  술:{name:"망신성(亡神星)",kw:"변동·관재·이동",desc:"변동·관재·이동의 에너지예요. 예상치 못한 변화가 생기기 쉬운 구조이지만, 그 변화가 성장으로 이어져요."},
+  해:{name:"복덕성(福德星)",kw:"복덕·순수·풍요",desc:"가장 복이 많은 별이에요. 순수하고 선량하며 풍요를 가져오는 기운으로, 주변을 이롭게 하는 사람이에요."},
 };
 
 // ━━ 십이운성 (일간 무토 기준 예시 → 실제는 일간별 계산) ━━
@@ -714,31 +723,51 @@ function buildSajuData(input){
 
   const yearGanYang=isYang(yeonju.gan.ko);
   const forward=(yearGanYang&&gender==="남")||(!yearGanYang&&gender==="여");
-  // 대운 시작 나이: 생일부터 절입일까지의 날수 ÷ 3 (반올림)
-  const JEOLIP_DAYS=[0,35,65,96,125,156,186,216,247,277,308,337,366]; // 각 월 절입 기준(대략)
+  // ━━ 대운 시작 나이 (표준 만세력 공식) ━━
+  //   순행: 생일 → 다음 절입(節入)까지 날수 ÷ 3
+  //   역행: 직전 절입 → 생일까지 날수 ÷ 3
+  //   (날수 3일 = 대운 1년, 1일 = 4개월)
   const calcDaeunStartAge=(()=>{
-    // 월주 간지 기준 절입일 계산: 현재 월의 절입 기준 날짜
-    const JI_MONTH_IDX={인:0,묘:1,진:2,사:3,오:4,미:5,신:6,유:7,술:8,해:9,자:10,축:11};
-    const mJiIdx=JI_MONTH_IDX[monthJi]??0;
-    // 절기 기준 날짜 (매월 초 절입) - 출생월 기준으로 다음/이전 절기까지 날수
-    const JEOLGI_MD=[[2,4],[3,6],[4,5],[5,6],[6,6],[7,7],[8,8],[9,8],[10,8],[11,7],[12,7],[1,6]];
-    const jg=JEOLGI_MD[mJiIdx]||[m,d];
+    // 12절기(월의 시작) 양력 근사일: 입춘(2/4)~소한(1/6)
+    // [월, 일] — 인월 시작=입춘(2/4), 묘월=경칩(3/6)...
+    const JEOLIP=[
+      [2,4],   // 입춘 → 인월
+      [3,6],   // 경칩 → 묘월
+      [4,5],   // 청명 → 진월
+      [5,6],   // 입하 → 사월
+      [6,6],   // 망종 → 오월
+      [7,7],   // 소서 → 미월
+      [8,8],   // 입추 → 신월
+      [9,8],   // 백로 → 유월
+      [10,8],  // 한로 → 술월
+      [11,7],  // 입동 → 해월
+      [12,7],  // 대설 → 자월
+      [1,6],   // 소한 → 축월
+    ];
+    const birth=new Date(y,m-1,d);
+    const MS=1000*60*60*24;
+    // 출생일 기준 직전/직후 절입일 찾기
+    const candidates=[];
+    for(let yy=y-1;yy<=y+1;yy++){
+      for(const [jm,jd] of JEOLIP){
+        candidates.push(new Date(yy,jm-1,jd));
+      }
+    }
+    candidates.sort((a,b)=>a-b);
+    let prevJeol=null,nextJeol=null;
+    for(const c of candidates){
+      if(c<=birth) prevJeol=c;
+      if(c>birth && !nextJeol) nextJeol=c;
+    }
     let distDays;
     if(forward){
-      // 순행: 다음 절기까지 남은 날수
-      const nextJeol=new Date(y,jg[0]-1,jg[1]);
-      const birth=new Date(y,m-1,d);
-      if(nextJeol<=birth) nextJeol.setFullYear(nextJeol.getFullYear()+1);
-      distDays=Math.round((nextJeol-birth)/(1000*60*60*24));
+      distDays=Math.round((nextJeol-birth)/MS);
     } else {
-      // 역행: 이전 절기까지 지난 날수
-      const prevJeol=new Date(y,jg[0]-1,jg[1]);
-      const birth=new Date(y,m-1,d);
-      if(prevJeol>=birth) prevJeol.setFullYear(prevJeol.getFullYear()-1);
-      distDays=Math.round((birth-prevJeol)/(1000*60*60*24));
+      distDays=Math.round((birth-prevJeol)/MS);
     }
+    // 절입 간격은 약 29~31일이므로 distDays는 0~31 범위 → ÷3 = 0~10세
     const age=Math.max(1,Math.round(distDays/3));
-    return age;
+    return Math.min(age,10); // 안전 상한
   })();
   const startAge=calcDaeunStartAge;
   const wGi=GL.indexOf(wolju.gan.ko),wJi=JL.indexOf(wolju.ji.ko);
@@ -822,6 +851,21 @@ function buildSajuData(input){
   const LP_DESC2={1:"의지와 실행의 에너지예요. 아이디어를 현실로 만드는 마법사예요.",2:"직관과 신비의 에너지예요. 보이지 않는 것을 보는 능력이 있어요.",3:"창조와 표현의 에너지예요. 무언가를 낳고 키우는 것이 삶의 핵심이에요.",4:"질서와 체계의 에너지예요. 꾸준히 쌓아 탑을 만드는 황제예요.",5:"자유와 변화의 에너지예요. 경험을 통해 성장하는 모험가예요.",6:"책임과 사랑의 에너지예요. 관계 속에서 꽃피는 타입이에요.",7:"탐구와 지혜의 에너지예요. 깊이 파고드는 분석가예요.",8:"힘과 성취의 에너지예요. 현실적인 성공을 향해 나아가요.",9:"완성과 봉사의 에너지예요. 세상에 나눠주는 사람이에요.",11:"영감과 이상의 에너지예요.\n마스터 넘버: 특별한 사명이 있어요.",22:"대건축가의 에너지예요.\n마스터 넘버 22: 꿈을 현실로 만드는 사람이에요."};
   const lifePathCard=LP_CARDS[lp]||`${lp}번 카드`;
   const lifePathDesc=LP_DESC2[lp]||`생명경로수 ${lp}번의 에너지예요.`;
+  // 영혼 카드 긴 설명 (성취 카드와 유사한 분량)
+  const SOUL_DESC={
+    1:"내면 깊은 곳에 '내 힘으로 무언가를 시작하고 싶다'는 강한 의지가 자리해요. 누군가 정해준 길을 따라가기보다, 스스로 첫 발자국을 찍을 때 비로소 살아있음을 느끼는 영혼이에요. 혼자 결정하고 책임지는 것을 두려워하지 않고, 오히려 그 과정에서 자신의 본질을 확인해요. 다만 모든 걸 혼자 짊어지려다 지칠 수 있으니, 의지할 줄 아는 것도 성장의 일부예요.",
+    2:"겉으로 드러내기보다 조용히 느끼고 헤아리는 데서 안정을 얻는 영혼이에요. 말로 다 표현되지 않는 미묘한 감정과 분위기를 예민하게 감지하고, 사람과 사람 사이를 부드럽게 잇는 역할에서 깊은 보람을 느껴요. 직관이 곧 나침반이라, 머리로 따지기 전에 마음이 먼저 답을 알아요. 다만 타인의 감정에 너무 깊이 물들지 않도록 자기만의 중심을 지키는 것이 중요해요.",
+    3:"무언가를 만들어내고 표현할 때 영혼이 가장 환하게 빛나요. 감정과 생각을 안에만 담아두면 답답해지고, 그것을 말·글·작품·관계로 풀어낼 때 비로소 자유로워져요. 사람들을 즐겁게 하고 분위기를 살리는 타고난 감각이 있어요. 다만 가볍게 흩어지기 쉬운 에너지라, 하나에 깊이 몰입하는 연습이 더 큰 결실을 만들어줘요.",
+    4:"질서와 안정 속에서 마음이 편안해지는 영혼이에요. 단단한 기초를 다지고 하나하나 쌓아 올릴 때 깊은 만족을 느끼고, 약속과 책임을 지키는 것에서 자기 가치를 확인해요. 화려함보다 꾸준함, 즉흥보다 계획을 신뢰하는 성실한 본성이 있어요. 다만 너무 틀에 갇히면 숨이 막힐 수 있으니, 가끔은 변화를 허용하는 유연함이 필요해요.",
+    5:"자유롭게 움직이고 새로운 것을 경험할 때 영혼이 숨을 쉬어요. 한 자리에 오래 묶여 있으면 답답함을 느끼고, 변화와 모험 속에서 자신을 발견하는 타입이에요. 호기심이 넘쳐 다양한 세계를 탐험하며 끊임없이 성장해요. 다만 모든 가능성을 열어두려다 정작 깊이 뿌리내리지 못할 수 있으니, 진짜 중요한 것에는 머무를 줄 아는 지혜가 필요해요.",
+    6:"사랑하고 보살피는 관계 속에서 영혼이 완성되는 타입이에요. 가까운 사람을 챙기고 책임지는 데서 깊은 의미를 찾고, 따뜻함과 조화를 만들어내는 능력이 탁월해요. 누군가에게 기댈 곳이 되어줄 때 가장 자기다움을 느껴요. 다만 타인을 위하느라 자신을 잃지 않도록, 나를 돌보는 것도 사랑임을 기억하는 게 중요해요.",
+    7:"홀로 깊이 사유하고 본질을 파고들 때 영혼이 충만해지는 타입이에요. 표면적인 답에 만족하지 못하고, 보이지 않는 원리와 진실을 탐구하는 데서 기쁨을 느껴요. 혼자만의 고요한 시간이 곧 에너지의 원천이에요. 다만 너무 안으로만 침잠하면 세상과 멀어질 수 있으니, 깨달은 것을 나누는 연결도 필요해요.",
+    8:"현실에서 구체적인 성취를 이뤄낼 때 영혼이 살아나는 타입이에요. 막연한 이상보다 손에 잡히는 결과를 만들고, 자신의 힘으로 영향력과 풍요를 일궈낼 때 깊은 만족을 느껴요. 강한 추진력과 현실 감각이 타고난 무기예요. 다만 성과에만 몰두하다 내면의 균형을 놓치지 않도록, 무엇을 위한 성공인지 늘 되묻는 게 중요해요.",
+    9:"세상에 베풀고 더 큰 가치에 기여할 때 영혼이 빛나는 타입이에요. 개인의 이익을 넘어 모두를 위한 무언가를 할 때 깊은 의미를 느끼고, 따뜻한 이해심과 넓은 시야를 가졌어요. 많은 것을 품고 놓아줄 줄 아는 성숙함이 본성이에요. 다만 모두를 끌어안으려다 지칠 수 있으니, 내려놓는 것도 사랑임을 아는 게 필요해요.",
+    11:"영감과 이상을 좇으며 사람들에게 빛을 비추는 영혼이에요. 마스터 넘버 11로서, 직관이 남달리 예민하고 보이지 않는 가능성을 먼저 감지해요. 자신보다 큰 무언가와 연결되어 있다는 감각이 늘 마음 깊은 곳에 있어요. 다만 높은 이상과 현실의 간극에서 흔들릴 수 있으니, 한 걸음씩 땅을 딛는 균형이 중요해요.",
+    22:"꿈을 현실의 구조물로 빚어내는 위대한 건축가의 영혼이에요. 마스터 넘버 22로서, 거대한 비전을 품으면서도 그것을 실제로 세워낼 수 있는 드문 힘을 가졌어요. 많은 사람에게 영향을 미치는 일에서 깊은 사명감을 느껴요. 다만 너무 큰 책임에 짓눌리지 않도록, 작은 성취들을 차곡차곡 쌓는 인내가 필요해요.",
+  };
+  const soulDesc_val=SOUL_DESC[lp]||LP_DESC2[lp]||`생명경로수 ${lp}번의 영혼 에너지예요.`;
   const currentAge=CY-y+1;
   const sang=(y%100)%8||8,jung=currentAge%6||6,ha=8;
   const sajaDB=TOJUNG_SAJA[sang]||TOJUNG_SAJA[5];
@@ -835,9 +879,9 @@ function buildSajuData(input){
     {ji:ilju.ji.ko,palace:"일주(배우자궁)"},
     {ji:siJi,palace:"시주(자녀궁)"},
   ].map(({ji,palace})=>{
-    const bs = BYEOLSEONG[ji] || {name:"분석 중",desc:""};
+    const bs = BYEOLSEONG[ji] || {name:"분석 중",kw:"",desc:""};
     const stage = getStage(ilgan,ji);
-    return {ji,byeolseong:bs.name,stage,palace,desc:bs.desc};
+    return {ji,byeolseong:bs.name,kw:bs.kw||"",stage,stageDesc:STAGE_DESC[stage]||"",palace,desc:bs.desc};
   });
 
   // 주역 본명괘 (사주 최다오행→상괘, 일간을 극하는 관성오행→하괘)
@@ -852,8 +896,8 @@ function buildSajuData(input){
   const headline_text = iljuCharDesc;
 
   // 성격 요약 persona (3개: 일주 / 일간 / 신살) — 타이틀에 한자 있으니 본문 반복 없음
-  const ilju_persona_desc = ILJU_CHAR[iljuKey] || `${OHK[ilO]} 기운의 일주예요.`;
-  const ilgan_persona_desc = ilganDB[vsKey] || ilganDB.core;
+  const ilju_persona_desc = stripLead(ILJU_CHAR[iljuKey]) || `${OHK[ilO]} 기운의 일주예요.`;
+  const ilgan_persona_desc = stripLead(ilganDB[vsKey]) || stripLead(ilganDB.core);
   const persona = [
     {icon:"🔮",title:`${ilju.hanja}(${ilju.ko}) 일주`,desc:ilju_persona_desc},
     {icon:"⭐",title:`${ilgan} 일간 (${OHK[ilO]} 기운)`,desc:ilgan_persona_desc},
@@ -891,8 +935,8 @@ function buildSajuData(input){
     name,birth:`양력 ${y}년 ${m}월 ${d}일 ${rawH}시 ${String(rawM).padStart(2,"0")}분 ${city}`,gender,
     personaTitle,scoreMeta,
     boundary:{...bnd,isBoundary:bnd.inBoundary,
-      standardDesc:`${ilju.hanja}(${ilju.ko}): ${ILJU_CHAR[iljuKey]||OHK[ilO]+" 기운의 일주예요."}\n${ilganDB.core}`,
-      midnightDesc:`${iljuB.hanja}(${iljuB.ko}): ${ILJU_CHAR[iljuB.ko]||OHK[normO(GAN_OE[ilganB])]+" 기운의 일주예요."}\n${(ILGAN_DESC[ilganB]||ILGAN_DESC["기"]).core}`,
+      standardDesc:`${stripLead(ILJU_CHAR[iljuKey])||OHK[ilO]+" 기운의 일주예요."}\n${stripLead(ilganDB.core)}`,
+      midnightDesc:`${stripLead(ILJU_CHAR[iljuB.ko])||OHK[normO(GAN_OE[ilganB])]+" 기운의 일주예요."}\n${stripLead((ILGAN_DESC[ilganB]||ILGAN_DESC["기"]).core)}`,
     },
     pillars,pillarsB,
     ohaengDist,singang,
@@ -908,7 +952,7 @@ function buildSajuData(input){
         {system:"사주",key:`${ilju.ko} 일주`,desc:ILGAN_PHILOSOPHY[ilgan]||ilganDB.core,insight:""},
         {system:"토정비결",key:sajaDB.saja,desc:sajaDB.desc,insight:""},
         {system:"주역",key:ichingData.name,desc:ichingData.nature,insight:""},
-        {system:"당사주",key:dansajuPillars.map(p=>p.byeolseong.split("(")[0]).join("·"),desc:`일주의 ${_dsName(dansajuPillars[2].byeolseong)}이 삶의 중심축이에요. 변동·관재·이동의 에너지를 가진 ${_dsName(dansajuPillars[0].byeolseong)}(년), ${dansajuPillars[1].desc.slice(0,18).replace(/\..*$/,"")}의 기운인 ${_dsName(dansajuPillars[1].byeolseong)}(월), 뛰어난 지혜와 임기응변, 다재다능의 ${_dsName(dansajuPillars[3].byeolseong)}(시)이 뒷받침해요.`,insight:""},
+        {system:"당사주",key:dansajuPillars.map(p=>p.byeolseong.split("(")[0]).join("·"),desc:`일주의 ${_dsName(dansajuPillars[2].byeolseong)}이 삶의 중심축이에요. ${dansajuPillars[0].kw}의 ${_dsName(dansajuPillars[0].byeolseong)}(년), ${dansajuPillars[1].kw}의 ${_dsName(dansajuPillars[1].byeolseong)}(월), ${dansajuPillars[3].kw}의 ${_dsName(dansajuPillars[3].byeolseong)}(시)이 뒷받침해요.`,insight:""},
         {system:"점성술",key:d._astroAI?`태양 ${d._astroAI.sun}`:"출생 차트",desc:d._astroAI?`${d._astroAI.sunDesc||""} ${(d._astroAI.triangle||"").slice(0,40)}…`:"출생 시각 기반 행성 배치예요.",insight:""},
         {system:"타로수비학",key:`생명경로수 ${lp}`,desc:lifePathDesc,insight:""},
         {system:"MBTI",key:mbtiType,desc:mbtiDesc,insight:""},
@@ -942,7 +986,7 @@ function buildSajuData(input){
     iching:{bonmyeonggae:ichingData.name,gaeSymbol:ichingData.symbol||"☯",gaeNum:ichingData.num||0,gaeUpper:`${TRIGRAM[domOForIching]||""}·${OHK[domOForIching]||""}`,gaeLower:`${TRIGRAM[relO]||""}·${OHK[relO]||""}(관성)`,gaeUpperO:domOForIching,gaeLowerO:relO,gaeDesc:ichingData.desc,gaeNature:ichingData.nature,currentGae:ichingData.currentGae||"분석 중",currentYear:`${CY}년`,currentDesc:ichingData.currentDesc||"",strategy:ichingData.strategy||[],yearFlow:ichingYearFlow},
     tojung:{sang,jung,ha,saja:sajaDB.saja,sajaDesc:sajaDB.desc,bonun:sajaDB.saja,bonunDesc:sajaDB.desc,yearFlow:tojungYearFlow,month2026:tojungMonth2026},
     astro:{sun:"분석 중",moon:"분석 중",asc:"분석 중",mercury:"분석 중",venus:"분석 중",mars:"분석 중",sunMeaning:"태양(☉)은 의식적 자아",moonMeaning:"달(☽)은 감정·본능",ascMeaning:"ASC는 첫인상",sunDesc:"점성술 분석 중이에요.",moonDesc:"점성술 분석 중이에요.",ascDesc:"점성술 분석 중이에요.",mercuryDesc:"분석 중",venusDesc:"분석 중",marsDesc:"분석 중",triangle:"",stellium:"",yearTransit:[]},
-    tarot:{lifePath:lp,isMaster:[11,22,33].includes(lp),lifePathCard,lifePathCardNum:String(lp),lifePathDesc,soulCard:LP_CARDS[lp]||"분석 중",achieveCard:LP_CARDS[(lp+1)>9?1:lp+1]||"분석 중",soulDesc:LP_DESC[lp]||"분석 중",achieveDesc:"성취 에너지 분석 중이에요.",calc,yearCards},
+    tarot:{lifePath:lp,isMaster:[11,22,33].includes(lp),lifePathCard,lifePathCardNum:String(lp),lifePathDesc,soulCard:LP_CARDS[lp]||"분석 중",achieveCard:LP_CARDS[(lp+1)>9?1:lp+1]||"분석 중",soulDesc:soulDesc_val,achieveDesc:"성취 에너지 분석 중이에요.",calc,yearCards},
     daynight:{overview:`${ilganDB.core} ${singang==="신강(身强)"?"강한 에너지를 가진 만큼, 그것을 흘려보내는 방법을 찾는 것이 중요해요.":"내면의 에너지를 충전하는 루틴이 필요해요."}`,
       day:{impression:dn_day.impression||"",mask:dn_day.mask||"",styling:{hair:"",fashion:"",color:"",makeup:"",perfume:""}},
       night:{desire:dn_night.desire||"",desire2:dn_night.desire2||"",triggers:dn_night.triggers||[],attraction:dn_night.attraction||"",idealType:dn_night.idealType||"",idealType2:dn_night.idealType2||""}},
@@ -1023,8 +1067,8 @@ function TabSummary({d,changeTab}){return <>
     <ST icon="🌐" title="7체계 종합 분석" sub="사주·토정비결·주역·당사주·점성술·타로수비학·MBTI"/>
     <GT>일곱 가지 운명 분석 체계가 공통으로 가리키는 핵심 주제입니다.</GT>
     <div style={{marginTop:10,padding:"14px 16px",background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderRadius:12,marginBottom:10}}>
-      {(d.summary?.sevenInsight||"").split("\n\n").map((para,i)=>(
-        <p key={i} style={{fontSize:13,color:"#e0e7ff",lineHeight:1.9,margin:i>0?"12px 0 0":"0",textAlign:"justify"}}>{para}</p>
+      {cleanText(d.summary?.sevenInsight||"").split("\n\n").map((para,i)=>(
+        <p key={i} style={{fontSize:13,color:"#e0e7ff",lineHeight:1.9,margin:i>0?"12px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}>{para}</p>
       ))}
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:6}}>
@@ -1033,7 +1077,7 @@ function TabSummary({d,changeTab}){return <>
           <div style={{width:60,fontSize:10,fontWeight:700,color:"#e65100",background:"#fff3e0",padding:"3px 5px",borderRadius:6,textAlign:"center",flexShrink:0,lineHeight:1.5}}>{s.system}</div>
           <div style={{flex:1}}>
             <div style={{fontSize:13,fontWeight:800,color:"#111",marginBottom:2}}>{s.key}</div>
-            <div style={{fontSize:12,color:"#666",lineHeight:1.5}}>{s.desc}</div>
+            <div style={{fontSize:12,color:"#666",lineHeight:1.5,whiteSpace:"pre-line"}}>{s.desc}</div>
           </div>
         </div>
       ))}
@@ -1126,14 +1170,12 @@ function Ohaeng({d}){
       ].map(({label,bg,border,items})=>(
         <div key={label} style={{padding:"10px 12px",background:bg,borderRadius:10,border:`1px solid ${border}`}}>
           <div style={{fontSize:10,color:"#888",fontWeight:600,marginBottom:8}}>{label}</div>
-          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
             {items.map(({name,sub,val,pillBg,pillTc,valC})=>(
-              <div key={name} style={{display:"flex",alignItems:"center",gap:6}}>
-                <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
-                  <span style={{background:pillBg,color:pillTc,fontSize:11,fontWeight:800,padding:"4px 10px",borderRadius:8}}>{name}</span>
-                  <span style={{fontSize:9,color:"#999",fontWeight:500}}>{sub}</span>
-                </div>
-                <span style={{fontSize:12,fontWeight:900,color:valC}}>{val}</span>
+              <div key={name} style={{display:"flex",alignItems:"center",gap:8}}>
+                <span style={{background:pillBg,color:pillTc,fontSize:11,fontWeight:800,padding:"4px 10px",borderRadius:8,whiteSpace:"nowrap",flexShrink:0,minWidth:38,textAlign:"center"}}>{name}</span>
+                <span style={{fontSize:13,fontWeight:900,color:valC,whiteSpace:"nowrap"}}>{val}</span>
+                <span style={{fontSize:10,color:"#999",fontWeight:500,marginLeft:"auto"}}>{sub}</span>
               </div>
             ))}
           </div>
@@ -1386,9 +1428,9 @@ function TabTojung({d}){
     {/* 토정비결 */}
     <section style={S.card}>
       <ST icon="📜" title="토정비결(土亭秘訣)"/>
-      <GT>토정비결은 조선 중기 이지함(李之菡) 선생이 집대성한 민간 예언서입니다. 사주를 수리화하여 한 해의 길흉과 본명 총운을 사자성어로 풀어냅니다.</GT>
+      <GT>토정비결은 조선 중기 이지함 선생이 집대성한 민간 예언서입니다. 사주를 수리화하여 한 해의 길흉과 본명 총운을 사자성어로 풀어냅니다.</GT>
       <div style={{marginTop:10,padding:"14px 15px",background:"#e8f5e0",borderRadius:11,border:"1px solid #a5d6a7"}}>
-        <div style={{fontSize:11,color:"#2d6a2d",fontWeight:700,marginBottom:5}}>본명 총운(總運) 사자성어</div>
+        <div style={{fontSize:11,color:"#2d6a2d",fontWeight:700,marginBottom:5}}>본명 총운 사자성어</div>
         <div style={{fontSize:20,fontWeight:900,color:"#1b5e20",marginBottom:6}}>{tj.saja}</div>
         <p style={{fontSize:13,color:"#388e3c",margin:0,lineHeight:1.78,textAlign:"justify"}}>{tj.bonunDesc}</p>
       </div>
@@ -1396,7 +1438,7 @@ function TabTojung({d}){
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
           {tj.yearFlow.map((y,i)=><div key={i} style={{padding:"11px 13px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:7}}><Ring score={y.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",marginBottom:2}}><span style={{fontSize:14,fontWeight:900,color:y.year===CY?"#2e7d32":"#111"}}>{y.year}년</span>{y.year===CY&&<span style={{fontSize:9,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}<span style={{fontSize:10,background:"#fff8e1",color:"#7b5800",padding:"2px 7px",borderRadius:99,fontWeight:700}}>{y.month}</span></div><div style={{fontSize:12,color:"#555"}}>{y.desc}</div></div></div>
-            <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>{Object.entries(y.areas).map(([k,v])=><div key={k} style={{fontSize:11,padding:"2px 8px",borderRadius:99,background:scBg(v),color:sc(v),fontWeight:700}}>{k} {v}점</div>)}</div>
+            <div style={{display:"flex",gap:3,flexWrap:"nowrap"}}>{Object.entries(y.areas).map(([k,v])=><div key={k} style={{flex:1,fontSize:9,padding:"2px 2px",borderRadius:7,background:scBg(v),color:sc(v),fontWeight:700,textAlign:"center",whiteSpace:"nowrap"}}>{k} {v}</div>)}</div>
           </div>)}
         </div>
       </div>
@@ -1445,6 +1487,7 @@ function TabTojung({d}){
               </div>
             </div>
             <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.75,textAlign:"justify"}}>{p.desc}</p>
+            {p.stageDesc&&<p style={{fontSize:11,color:"#888",margin:"6px 0 0",lineHeight:1.7,textAlign:"justify",paddingTop:6,borderTop:"1px dashed #eee"}}><span style={{color:"#e65100",fontWeight:700}}>{p.stage} </span>{p.stageDesc}</p>}
           </div>;
         })}
       </div>
@@ -1604,12 +1647,11 @@ JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
           <div style={{fontSize:20,fontWeight:900,color:"#5e35b1",marginTop:2}}>{t.lifePathCardNum}</div>
         </div>
       </div>
-      <p style={{fontSize:13,color:"#444",lineHeight:1.85,textAlign:"justify",margin:"0 0 10px",whiteSpace:"pre-line"}}>{t.lifePathDesc}</p>
       <div style={{display:"flex",gap:8,marginBottom:12}}>
         <div style={{flex:1,padding:"10px 11px",background:"#e3f2fd",borderRadius:10}}>
           <div style={{fontSize:10,color:"#0d47a1",fontWeight:700,marginBottom:2}}>영혼 카드(Soul)</div>
           <div style={{fontSize:13,fontWeight:800,color:"#1565c0"}}>{t.soulCard}</div>
-          <div style={{fontSize:11,color:"#555",marginTop:3}}>{t.soulDesc}</div>
+          <div style={{fontSize:11,color:"#555",marginTop:3,textAlign:"justify",lineHeight:1.7}}>{cleanText(t.soulDesc)}</div>
         </div>
         <div style={{flex:1,padding:"10px 11px",background:"#e8f5e0",borderRadius:10}}>
           <div style={{fontSize:10,color:"#2d6a2d",fontWeight:700,marginBottom:2}}>성취 카드(Achievement)</div>
@@ -1617,7 +1659,7 @@ JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
           <div style={{fontSize:11,color:"#555",marginTop:3,textAlign:"justify",lineHeight:1.7}}>
             {loadingTarot
               ? <><Skel h={11} w="100%"/><Skel h={11} w="90%"/><Skel h={11} w="70%"/></>
-              : achieveDesc}
+              : cleanText(achieveDesc)}
           </div>
           {errTarot&&<div style={{fontSize:11,color:"#b71c1c",marginTop:4,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
             <span>분석 실패</span>
@@ -1710,10 +1752,6 @@ function TabMBTI({d}){
           </div>;
         })}
       </div>
-    </section>
-    <section style={S.card}>
-      <ST icon="⚡" title="경계 기능 (F↔T)"/>
-      <div style={{padding:"12px 14px",background:"#fff8e1",borderRadius:11,border:"1px solid #ffe082",marginTop:10}}><p style={{fontSize:13,color:"#5d4037",margin:0,lineHeight:1.8,textAlign:"justify"}}>{m.borderline}</p></div>
     </section>
     <section style={S.card}>
       <ST icon="🌟" title="강점·과제·최적 환경"/>
@@ -1940,6 +1978,15 @@ JSON만 응답: {"sevenInsight":"..."}`;
       await Promise.all([fetchAstro(), fetchTarot(), fetchSeven()]);
 
       // 4. API 결과를 reportData에 합쳐서 저장
+      const updatedSixSystems=(data.summary?.sixSystems||[]).map(s=>{
+        if(s.system!=="점성술") return s;
+        if(!astroResult) return s;
+        return {
+          ...s,
+          key:`태양 ${astroResult.sun||""}`.trim(),
+          desc:`${astroResult.sunDesc||""} ${(astroResult.triangle||"").slice(0,40)}…`.trim(),
+        };
+      });
       const enrichedData={
         ...data,
         _astroAI: astroResult,
@@ -1947,6 +1994,7 @@ JSON만 응답: {"sevenInsight":"..."}`;
         _sevenAI: sevenResult,
         summary:{
           ...data.summary,
+          sixSystems: updatedSixSystems,
           sevenInsight: sevenResult?.sevenInsight || data.summary?.sevenInsight || "",
         },
       };
@@ -2469,7 +2517,7 @@ function SajuInputForm({onSubmit}){
           ))}
         </div>
         <div style={{padding:"12px 14px",background:"#e3f2fd",borderRadius:12,marginBottom:16,fontSize:12,color:"#0d47a1",lineHeight:1.7}}>
-          ✨ 입력 정보로 사주 8자를 계산하고 종합 운세 리포트를 생성해요.
+          ✨ 입력 정보로 사주팔자를 계산하고 종합 운세 리포트를 생성해요.
         </div>
         <button style={{...SF.btn,fontSize:16,padding:"16px 0",background:"linear-gradient(135deg,#e65100,#bf360c)"}}
           onClick={()=>onSubmit(form)}>
