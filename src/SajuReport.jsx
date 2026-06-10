@@ -25,6 +25,8 @@ const cleanText=(s)=>(s||"")
   .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,"")
   .replace(/ {2,}/g," ")
   .trim();
+// 별자리 표기에서 도수(숫자) 제거: "궁수자리 4도" / "전갈자리 8°" → 별자리 이름만
+const stripDegree=(s)=>(s||"").replace(/\s*\d+\s*도\s*$/,"").replace(/\s*\d+\s*°.*$/,"").replace(/\s*\d+\s*$/,"").trim();
 // 관성(官星) 오행 = 일간을 극(剋)하는 오행
 const GWAN_O={목:"금",화:"수",토:"목",금:"화",수:"토"};
 // 일간별 인물 키워드 (자연 비유, 동물 X)
@@ -935,8 +937,8 @@ function buildSajuData(input){
     name,birth:`양력 ${y}년 ${m}월 ${d}일 ${rawH}시 ${String(rawM).padStart(2,"0")}분 ${city}`,gender,
     personaTitle,scoreMeta,
     boundary:{...bnd,isBoundary:bnd.inBoundary,
-      standardDesc:`${stripLead(ILJU_CHAR[iljuKey])||OHK[ilO]+" 기운의 일주예요."}\n${stripLead(ilganDB.core)}`,
-      midnightDesc:`${stripLead(ILJU_CHAR[iljuB.ko])||OHK[normO(GAN_OE[ilganB])]+" 기운의 일주예요."}\n${stripLead((ILGAN_DESC[ilganB]||ILGAN_DESC["기"]).core)}`,
+      standardDesc:`${stripLead(ILJU_CHAR[iljuKey])||OHK[ilO]+" 기운의 일주예요."} ${stripLead(ilganDB.core)}`,
+      midnightDesc:`${stripLead(ILJU_CHAR[iljuB.ko])||OHK[normO(GAN_OE[ilganB])]+" 기운의 일주예요."} ${stripLead((ILGAN_DESC[ilganB]||ILGAN_DESC["기"]).core)}`,
     },
     pillars,pillarsB,
     ohaengDist,singang,
@@ -1124,7 +1126,7 @@ function Manseryeok({d}){
     <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6,marginTop:10}}>
       {active.map((p,i)=>{const isI=p.name==="일주";return <div key={i} style={{display:"flex",flexDirection:"column",gap:5,alignItems:"center",position:"relative",...(isI?{border:"2px solid #ffb300",borderRadius:15,background:"#fffde7",padding:"4px 3px 7px"}:{})}}>{isI&&<div style={{position:"absolute",top:-10,left:"50%",transform:"translateX(-50%)",background:"#e65100",color:"#fff",fontSize:9,fontWeight:800,padding:"2px 7px",borderRadius:99,zIndex:1,whiteSpace:"nowrap"}}>나</div>}<div style={{fontSize:10,color:"#aaa",fontWeight:600}}>{p.name}</div><GCard g={p.gan} s={p.gan.sibsong}/><JCard j={p.ji} s={p.ji.sibsong}/></div>;})}
     </div>
-    {b.isBoundary&&<div style={{marginTop:10,padding:"10px 12px",background:"#f9f9f9",borderRadius:9,fontSize:12,color:"#555",lineHeight:1.78,borderLeft:"3px solid #ffb300"}}>{(w==="A"?b.standardDesc:b.midnightDesc).split("\n").map((line,i,arr)=><span key={i}>{line}{i<arr.length-1&&<br/>}</span>)}</div>}
+    {b.isBoundary&&<div style={{marginTop:10,padding:"10px 12px",background:"#f9f9f9",borderRadius:9,fontSize:12,color:"#555",lineHeight:1.78,borderLeft:"3px solid #ffb300"}}>{w==="A"?b.standardDesc:b.midnightDesc}</div>}
     <div style={{marginTop:8,fontSize:11,color:"#ccc",textAlign:"center"}}>☀️ 양(陽) 적극·외향 &nbsp;·&nbsp; 🌙 음(陰) 수용·내향</div>
   </section>;
 }
@@ -1169,13 +1171,15 @@ function Ohaeng({d}){
         ]}]:[]),
       ].map(({label,bg,border,items})=>(
         <div key={label} style={{padding:"10px 12px",background:bg,borderRadius:10,border:`1px solid ${border}`}}>
-          <div style={{fontSize:10,color:"#888",fontWeight:600,marginBottom:8}}>{label}</div>
-          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          <div style={{fontSize:10,color:"#888",fontWeight:600,marginBottom:10}}>{label}</div>
+          <div style={{display:"flex",alignItems:"flex-start",gap:14,flexWrap:"wrap"}}>
             {items.map(({name,sub,val,pillBg,pillTc,valC})=>(
-              <div key={name} style={{display:"flex",alignItems:"center",gap:8}}>
-                <span style={{background:pillBg,color:pillTc,fontSize:11,fontWeight:800,padding:"4px 10px",borderRadius:8,whiteSpace:"nowrap",flexShrink:0,minWidth:38,textAlign:"center"}}>{name}</span>
-                <span style={{fontSize:13,fontWeight:900,color:valC,whiteSpace:"nowrap"}}>{val}</span>
-                <span style={{fontSize:10,color:"#999",fontWeight:500,marginLeft:"auto"}}>{sub}</span>
+              <div key={name} style={{display:"flex",flexDirection:"column",alignItems:"flex-start",gap:4}}>
+                <div style={{display:"flex",alignItems:"center",gap:7}}>
+                  <span style={{background:pillBg,color:pillTc,fontSize:11,fontWeight:800,padding:"4px 10px",borderRadius:8,whiteSpace:"nowrap"}}>{name}</span>
+                  <span style={{fontSize:14,fontWeight:900,color:valC,whiteSpace:"nowrap"}}>{val}</span>
+                </div>
+                <span style={{fontSize:10,color:"#999",fontWeight:500}}>{sub}</span>
               </div>
             ))}
           </div>
@@ -1534,10 +1538,10 @@ function TabAstro({d}){
 출생 데이터를 기반으로 가장 가능성 높은 행성 위치를 추정하고, 각 행성이 사주 일간의 기질과 어떻게 공명하는지 설명해줘.
 각 행성 설명은 2~3문장. 삼각 핵심 분석(태양·달·ASC 관계)은 3~4문장.
 반드시 ~이에요, ~해요 체로 작성해줘. 한자는 반드시 한글(한자) 형식으로 병기해줘.
-궁 이름은 반드시 한국어로만 표기해줘 (예: 천칭궁 29도, 전갈궁 8도, 처녀궁 18도, 게자리 15도). 영어나 한자 단독 표기 금지.
+별자리 이름은 반드시 한국어 "○○자리" 형식으로만 표기해줘 (예: 궁수자리, 전갈자리, 천칭자리, 처녀자리, 게자리). 도수(숫자)는 절대 표기하지 말고 별자리 이름만 써줘. 영어나 한자, 궁(宮) 표기 금지.
 이모지나 특수문자 사용 금지.
 JSON만 응답 (다른 텍스트 없음):
-{"sun":"궁도 위치","sunDesc":"..","moon":"궁도 위치","moonDesc":"..","asc":"궁도 위치","ascDesc":"..","mercury":"궁도 위치","mercuryDesc":"..","venus":"궁도 위치","venusDesc":"..","mars":"궁도 위치","marsDesc":"..","triangle":".."}`;
+{"sun":"○○자리","sunDesc":"..","moon":"○○자리","moonDesc":"..","asc":"○○자리","ascDesc":"..","mercury":"○○자리","mercuryDesc":"..","venus":"○○자리","venusDesc":"..","mars":"○○자리","marsDesc":"..","triangle":".."}`;
         const res=await fetch("/.netlify/functions/claude",{
           method:"POST",
           headers:{"Content-Type":"application/json"},
@@ -1608,12 +1612,12 @@ JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
               <span style={{fontSize:11,fontWeight:700,color:item.c,minWidth:72,flexShrink:0}}>{item.l}</span>
               {loadingAstro
                 ? <Skel h={14} w="60%" r={4}/>
-                : <span style={{fontSize:13,fontWeight:900,color:"#111"}}>{item.v}</span>}
+                : <span style={{fontSize:13,fontWeight:900,color:"#111"}}>{stripDegree(cleanText(item.v))}</span>}
             </div>
             <div style={{fontSize:10,color:"#999",marginBottom:4}}>{item.meaning}</div>
             {loadingAstro
               ? <><Skel h={11} w="100%"/><Skel h={11} w="80%"/></>
-              : <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.65,textAlign:"justify"}}>{item.desc}</p>}
+              : <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.65,textAlign:"justify"}}>{cleanText(item.desc)}</p>}
           </div>
         ))}
       </div>
@@ -1621,7 +1625,7 @@ JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
         <div style={{fontSize:11,color:"#4a148c",fontWeight:700,marginBottom:4}}>삼각 핵심 분석</div>
         {loadingAstro
           ? <><Skel h={12} w="100%"/><Skel h={12} w="90%"/><Skel h={12} w="70%"/></>
-          : <p style={{fontSize:13,color:"#444",margin:0,lineHeight:1.8,textAlign:"justify"}}>{astroAI?.triangle||a.triangle}</p>}
+          : <p style={{fontSize:13,color:"#444",margin:0,lineHeight:1.8,textAlign:"justify"}}>{cleanText(astroAI?.triangle||a.triangle)}</p>}
       </div>
       {errAstro&&<div style={{marginTop:8,padding:"11px 12px",background:"#fdecea",borderRadius:10,fontSize:12,color:"#b71c1c",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <span>네이탈 차트 분석을 불러오지 못했어요.</span>
@@ -1803,7 +1807,7 @@ function LoadingScreen({name}){
         <img
           src={cur.img}
           alt={cur.name}
-          style={{width:150,height:150,objectFit:"contain",filter:`drop-shadow(0 8px 24px ${cur.color}55)`}}
+          style={{width:150,height:150,objectFit:"contain"}}
         />
       </div>
       <div style={{
@@ -1878,8 +1882,8 @@ export default function SajuReport(){
       })();
 
       // 3. 네이탈차트 + 성취카드 API 병렬 호출 (로딩 중)
-      const cacheKey=`fy_astro_${data.birth}`;
-      const cacheTarotKey=`fy_tarot_${data.birth}`;
+      const cacheKey=`fy_astro_v2_${data.birth}`;
+      const cacheTarotKey=`fy_tarot_v2_${data.birth}`;
       let astroResult=null, tarotResult=null;
 
       // sessionStorage 캐시 확인
@@ -1914,9 +1918,9 @@ export default function SajuReport(){
 출생 데이터를 기반으로 가장 가능성 높은 행성 위치를 추정하고, 각 행성이 사주 일간의 기질과 어떻게 공명하는지 설명해줘.
 각 행성 설명은 2~3문장. 삼각 핵심 분석(태양·달·ASC 관계)은 3~4문장.
 반드시 ~이에요, ~해요 체로 작성해줘. 한자는 반드시 한글(한자) 형식으로 병기해줘.
-궁 이름은 반드시 한국어로만 표기해줘 (예: 천칭궁 29도, 전갈궁 8도, 처녀궁 18도, 게자리 15도). 영어나 한자 단독 표기 금지.
+별자리 이름은 반드시 한국어 "○○자리" 형식으로만 표기해줘 (예: 궁수자리, 전갈자리, 천칭자리, 처녀자리, 게자리). 도수(숫자)는 절대 표기하지 말고 별자리 이름만 써줘. 영어나 한자, 궁(宮) 표기 금지.
 이모지나 특수문자 사용 금지.
-JSON만 응답: {"sun":"궁도","sunDesc":"..","moon":"궁도","moonDesc":"..","asc":"궁도","ascDesc":"..","mercury":"궁도","mercuryDesc":"..","venus":"궁도","venusDesc":"..","mars":"궁도","marsDesc":"..","triangle":".."}`;
+JSON만 응답: {"sun":"○○자리","sunDesc":"..","moon":"○○자리","moonDesc":"..","asc":"○○자리","ascDesc":"..","mercury":"○○자리","mercuryDesc":"..","venus":"○○자리","venusDesc":"..","mars":"○○자리","marsDesc":"..","triangle":".."}`;
           const text=await apiCall({model:"claude-haiku-4-5-20251001",max_tokens:1200,messages:[{role:"user",content:prompt}]});
           astroResult=JSON.parse(text);
           try{sessionStorage.setItem(cacheKey,JSON.stringify(astroResult));}catch{}
@@ -1936,7 +1940,7 @@ JSON만 응답: {"achieveDesc":"..."}`;
         }catch(e){console.warn("tarot API:", e);}
       };
 
-      const cacheSevenKey=`fy_seven_${data.birth}`;
+      const cacheSevenKey=`fy_seven_v2_${data.birth}`;
       let sevenResult=null;
       try{const cs=sessionStorage.getItem(cacheSevenKey);if(cs)sevenResult=JSON.parse(cs);}catch{}
 
@@ -1978,13 +1982,15 @@ JSON만 응답: {"sevenInsight":"..."}`;
       await Promise.all([fetchAstro(), fetchTarot(), fetchSeven()]);
 
       // 4. API 결과를 reportData에 합쳐서 저장
+      // 앞 2문장만 추출
+      const take2=(s)=>{const arr=(s||"").split(/(?<=[.!?。])\s+/).filter(Boolean);return arr.slice(0,2).join(" ").trim();};
       const updatedSixSystems=(data.summary?.sixSystems||[]).map(s=>{
         if(s.system!=="점성술") return s;
         if(!astroResult) return s;
         return {
           ...s,
-          key:`태양 ${astroResult.sun||""}`.trim(),
-          desc:`${astroResult.sunDesc||""} ${(astroResult.triangle||"").slice(0,40)}…`.trim(),
+          key:`태양 ${stripDegree(astroResult.sun)||""}`.trim(),
+          desc:take2(astroResult.sunDesc)||astroResult.sunDesc||"",
         };
       });
       const enrichedData={
