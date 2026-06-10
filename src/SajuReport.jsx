@@ -119,9 +119,9 @@ function calcSeunAreas(yr,month,meta){
 // ━━ 일간별 성격 기본 설명 ━━
 const ILGAN_DESC = {
   갑: {
-    core: "甲木(갑목): 곧게 뻗은 나무처럼 성장 지향적이고 리더십이 강한 타입이에요.",
-    strong: "신강(身强) 甲木(갑목): 자기 주관이 뚜렷하고 추진력이 강해요. 때로는 고집으로 보이지만 그게 결국 큰 성과를 만들어요. 에너지가 넘치는 만큼 용신인 금(金)·수(水)로 균형을 잡으면 더 크게 성장해요.",
-    weak: "신약(身弱) 甲木(갑목): 유연하고 공감력이 높아요. 혼자보다 팀에서 진가가 드러나는 타입이에요. 수(水)·목(木)의 도움을 받아 뿌리를 깊게 내리는 것이 중요해요.",
+    core: "갑목(甲木): 곧게 뻗은 나무처럼 성장 지향적이고 리더십이 강한 타입이에요.",
+    strong: "신강(身强) 갑목(甲木): 자기 주관이 뚜렷하고 추진력이 강해요. 때로는 고집으로 보이지만 그게 결국 큰 성과를 만들어요. 에너지가 넘치는 만큼 용신인 금(金)·수(水)로 균형을 잡으면 더 크게 성장해요.",
+    weak: "신약(身弱) 갑목(甲木): 유연하고 공감력이 높아요. 혼자보다 팀에서 진가가 드러나는 타입이에요. 수(水)·목(木)의 도움을 받아 뿌리를 깊게 내리는 것이 중요해요.",
     strengths: ["방향을 한번 정하면 끝까지 밀고 나가는 완주력이 있어요. 중간에 흐지부지하는 법이 없어요.", "성장 지향적인 에너지로 끊임없이 더 나은 것을 추구해요. 현재에 안주하는 것을 본능적으로 거부해요.", "리더십이 자연스러워요. 강요하지 않는데도 사람들이 따라오는 구조예요."],
     challenges: ["'내 방식이 맞다'는 확신이 지나치면 고집이 돼요. 다른 방식의 가능성을 닫아버릴 수 있어요.", "속도가 빠른 만큼 주변이 따라오지 못할 때 답답해해요. 기다리는 것이 가장 어려운 숙제예요.", "약한 모습을 드러내는 게 자존심이 허락하지 않아요. 힘들 때일수록 혼자 버티다 소진돼요."],
     bestEnv: "명확한 목표와 성과가 보이는 환경이에요. 프로젝트를 처음부터 끝까지 이끄는 역할, 성장 가능성이 있는 분야에서 진가를 발휘해요. 창업, 컨설팅, 기획, 리더십이 필요한 직무가 잘 맞아요.",
@@ -131,7 +131,7 @@ const ILGAN_DESC = {
       mask: "사회에서는 추진력 있고 책임감 강한 리더로 보여요. 어떤 일이든 앞장서서 방향을 잡는 역할을 자처하고, 약한 모습을 거의 드러내지 않아요. 실제론 인정받고 싶은 마음이 누구보다 크지만, 그 마음을 직접 표현하는 건 자존심이 허락하지 않아요. '알아서 알아봐줬으면 좋겠다'는 마음이 늘 있어요."
     },
     night: {
-      desire: "사주 글자 안에 숨겨진 기운: 甲木(갑목)은 庚金(경금)의 관성(官星)에 의해 깎이고 다듬어져요. 역설적으로 강한 외압이 있을 때 더 뚜렷하게 자신을 드러내는 구조예요. '나를 이길 수 있는 사람을 만나고 싶다, 나를 진짜로 자극해주는 존재가 필요하다'는 욕망이 내면 깊숙이 있어요. 쉬운 관계에는 흥미를 잃고, 팽팽한 긴장감이 있는 관계에서 오히려 빛나요.",
+      desire: "사주 글자 안에 숨겨진 기운: 갑목(甲木)은 경금(庚金)의 관성(官星)에 의해 깎이고 다듬어져요. 역설적으로 강한 외압이 있을 때 더 뚜렷하게 자신을 드러내는 구조예요. '나를 이길 수 있는 사람을 만나고 싶다, 나를 진짜로 자극해주는 존재가 필요하다'는 욕망이 내면 깊숙이 있어요. 쉬운 관계에는 흥미를 잃고, 팽팽한 긴장감이 있는 관계에서 오히려 빛나요.",
       desire2: "목(木) 일간의 재성(財星) 구조: 토(土)가 재성이에요. 내가 통제하고 결과를 만드는 대상. 일과 관계 모두에서 '내가 방향을 잡고 있는가'가 중요한 기준이에요. 주도권을 빼앗겼다고 느낄 때 심한 불편함을 느껴요.",
       triggers: [
         "내가 오래 공들인 결과물이 칭찬이 아닌 '성과'로 인정받는 순간 — 숫자나 결과로 확인될 때",
@@ -144,9 +144,9 @@ const ILGAN_DESC = {
     }
   },
   을: {
-    core: "乙木(을목): 바람에 휘어도 부러지지 않는 덩굴처럼 유연하고 생명력이 강한 타입이에요.",
-    strong: "신강(身强) 乙木(을목): 자기 페이스가 분명하고 어떤 환경에도 적응하는 능력이 뛰어나요. 에너지가 넘치는 만큼 금(金)·화(火)로 균형을 맞추면 더 넓게 뻗어나가요.",
-    weak: "신약(身弱) 乙木(을목): 감수성이 풍부하고 공감 능력이 탁월해요. 수(水)·목(木)을 통해 뿌리를 깊게 내리는 것이 중요해요. 사람들 사이에서 자연스럽게 연결고리가 되는 타입이에요.",
+    core: "을목(乙木): 바람에 휘어도 부러지지 않는 덩굴처럼 유연하고 생명력이 강한 타입이에요.",
+    strong: "신강(身强) 을목(乙木): 자기 페이스가 분명하고 어떤 환경에도 적응하는 능력이 뛰어나요. 에너지가 넘치는 만큼 금(金)·화(火)로 균형을 맞추면 더 넓게 뻗어나가요.",
+    weak: "신약(身弱) 을목(乙木): 감수성이 풍부하고 공감 능력이 탁월해요. 수(水)·목(木)을 통해 뿌리를 깊게 내리는 것이 중요해요. 사람들 사이에서 자연스럽게 연결고리가 되는 타입이에요.",
     strengths: ["어떤 환경에도 적응하는 유연성이에요. 덩굴처럼 조건이 안 맞으면 방향을 바꿔서라도 뻗어나가요.", "감수성과 공감 능력이 뛰어나서 관계에서 신뢰를 빠르게 쌓아요.", "겉으로는 부드럽지만 내면의 방향성은 확고해요. 조용히 원하는 것을 얻어내는 능력이 있어요."],
     challenges: ["타인의 감정에 너무 민감하게 반응해요. 내 감정보다 상대 감정을 먼저 챙기다 에너지가 소진돼요.", "의견 충돌이 생기면 직접 대면하기보다 돌아가는 방법을 선택해요. 갈등 회피가 오히려 더 복잡한 상황을 만들기도 해요.", "자신의 욕구를 직접 표현하는 것이 서툴러요. '알아서 알아줬으면'이라는 기대가 관계에서 오해를 만들어요."],
     bestEnv: "협업과 관계 중심의 환경이에요. 사람 사이를 연결하는 역할, 감성이 필요한 콘텐츠·상담·교육·예술 분야에서 빛나요. 경쟁보다 협력이 강조되는 조직 문화가 맞아요.",
@@ -169,9 +169,9 @@ const ILGAN_DESC = {
     }
   },
   병: {
-    core: "丙火(병화): 태양처럼 밝고 따뜻하며, 주변을 환하게 만드는 에너지를 가진 타입이에요.",
-    strong: "신강(身强) 丙火(병화): 카리스마가 넘치고 어디서든 중심이 돼요. 에너지가 너무 강할 때는 수(水)·토(土)로 균형을 맞추는 것이 중요해요. 주변을 이끄는 자연스러운 리더예요.",
-    weak: "신약(身弱) 丙火(병화): 따뜻하고 감성적이에요. 목(木)·화(火)를 통해 에너지를 채우는 것이 중요해요. 사람들에게 온기를 주는 존재지만, 혼자만의 충전 시간도 꼭 필요해요.",
+    core: "병화(丙火): 태양처럼 밝고 따뜻하며, 주변을 환하게 만드는 에너지를 가진 타입이에요.",
+    strong: "신강(身强) 병화(丙火): 카리스마가 넘치고 어디서든 중심이 돼요. 에너지가 너무 강할 때는 수(水)·토(土)로 균형을 맞추는 것이 중요해요. 주변을 이끄는 자연스러운 리더예요.",
+    weak: "신약(身弱) 병화(丙火): 따뜻하고 감성적이에요. 목(木)·화(火)를 통해 에너지를 채우는 것이 중요해요. 사람들에게 온기를 주는 존재지만, 혼자만의 충전 시간도 꼭 필요해요.",
     strengths: ["어디서든 분위기를 밝게 만드는 자연스러운 능력이에요. 존재 자체가 에너지예요.", "진심이 넘쳐서 사람들이 신뢰해요. 가식이 없고 투명한 에너지가 매력이에요.", "무언가를 시작하는 추진력이 탁월해요. 아이디어를 현실로 만드는 불꽃 같은 실행력이에요."],
     challenges: ["에너지를 너무 빠르게 소모해요. 타오르는 만큼 빠르게 꺼지는 구조라 번아웃에 취약해요.", "감정 기복이 클 수 있어요. 기쁠 때는 태양처럼 뜨겁지만, 상처받으면 완전히 차가워지는 낙차가 있어요.", "인정 욕구가 강해요. 노력에 비해 반응이 없을 때 심한 허탈감을 느껴요."],
     bestEnv: "사람들 앞에서 에너지를 발산할 수 있는 환경이에요. 영업, 강연, 방송, 엔터테인먼트, 서비스, 교육처럼 사람과 직접 만나는 분야에서 빛나요. 혼자 고립되는 업무 환경은 맞지 않아요.",
@@ -194,9 +194,9 @@ const ILGAN_DESC = {
     }
   },
   정: {
-    core: "丁火(정화): 촛불처럼 작지만 꾸준하고 따뜻한 빛을 내는 타입이에요. 섬세함과 집중력이 강해요.",
-    strong: "신강(身强) 丁火(정화): 자기만의 세계가 뚜렷하고 창의성이 풍부해요. 에너지가 강할 때는 수(水)·토(土)로 방향을 잡아주면 더 빛나요. 한 가지에 깊이 몰입하는 전문가 기질이에요.",
-    weak: "신약(身弱) 丁火(정화): 감수성과 직관이 예민해요. 목(木)·화(火)를 통해 에너지를 채우는 것이 중요해요. 예술·음악·글쓰기 등 창작 영역에서 남다른 재능을 보여요.",
+    core: "정화(丁火): 촛불처럼 작지만 꾸준하고 따뜻한 빛을 내는 타입이에요. 섬세함과 집중력이 강해요.",
+    strong: "신강(身强) 정화(丁火): 자기만의 세계가 뚜렷하고 창의성이 풍부해요. 에너지가 강할 때는 수(水)·토(土)로 방향을 잡아주면 더 빛나요. 한 가지에 깊이 몰입하는 전문가 기질이에요.",
+    weak: "신약(身弱) 정화(丁火): 감수성과 직관이 예민해요. 목(木)·화(火)를 통해 에너지를 채우는 것이 중요해요. 예술·음악·글쓰기 등 창작 영역에서 남다른 재능을 보여요.",
     strengths: ["한 가지에 몰입하면 누구도 따라올 수 없는 깊이가 나와요. 전문가로 성장하는 데 최고의 구조예요.", "섬세하고 따뜻한 감성으로 사람들의 마음을 움직여요. 작은 것에서 큰 의미를 찾는 능력이 있어요.", "꾸준함이 강점이에요. 華(화려함)보다 지속적인 빛을 내는 타입으로 오래 기억에 남아요."],
     challenges: ["너무 깊이 몰입해서 주변을 놓치는 경우가 있어요. 숲을 못 보고 나무만 보는 패턴이에요.", "감수성이 예민해서 상처를 깊게 받아요. 오랫동안 기억하고 곱씹는 경향이 있어요.", "자신의 세계에 빠지면 소통이 줄어요. 외부와 연결을 의식적으로 유지해야 해요."],
     bestEnv: "깊이 몰입할 수 있는 전문 분야예요. 연구, 창작, 작곡, 글쓰기, 치료사, 상담가처럼 한 사람 또는 한 주제와 깊게 연결되는 환경에서 빛나요. 시끄럽고 산만한 환경은 에너지를 소진시켜요.",
@@ -206,7 +206,7 @@ const ILGAN_DESC = {
       mask: "사회에서는 조용하고 신중한 사람으로 보여요. 나서지 않지만 결정적인 순간에 핵심을 짚는 능력이 있어요. 감정을 잘 드러내지 않아서 속내를 파악하기 어렵지만, 실제로는 내면에서 엄청난 감정의 불꽃이 타고 있어요. 그 불을 알아봐 주는 사람에게만 열려요."
     },
     night: {
-      desire: "사주 글자 안에 숨겨진 기운: 정화(丁火)는 갑목(甲木)을 통해 키워지고, 壬水(임수)의 관성에 의해 단련돼요. '완전히 이해받고 싶다'는 욕망이 있어요. 표면적인 이해가 아니라 설명하지 않아도 내 감성의 결을 느끼고 알아주는 사람을 원해요. 그런 사람을 만나기 전까지는 진짜 자신을 보여주지 않아요.",
+      desire: "사주 글자 안에 숨겨진 기운: 정화(丁火)는 갑목(甲木)을 통해 키워지고, 임수(壬水)의 관성에 의해 단련돼요. '완전히 이해받고 싶다'는 욕망이 있어요. 표면적인 이해가 아니라 설명하지 않아도 내 감성의 결을 느끼고 알아주는 사람을 원해요. 그런 사람을 만나기 전까지는 진짜 자신을 보여주지 않아요.",
       desire2: "화(火) 일간의 재성 구조: 금(金)이 재성이에요. 정화(丁火)의 관계 방식은 천천히 데우는 것이에요. 처음엔 거리를 두다가 신뢰가 쌓이면 촛불처럼 따뜻하게 타오르는 구조예요. 급한 친밀감을 본능적으로 경계해요.",
       triggers: [
         "내 말의 행간을 읽어주는 사람을 만났을 때 — 설명하지 않았는데 알아챘을 때",
@@ -219,8 +219,8 @@ const ILGAN_DESC = {
     }
   },
   무: {
-    core: "戊土(무토): 큰 산처럼 묵직하고 포용력이 강한 타입이에요. 한번 결심한 것은 끝까지 가요.",
-    strong: "신강(身强) 戊土(무토): 압박 속에서 더욱 강해지는 구조예요. 외부 자극이 실력을 끌어올리는 타입이에요.",
+    core: "무토(戊土): 큰 산처럼 묵직하고 포용력이 강한 타입이에요. 한번 결심한 것은 끝까지 가요.",
+    strong: "신강(身强) 무토(戊土): 압박 속에서 더욱 강해지는 구조예요. 외부 자극이 실력을 끌어올리는 타입이에요.",
     weak: "따뜻하고 배려심이 깊어요. 사람들에게 든든한 지지대가 되어주는 존재예요.",
     strengths: ["한번 결심한 것은 산처럼 흔들리지 않는 실행력이에요. 포기라는 단어가 없어요.", "압박과 위기 속에서 오히려 더 강해지는 역설적인 에너지: 어려울수록 빛나요.", "무게감 있는 존재감으로 주변을 안정시키는 능력이 있어요. 사람들이 자연스럽게 의지해요."],
     challenges: ["완벽주의로 인한 자기비판 과잉: 스스로에게 너무 엄격해서 소진될 수 있어요.", "감정 표현이 서툴러 오해받기 쉬워요. 속에서 많은 게 일어나도 겉으론 잘 티가 안 나요.", "축술(丑戌)형의 배신 에너지: 믿었던 사람에게 실망하는 경험이 반복될 수 있어요. 기대치 조율이 필요해요."],
@@ -244,9 +244,9 @@ const ILGAN_DESC = {
     }
   },
   기: {
-    core: "己土(기토): 습토(濕土)처럼 포용력과 공감력이 극도로 높은 타입이에요. 물 위에 뜬 섬처럼 유연하게 중심을 잡아요.",
-    strong: "신강(身强) 己土(기토): 자기 페이스를 유지하면서도 주변과 자연스럽게 어우러져요. 조직의 접착제 역할을 해요.",
-    weak: "신약(身弱) 己土(기토): 공감 능력이 탁월하고 타인의 감정을 빠르게 읽어요. 화(火)·토(土)를 통해 에너지를 채우는 것이 중요해요. 관계 속에서 에너지를 얻는 타입이에요.",
+    core: "기토(己土): 습토(濕土)처럼 포용력과 공감력이 극도로 높은 타입이에요. 물 위에 뜬 섬처럼 유연하게 중심을 잡아요.",
+    strong: "신강(身强) 기토(己土): 자기 페이스를 유지하면서도 주변과 자연스럽게 어우러져요. 조직의 접착제 역할을 해요.",
+    weak: "신약(身弱) 기토(己土): 공감 능력이 탁월하고 타인의 감정을 빠르게 읽어요. 화(火)·토(土)를 통해 에너지를 채우는 것이 중요해요. 관계 속에서 에너지를 얻는 타입이에요.",
     strengths: ["타인의 감정을 빠르게 읽고 자연스럽게 중재하는 능력: 갈등 상황에서 빛나요.", "갑기합(甲己合)으로 관성과 밀착: 조직·파트너십 속에서 진가가 드러나는 타입이에요.", "귀인을 자연스럽게 끌어당기는 인덕이 있어요. 주변에 도움을 주는 사람들이 모여요."],
     challenges: ["타인의 기대에 지나치게 부응하려는 경향: 나를 잃어버리기 쉬워요.", "'내가 다 해야 해' 마인드: 위임하는 것을 배워야 해요.", "감정을 억누르다 폭발하는 패턴: 화(火)의 결핍이 만드는 내면 에너지 축적이에요."],
     bestEnv: "팀과 역할이 명확한 환경. 내가 기여하는 게 보이는 프로젝트. 신뢰할 수 있는 소수와의 깊은 협업이 최고예요. 교육, 복지, 상담, HR, 조직 관리처럼 사람 사이를 조율하는 분야가 잘 맞아요.",
@@ -269,9 +269,9 @@ const ILGAN_DESC = {
     }
   },
   경: {
-    core: "庚金(경금): 단단한 쇠처럼 원칙과 정의를 중시하고, 불의에 타협하지 않는 타입이에요.",
-    strong: "신강(身强) 庚金(경금): 추진력과 결단력이 강해요. 목표가 생기면 거침없이 나아가는 실행력이 무기예요. 화(火)·수(水)로 균형을 맞추면 더 빛나요.",
-    weak: "신약(身弱) 庚金(경금): 섬세하고 분석적이에요. 토(土)·금(金)을 통해 에너지를 채우는 것이 중요해요. 겉은 강해 보여도 속은 매우 예민한 감수성을 가지고 있어요.",
+    core: "경금(庚金): 단단한 쇠처럼 원칙과 정의를 중시하고, 불의에 타협하지 않는 타입이에요.",
+    strong: "신강(身强) 경금(庚金): 추진력과 결단력이 강해요. 목표가 생기면 거침없이 나아가는 실행력이 무기예요. 화(火)·수(水)로 균형을 맞추면 더 빛나요.",
+    weak: "신약(身弱) 경금(庚金): 섬세하고 분석적이에요. 토(土)·금(金)을 통해 에너지를 채우는 것이 중요해요. 겉은 강해 보여도 속은 매우 예민한 감수성을 가지고 있어요.",
     strengths: ["한번 방향을 잡으면 흔들리지 않는 결단력이에요. 모호한 상황에서도 명확한 선택을 해요.", "불의에 타협하지 않는 정의감이 있어요. 원칙을 지키는 것이 때로 외롭지만 결국 신뢰를 만들어요.", "목표를 향한 거침없는 실행력이에요. 장애물이 생기면 뚫거나 부수는 구조예요."],
     challenges: ["원칙과 고집의 경계가 흐려질 수 있어요. 내 기준이 절대적이라고 믿는 순간 관계가 틀어져요.", "감정 표현이 서툴러요. 마음속엔 많은 감정이 있지만 직접 표현하는 것이 어색하고 불편해요.", "완벽주의로 자신과 타인 모두를 힘들게 해요. '충분히 좋은 것'을 받아들이는 연습이 필요해요."],
     bestEnv: "명확한 기준과 원칙이 있는 환경이에요. 법, 군대, 경찰, 외과, 기계 엔지니어링, 스포츠처럼 명확한 규칙과 결과가 있는 분야에서 빛나요. 모호하고 원칙이 없는 환경은 에너지를 소진시켜요.",
@@ -294,9 +294,9 @@ const ILGAN_DESC = {
     }
   },
   신: {
-    core: "辛金(신금): 세공된 보석처럼 예민하고 아름다움을 추구하는 타입이에요. 섬세한 감각과 날카로운 통찰력이 있어요.",
-    strong: "신강(身强) 辛金(신금): 자기 미학이 뚜렷하고 타협하지 않는 완벽주의자 기질이에요. 화(火)·수(水)로 균형을 맞추면 더 빛나요.",
-    weak: "신약(身弱) 辛金(신금): 감수성이 극도로 예민해요. 토(土)·금(金)을 통해 에너지를 채우는 것이 중요해요. 아름다운 것에 깊이 감동하고, 추한 것에 깊이 상처받아요.",
+    core: "신금(辛金): 세공된 보석처럼 예민하고 아름다움을 추구하는 타입이에요. 섬세한 감각과 날카로운 통찰력이 있어요.",
+    strong: "신강(身强) 신금(辛金): 자기 미학이 뚜렷하고 타협하지 않는 완벽주의자 기질이에요. 화(火)·수(水)로 균형을 맞추면 더 빛나요.",
+    weak: "신약(身弱) 신금(辛金): 감수성이 극도로 예민해요. 토(土)·금(金)을 통해 에너지를 채우는 것이 중요해요. 아름다운 것에 깊이 감동하고, 추한 것에 깊이 상처받아요.",
     strengths: ["섬세한 감각으로 아무도 포착하지 못한 디테일을 잡아내요. 이 능력이 전문성의 핵심이에요.", "한번 정한 미학과 기준은 흔들리지 않아요. 타협하지 않는 퀄리티가 신뢰를 만들어요.", "날카로운 통찰력으로 본질을 꿰뚫어요. 겉으로 드러나지 않는 것을 감지하는 능력이 있어요."],
     challenges: ["완벽주의가 행동을 막아요. '조금만 더 다듬으면'이라는 생각에 시작이 늦거나 완성이 안 되는 경우가 있어요.", "감수성이 너무 예민해서 일상적인 상황에서도 상처를 받아요. 회복 시간이 필요해요.", "자신의 기준이 너무 높아서 타인의 결과물을 인정하기 어려울 때가 있어요. 함께하는 사람들이 위축돼요."],
     bestEnv: "세밀함과 미적 감각이 필요한 환경이에요. 디자인, 패션, 보석, 작곡, 외과 수술, 정밀 기계, 편집처럼 섬세함이 가치인 분야에서 빛나요. 투박하고 대충 하는 문화는 스트레스예요.",
@@ -319,9 +319,9 @@ const ILGAN_DESC = {
     }
   },
   임: {
-    core: "壬水(임수): 큰 강처럼 흐르며 모든 것을 담는 포용력과 지혜를 가진 타입이에요.",
-    strong: "신강(身强) 壬水(임수): 통찰력과 직관이 탁월해요. 토(土)·목(木)으로 균형을 맞추면 더 크게 흐를 수 있어요. 전체를 보는 눈이 있고, 큰 그림을 그리는 능력이 있어요.",
-    weak: "신약(身弱) 壬水(임수): 공감 능력이 깊고 타인의 마음을 잘 읽어요. 금(金)·수(水)를 통해 에너지를 채우는 것이 중요해요. 섬세한 감수성으로 많은 사람에게 위로가 돼요.",
+    core: "임수(壬水): 큰 강처럼 흐르며 모든 것을 담는 포용력과 지혜를 가진 타입이에요.",
+    strong: "신강(身强) 임수(壬水): 통찰력과 직관이 탁월해요. 토(土)·목(木)으로 균형을 맞추면 더 크게 흐를 수 있어요. 전체를 보는 눈이 있고, 큰 그림을 그리는 능력이 있어요.",
+    weak: "신약(身弱) 임수(壬水): 공감 능력이 깊고 타인의 마음을 잘 읽어요. 금(金)·수(水)를 통해 에너지를 채우는 것이 중요해요. 섬세한 감수성으로 많은 사람에게 위로가 돼요.",
     strengths: ["전체를 보는 시야와 통찰력이에요. 복잡한 상황도 큰 흐름으로 읽는 능력이 있어요.", "포용력이 넓어서 다양한 사람과 상황을 담아낼 수 있어요. 편을 가르지 않아요.", "지적 호기심이 강해요. 끊임없이 새로운 것을 흡수하고 연결하는 능력이 있어요."],
     challenges: ["모든 것을 담으려다 정작 자신의 방향을 잃어요. 흐름에 맡기다 목적지를 잊는 패턴이에요.", "감정이 깊어서 상처도 깊어요. 흘려보내는 것처럼 보이지만 내면에서 오래 남아요.", "결정을 미루는 경향이 있어요. 모든 가능성을 열어두고 싶어서 선택을 늦춰요."],
     bestEnv: "넓은 시야와 전략적 사고가 필요한 환경이에요. 전략 기획, 학술 연구, 철학, 투자, 작가, 탐험가처럼 큰 그림을 그리는 분야에서 빛나요. 좁고 반복적인 업무는 에너지를 소진시켜요.",
@@ -344,9 +344,9 @@ const ILGAN_DESC = {
     }
   },
   계: {
-    core: "癸水(계수): 이슬처럼 섬세하고 스며드는 방식으로 세상을 이해하는 타입이에요. 직관과 감수성이 극도로 예민해요.",
-    strong: "신강(身强) 癸水(계수): 직관력과 통찰력이 뛰어나요. 토(土)·목(木)으로 방향을 잡아주면 더 깊어져요. 사람의 마음을 읽는 능력이 탁월해요.",
-    weak: "신약(身弱) 癸水(계수): 감수성이 매우 풍부해요. 금(金)·수(水)를 통해 에너지를 채우는 것이 중요해요. 예술·창작·치유 분야에서 남다른 재능을 보여요.",
+    core: "계수(癸水): 이슬처럼 섬세하고 스며드는 방식으로 세상을 이해하는 타입이에요. 직관과 감수성이 극도로 예민해요.",
+    strong: "신강(身强) 계수(癸水): 직관력과 통찰력이 뛰어나요. 토(土)·목(木)으로 방향을 잡아주면 더 깊어져요. 사람의 마음을 읽는 능력이 탁월해요.",
+    weak: "신약(身弱) 계수(癸水): 감수성이 매우 풍부해요. 금(金)·수(水)를 통해 에너지를 채우는 것이 중요해요. 예술·창작·치유 분야에서 남다른 재능을 보여요.",
     strengths: ["눈에 보이지 않는 것을 감지하는 직관이에요. 첫인상에서 상대의 본질을 꿰뚫는 능력이 있어요.", "이슬처럼 스며드는 방식으로 사람의 마음에 오래 남아요. 강요 없이 자연스럽게 영향을 줘요.", "감수성이 극도로 예민해서 예술·창작 분야에서 남다른 결과를 만들어요."],
     challenges: ["감수성이 너무 예민해서 일상에서도 자주 상처받아요. 회복에 시간이 오래 걸려요.", "자기 감정과 타인의 감정이 섞여서 경계가 흐려져요. 나인지 상대인지 모를 감정에 지치는 경우가 있어요.", "이상과 현실의 괴리에 자주 힘들어해요. 현실이 내 감성의 기준에 미치지 못하는 것이 괴로워요."],
     bestEnv: "감성과 직관이 가치인 환경이에요. 작가, 음악가, 심리상담, 치유 관련 분야, 영성·철학, 예술처럼 보이지 않는 것을 다루는 분야에서 빛나요. 차갑고 기계적인 환경은 맞지 않아요.",
@@ -854,7 +854,7 @@ function buildSajuData(input){
       persona,
       yearForecast,
       sixSystems:[
-        {system:"사주",key:`${ilju.hanja} 일주`,desc:`${OHK[ilO]} 일간의 ${singang}: ${singang==="신강(身强)"?`에너지가 넘쳐 외부의 자극을 동력으로 삼아요.`:`${OHK[ilO]}의 무게감을 지녔지만 내면의 에너지를 채우는 것이 우선이에요. 타인의 기대보다 자신의 중심을 지키는 것이 핵심이에요.`}`,insight:ILGAN_PHILOSOPHY[ilgan]||ilganDB.core},
+        {system:"사주",key:`${ilju.hanja} 일주`,desc:ILGAN_PHILOSOPHY[ilgan]||ilganDB.core,insight:""},
         {system:"토정비결",key:sajaDB.saja,desc:`${sajaDB.saja} 기운이에요.`,insight:sajaDB.desc},
         {system:"주역",key:ichingData.name,desc:ichingData.nature,insight:""},
         {system:"당사주",key:dansajuPillars.map(p=>p.byeolseong.split("(")[0]).join("·"),desc:`뿌리(년)에 ${_dsName(dansajuPillars[0].byeolseong)}이 자리해 타고난 재능과 뿌리 에너지를 만들고, 성장기(월)에 ${_dsName(dansajuPillars[1].byeolseong)}이 들어 안정과 성장의 에너지를 더해요. 일주(나)에 ${_dsName(dansajuPillars[2].byeolseong)}이 있어 가장 가까운 관계에서 변수가 생기기 쉽고, 말년(시)에 ${_dsName(dansajuPillars[3].byeolseong)}이 들어 삶의 후반에 독특한 인연과 직관이 빛나요.`,insight:""},
@@ -863,17 +863,26 @@ function buildSajuData(input){
         {system:"MBTI",key:mbtiType,desc:mbtiDesc,insight:""},
       ],
       sevenInsight:(()=>{
-        const best=yearForecast.reduce((a,b)=>a.score>=b.score?a:b);
+        // 점수 정렬: 최고점 / 2등 연도 파악
+        const sorted=[...yearForecast].sort((a,b)=>b.score-a.score);
         const today=yearForecast[0];
-        const todayAreas=today.areas?Object.entries(today.areas).sort((a,b)=>b[1]-a[1]):[]; // 높은 순
-        const bestAreas=best.areas?Object.entries(best.areas).sort((a,b)=>b[1]-a[1]):[];
-        const topTodayArea=todayAreas[0]?`${todayAreas[0][0]}(${todayAreas[0][1]}점)`:"";
-        const topBestArea=bestAreas[0]?`${bestAreas[0][0]}(${bestAreas[0][1]}점)`:"";
-        const isSameYear=best.year===today.year;
-        const charPart=`${OHK[ilO]} 기운의 ${singang} 구조로, 용신인 ${yongsinA_val} 기운이 살아날 때 준비한 것들이 결실을 맺어요.`;
-        const todayPart=`올해 ${today.year}년은 ${today.summary} ${topTodayArea?`특히 ${topTodayArea} 영역이 가장 활발해요.`:""}`;
-        const bestPart=isSameYear?"":`향후 가장 빛나는 해는 ${best.year}년(${best.score}점)으로, ${topBestArea?`${topBestArea} 영역을 중심으로 `:""}준비해온 것들이 가장 크게 꽃피는 시기예요. 그 해를 목표로 지금부터 씨앗을 심는 흐름이에요.`;
-        return `${charPart} ${todayPart} ${bestPart}`.trim();
+        const best=sorted[0];
+        const second=sorted[1];
+        // 올해가 최고점이면 2등 연도 사용
+        const highlight=best.year===today.year?second:best;
+        const hlAreas=highlight.areas?Object.entries(highlight.areas).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,v])=>`${k} ${v}점`).join(", "):"";
+        const todayAreas=today.areas?Object.entries(today.areas).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,v])=>`${k} ${v}점`).join(", "):"";
+
+        // 7체계 통합 성격 결론 (사주+토정+주역+당사주+타로+MBTI 핵심 교차)
+        const charConclusion=`${OHK[ilO]} 기운의 ${singang} 구조로, ${ILGAN_PHILOSOPHY[ilgan]||ilganDB.core} 토정비결의 ${sajaDB.saja}(${sajaDB.desc.slice(0,20)}…), 주역의 ${ichingData.name}(${ichingData.nature})이 이 흐름을 뒷받침해요. 당사주의 ${_dsName(dansajuPillars[2].byeolseong)}이 삶의 중심축이 되고, 생명경로수 ${lp}의 에너지와 ${mbtiType}의 기질이 더해져 ${OHK[ilO]} 일간 특유의 ${singang==="신강(身强)"?"강한 추진력과 실행력":"조용하지만 깊은 내면의 저력"}이 삶 전체를 관통해요.`;
+
+        // 올해 운세
+        const todayPart=`올해 ${today.year}년(${today.score}점)은 ${today.summary}${todayAreas?` 특히 ${todayAreas} 영역이 활발해요.`:" 꾸준히 나아가는 것이 중요해요."}`;
+
+        // 하이라이트 연도 운세
+        const hlPart=`향후 가장 빛나는 시기는 ${highlight.year}년(${highlight.score}점)으로${hlAreas?`, ${hlAreas} 영역을 중심으로`:""} 지금까지 쌓아온 것들이 가장 크게 꽃피는 해예요. 지금은 그 해를 향해 씨앗을 심는 시기예요.`;
+
+        return `${charConclusion}\n\n${todayPart} ${hlPart}`;
       })(),
     },
     sinsal,hap:[],hyeong:[],chung:[],
@@ -897,7 +906,7 @@ function buildSajuData(input){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 4. 공통 UI
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const GT=({children})=><p style={{fontSize:13,color:"#666",lineHeight:1.78,margin:"8px 0 0",borderLeft:"3px solid #e8e8e8",paddingLeft:10}}>{children}</p>;
+const GT=({children})=><p style={{fontSize:13,color:"#666",lineHeight:1.78,margin:"8px 0 0",borderLeft:"3px solid #e8e8e8",paddingLeft:10,textAlign:"justify"}}>{children}</p>;
 const ST=({icon,title,sub})=><div style={{marginBottom:6}}><div style={{fontSize:16,fontWeight:800,color:"#1a1a1a",display:"flex",alignItems:"center",gap:6}}><span>{icon}</span><span>{title}</span></div>{sub&&<div style={{fontSize:11,color:"#aaa",marginTop:1}}>{sub}</div>}</div>;
 const Ring=({score,size=52})=>{const r=18,c2=2*Math.PI*r,col=score>=75?"#4caf50":score>=60?"#ffb300":"#ef5350";return <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{flexShrink:0}}><circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#eee" strokeWidth={3.5}/><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={col} strokeWidth={3.5} strokeDasharray={`${(score/100)*c2} ${c2}`} strokeLinecap="round" transform={`rotate(-90 ${size/2} ${size/2})`}/><text x={size/2} y={size/2+4} textAnchor="middle" fontSize={size<=44?10:12} fontWeight={800} fill={col}>{score}</text></svg>;};
 const sc=s=>s>=75?"#2e7d32":s>=60?"#e65100":"#b71c1c";
@@ -956,14 +965,16 @@ function TabSummary({d,changeTab}){return <>
   <section style={S.card}>
     <ST icon="🔮" title="사주 성격 요약"/>
     <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
-      {(d.summary?.persona||[]).map((p,i)=><div key={i} style={{display:"flex",gap:10,padding:"11px 13px",background:"#fafafa",borderRadius:11,border:"1px solid #f0f0f0"}}><span style={{fontSize:20,flexShrink:0}}>{p.icon}</span><div><div style={{fontSize:13,fontWeight:800,color:"#111",marginBottom:2}}>{p.title}</div><div style={{fontSize:12,color:"#555",lineHeight:1.75}}>{p.desc}</div></div></div>)}
+      {(d.summary?.persona||[]).map((p,i)=><div key={i} style={{display:"flex",gap:10,padding:"11px 13px",background:"#fafafa",borderRadius:11,border:"1px solid #f0f0f0"}}><span style={{fontSize:20,flexShrink:0}}>{p.icon}</span><div><div style={{fontSize:13,fontWeight:800,color:"#111",marginBottom:2}}>{p.title}</div><div style={{fontSize:12,color:"#555",lineHeight:1.75,textAlign:"justify"}}>{p.desc}</div></div></div>)}
     </div>
   </section>
   <section style={S.card}>
     <ST icon="🌐" title="7체계 종합 분석" sub="사주·토정비결·주역·당사주·점성술·타로수비학·MBTI"/>
     <GT>일곱 가지 운명 분석 체계가 공통으로 가리키는 핵심 주제입니다.</GT>
     <div style={{marginTop:10,padding:"14px 16px",background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderRadius:12,marginBottom:10}}>
-      <p style={{fontSize:13,color:"#e0e7ff",lineHeight:1.9,margin:0}}>{d.summary?.sevenInsight||""}</p>
+      {(d.summary?.sevenInsight||"").split("\n\n").map((para,i)=>(
+        <p key={i} style={{fontSize:13,color:"#e0e7ff",lineHeight:1.9,margin:i>0?"12px 0 0":"0",textAlign:"justify"}}>{para}</p>
+      ))}
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:6}}>
       {(d.summary?.sixSystems||[]).map((s,i)=>(
@@ -981,7 +992,7 @@ function TabSummary({d,changeTab}){return <>
     <ST icon="📆" title={`향후 5년 흐름 (${CY}~${CY+4})`}/>
     <GT>6체계 교차 분석 종합 운기 점수입니다.</GT>
     <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
-      {(d.summary?.yearForecast||[]).map((yf,i)=><div key={i} style={{display:"flex",flexDirection:"column",gap:6,padding:"10px 12px",background:scBg(yf.score),borderRadius:11}}><div style={{display:"flex",alignItems:"center",gap:10}}><Ring score={yf.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}><span style={{fontSize:14,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>{yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}</div><div style={{fontSize:12,color:"#444",lineHeight:1.6}}>{yf.summary}</div></div></div>{yf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.1)"}}>
+      {(d.summary?.yearForecast||[]).map((yf,i)=><div key={i} style={{display:"flex",flexDirection:"column",gap:6,padding:"10px 12px",background:scBg(yf.score),borderRadius:11}}><div style={{display:"flex",alignItems:"center",gap:10}}><Ring score={yf.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}><span style={{fontSize:14,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>{yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}</div><div style={{fontSize:12,color:"#444",lineHeight:1.6,textAlign:"justify"}}>{yf.summary}</div></div></div>{yf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.1)"}}>
         {Object.entries(yf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.6)",color:sc(v),fontWeight:700}}>{k.slice(0,3)} {v}</div>)}
       </div>}</div>)}
     </div>
@@ -1127,7 +1138,7 @@ function SeunSheet({item,onClose,reportData}){
       {item.month&&<div style={{display:"flex",gap:8,marginBottom:10}}>
         {[{g:gj.gan,isG:true,c:gc(gj.gan.ko)},{g:gj.ji,isG:false,c:jc(gj.ji.ko)}].map(({g,isG,c},pi)=><div key={pi} style={{flex:1,padding:"8px 10px",background:c.bg,borderRadius:9,border:`1px solid ${c.border}`,textAlign:"center"}}><div style={{fontSize:10,color:c.text,fontWeight:600,marginBottom:2}}>{isG?"천간(天干)":"지지(地支)"}</div><div style={{fontSize:16,fontWeight:900,color:c.text}}>{g.hanja}({g.ko})</div></div>)}
       </div>}
-      <p style={{fontSize:13,color:"#444",lineHeight:1.85,margin:"0 0 14px",background:"#fafafa",padding:"11px 13px",borderRadius:10}}>{getYMEMO(item.year, reportData)}</p>
+      <p style={{fontSize:13,color:"#444",lineHeight:1.85,textAlign:"justify",margin:"0 0 14px",background:"#fafafa",padding:"11px 13px",borderRadius:10}}>{getYMEMO(item.year, reportData)}</p>
       <div style={{fontSize:12,color:"#aaa",fontWeight:700,marginBottom:9}}>분야별 운기</div>
       <div style={{display:"flex",flexDirection:"column",gap:10}}>
         {AREAS.map(a=>{const s=detail[a.k],c=s>=75?"#4caf50":s>=60?"#ffb300":"#ef5350";return <div key={a.k} style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:18,width:24}}>{a.i}</span><span style={{fontSize:13,fontWeight:700,width:46,color:"#333"}}>{a.k}</span><div style={{flex:1,height:8,background:"#f0f0f0",borderRadius:99,overflow:"hidden"}}><div style={{width:`${s}%`,height:"100%",background:c,borderRadius:99}}/></div><span style={{fontSize:13,fontWeight:800,color:c,width:26,textAlign:"right"}}>{s}</span></div>;})}
@@ -1253,7 +1264,7 @@ function TabSaju({d,reportData}){
                     <div style={{fontSize:10,color:"#999"}}>{OC[dv.ohaeng]?.name} 기운</div>
                   </div>
                 </div>
-                <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.75}}>{dv.desc}</p>
+                <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.75,textAlign:"justify"}}>{dv.desc}</p>
               </div>
             </div>
           );
@@ -1279,7 +1290,7 @@ function TabDayNight({d}){
         ].map(({t,c,tc,v})=>(
           <div key={t} style={{minHeight:72,padding:"10px 14px",background:c,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
             <div style={{fontSize:12,fontWeight:800,color:tc,marginBottom:v?4:0}}>{t}</div>
-            {v&&<p style={{fontSize:13,color:"#444",margin:0,lineHeight:1.75}}>{v}</p>}
+            {v&&<p style={{fontSize:13,color:"#444",margin:0,lineHeight:1.75,textAlign:"justify"}}>{v}</p>}
           </div>
         ))}
       </div>
@@ -1325,7 +1336,7 @@ function TabTojung({d}){
       <div style={{marginTop:10,padding:"14px 15px",background:"#e8f5e0",borderRadius:11,border:"1px solid #a5d6a7"}}>
         <div style={{fontSize:11,color:"#2d6a2d",fontWeight:700,marginBottom:5}}>본명 총운(總運) 사자성어</div>
         <div style={{fontSize:20,fontWeight:900,color:"#1b5e20",marginBottom:6}}>{tj.saja}</div>
-        <p style={{fontSize:13,color:"#388e3c",margin:0,lineHeight:1.78}}>{tj.bonunDesc}</p>
+        <p style={{fontSize:13,color:"#388e3c",margin:0,lineHeight:1.78,textAlign:"justify"}}>{tj.bonunDesc}</p>
       </div>
       <div style={{marginTop:12}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>연도별 운세 ({CY}~{CY+4})</div>
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
@@ -1349,12 +1360,12 @@ function TabTojung({d}){
         <div style={{fontSize:11,color:"#5c6bc0",marginTop:3}}>{ic.gaeNature}</div>
         <div style={{fontSize:11,color:"#888",marginTop:4}}>상괘 {ic.gaeUpper} / 하괘 {ic.gaeLower}</div>
       </div>
-      <p style={{fontSize:13,color:"#444",lineHeight:1.85,margin:"10px 0 0"}}>{ic.gaeDesc}</p>
-      <div style={{marginTop:10,padding:"11px 13px",background:"#e3f2fd",borderRadius:10}}><div style={{fontSize:11,color:"#0d47a1",fontWeight:700,marginBottom:3}}>현재 변괘 ({ic.currentYear})</div><div style={{fontSize:15,fontWeight:900,color:"#1565c0"}}>{ic.currentGae}</div><p style={{fontSize:12,color:"#555",margin:"5px 0 0",lineHeight:1.7}}>{ic.currentDesc}</p></div>
-      <div style={{marginTop:10,padding:"11px 13px",background:"#f9f9f9",borderRadius:10}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:7}}>주역이 전하는 인생 전략 3가지</div>{ic.strategy.map((s,i)=><div key={i} style={{fontSize:13,color:"#555",padding:"5px 0",borderBottom:i<2?"1px dashed #eee":"none",lineHeight:1.7}}><span style={{fontWeight:700,color:"#e65100",marginRight:6}}>{i+1}.</span>{s}</div>)}</div>
+      <p style={{fontSize:13,color:"#444",lineHeight:1.85,textAlign:"justify",margin:"10px 0 0"}}>{ic.gaeDesc}</p>
+      <div style={{marginTop:10,padding:"11px 13px",background:"#e3f2fd",borderRadius:10}}><div style={{fontSize:11,color:"#0d47a1",fontWeight:700,marginBottom:3}}>현재 변괘 ({ic.currentYear})</div><div style={{fontSize:15,fontWeight:900,color:"#1565c0"}}>{ic.currentGae}</div><p style={{fontSize:12,color:"#555",margin:"5px 0 0",lineHeight:1.7,textAlign:"justify"}}>{ic.currentDesc}</p></div>
+      <div style={{marginTop:10,padding:"11px 13px",background:"#f9f9f9",borderRadius:10}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:7}}>주역이 전하는 인생 전략 3가지</div>{ic.strategy.map((s,i)=><div key={i} style={{fontSize:13,color:"#555",padding:"5px 0",borderBottom:i<2?"1px dashed #eee":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{fontWeight:700,color:"#e65100",marginRight:6}}>{i+1}.</span>{s}</div>)}</div>
       <div style={{marginTop:10}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>연도별 괘 에너지</div>
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
-          {ic.yearFlow.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}><span style={{fontSize:13,fontWeight:900,color:"#111"}}>{y.year}년</span><span style={{fontSize:11,color:"#888"}}>{y.gae}</span></div><div style={{fontSize:12,color:"#555",lineHeight:1.6}}>{y.desc}</div></div></div>)}
+          {ic.yearFlow.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}><span style={{fontSize:13,fontWeight:900,color:"#111"}}>{y.year}년</span><span style={{fontSize:11,color:"#888"}}>{y.gae}</span></div><div style={{fontSize:12,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
         </div>
       </div>
     </section>
@@ -1379,14 +1390,14 @@ function TabTojung({d}){
                 <div style={{fontSize:11,color:"#888"}}>{p.palace}</div>
               </div>
             </div>
-            <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.75}}>{p.desc}</p>
+            <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.75,textAlign:"justify"}}>{p.desc}</p>
           </div>;
         })}
       </div>
-      <div style={{marginTop:10,padding:"11px 13px",background:"#e8f5e0",borderRadius:10}}><div style={{fontSize:12,fontWeight:800,color:"#2d6a2d",marginBottom:5}}>당사주 종합 기질</div><p style={{fontSize:13,color:"#333",margin:0,lineHeight:1.8}}>{ds.overall}</p></div>
+      <div style={{marginTop:10,padding:"11px 13px",background:"#e8f5e0",borderRadius:10}}><div style={{fontSize:12,fontWeight:800,color:"#2d6a2d",marginBottom:5}}>당사주 종합 기질</div><p style={{fontSize:13,color:"#333",margin:0,lineHeight:1.8,textAlign:"justify"}}>{ds.overall}</p></div>
       <div style={{marginTop:10}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>연도별 운세</div>
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
-          {ds.yearFlow.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{fontSize:13,fontWeight:900,color:"#111",marginBottom:2}}>{y.year}년</div><div style={{fontSize:12,color:"#555",lineHeight:1.6}}>{y.desc}</div></div></div>)}
+          {ds.yearFlow.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{fontSize:13,fontWeight:900,color:"#111",marginBottom:2}}>{y.year}년</div><div style={{fontSize:12,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
         </div>
       </div>
     </section>
@@ -1398,18 +1409,56 @@ function TabTojung({d}){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function TabAstro({d}){
   const a=d.astro,t=d.tarot;
+  const [astroAI,setAstroAI]=React.useState(null);
+  const [tarotAI,setTarotAI]=React.useState(null);
+  const [loadingAstro,setLoadingAstro]=React.useState(false);
+  const [loadingTarot,setLoadingTarot]=React.useState(false);
+
+  async function fetchNatal(){
+    if(astroAI||loadingAstro) return;
+    setLoadingAstro(true);
+    try{
+      const prompt=`사주: ${d.pillars?.map(p=>`${p.name} ${p.gan.hanja}${p.ji.hanja}`).join(", ")}. 일간: ${d.pillars?.[2]?.gan?.ko||"무"}. 생년월일: ${d.birth}. 서양 점성술 네이탈 차트 관점에서 이 사람의 태양궁·달궁·ASC·수성·금성·화성 위치를 사주 일간과 교차하여 분석해줘. 각 행성은 2~3문장으로 설명해. 마지막에 삼각 핵심 분석(태양·달·ASC 관계) 1문단 추가. 전체를 JSON으로만 응답: {"sun":"양자리 0도","sunDesc":"..","moon":"게자리","moonDesc":"..","asc":"천칭자리","ascDesc":"..","mercury":"물고기자리","mercuryDesc":"..","venus":"황소자리","venusDesc":"..","mars":"전갈자리","marsDesc":"..","triangle":".."}`;
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
+      const data=await res.json();
+      const text=data.content?.map(c=>c.text||"").join("").replace(/```json|```/g,"").trim();
+      setAstroAI(JSON.parse(text));
+    }catch(e){console.error(e);}
+    setLoadingAstro(false);
+  }
+
+  async function fetchTarotAchieve(){
+    if(tarotAI||loadingTarot) return;
+    setLoadingTarot(true);
+    try{
+      const prompt=`생명경로수: ${t.lifePath}. 본명 타로 카드: ${t.lifePathCard}. 영혼 카드: ${t.soulCard}. 사주 일간: ${d.pillars?.[2]?.gan?.ko||"무"}(${d.pillars?.[2]?.gan?.hanja||"戊"}). 성취 카드(Achievement Card)는 생명경로수+1번 카드인 ${t.achieveCard}이에요. 이 사람이 인생에서 실현해야 할 성취의 에너지를 사주 일간과 연결하여 구체적이고 깊게 설명해줘. 3~4문장. JSON으로만 응답: {"achieveDesc":"..."}`;
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:400,messages:[{role:"user",content:prompt}]})});
+      const data=await res.json();
+      const text=data.content?.map(c=>c.text||"").join("").replace(/```json|```/g,"").trim();
+      setTarotAI(JSON.parse(text));
+    }catch(e){console.error(e);}
+    setLoadingTarot(false);
+  }
+
+  const sunData=astroAI||a;
+  const achieveDesc=tarotAI?.achieveDesc||t.achieveDesc;
+
   return <>
     <section style={S.card}>
       <ST icon="✨" title="서양 점성술 네이탈 차트"/>
       <GT>출생 시각과 장소를 기준으로 행성의 위치를 분석합니다. 태양·달·ASC 삼각 관계가 성격의 핵심 구조를 이룹니다.</GT>
+      {!astroAI&&<button onClick={fetchNatal} disabled={loadingAstro}
+        style={{marginTop:10,width:"100%",padding:"11px 0",borderRadius:10,border:"1.5px solid #5e35b1",fontSize:13,fontWeight:700,cursor:loadingAstro?"not-allowed":"pointer",background:loadingAstro?"#f5f5f5":"#fff",color:loadingAstro?"#aaa":"#5e35b1",fontFamily:"inherit"}}>
+        {loadingAstro?"✨ 네이탈 차트 분석 중...":"✨ AI 네이탈 차트 분석 받기"}
+      </button>}
       <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:7}}>
         {[
-          {l:"태양 ☉",v:a.sun,meaning:a.sunMeaning,desc:a.sunDesc,bg:"#fff8e1",c:"#f57f17"},
-          {l:"달 ☽",v:a.moon,meaning:a.moonMeaning,desc:a.moonDesc,bg:"#e8f5e0",c:"#2e7d32"},
-          {l:"ASC 상승점",v:a.asc,meaning:a.ascMeaning,desc:a.ascDesc,bg:"#fce4ec",c:"#880e4f"},
-          {l:"수성 ☿",v:a.mercury,meaning:"언어·사고·소통 방식",desc:a.mercuryDesc,bg:"#f3f3f3",c:"#424242"},
-          {l:"금성 ♀",v:a.venus,meaning:"사랑·가치관·매력",desc:a.venusDesc,bg:"#fce4ec",c:"#c62828"},
-          {l:"화성 ♂",v:a.mars,meaning:"행동력·에너지·욕망",desc:a.marsDesc,bg:"#fdecea",c:"#b71c1c"},
+          {l:"태양 ☉",v:sunData.sun,meaning:a.sunMeaning,desc:sunData.sunDesc,bg:"#fff8e1",c:"#f57f17"},
+          {l:"달 ☽",v:sunData.moon,meaning:a.moonMeaning,desc:sunData.moonDesc,bg:"#e8f5e0",c:"#2e7d32"},
+          {l:"ASC 상승점",v:sunData.asc,meaning:a.ascMeaning,desc:sunData.ascDesc,bg:"#fce4ec",c:"#880e4f"},
+          {l:"수성 ☿",v:sunData.mercury,meaning:"언어·사고·소통 방식",desc:sunData.mercuryDesc,bg:"#f3f3f3",c:"#424242"},
+          {l:"금성 ♀",v:sunData.venus,meaning:"사랑·가치관·매력",desc:sunData.venusDesc,bg:"#fce4ec",c:"#c62828"},
+          {l:"화성 ♂",v:sunData.mars,meaning:"행동력·에너지·욕망",desc:sunData.marsDesc,bg:"#fdecea",c:"#b71c1c"},
         ].map((item,i)=>(
           <div key={i} style={{padding:"10px 13px",background:item.bg,borderRadius:10}}>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
@@ -1417,21 +1466,20 @@ function TabAstro({d}){
               <span style={{fontSize:13,fontWeight:900,color:"#111"}}>{item.v}</span>
             </div>
             <div style={{fontSize:10,color:"#999",marginBottom:4}}>{item.meaning}</div>
-            <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.65}}>{item.desc}</p>
+            <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.65,textAlign:"justify"}}>{item.desc}</p>
           </div>
         ))}
       </div>
-      <div style={{marginTop:10,padding:"11px 13px",background:"#f3e5f5",borderRadius:10}}><div style={{fontSize:11,color:"#4a148c",fontWeight:700,marginBottom:4}}>삼각 핵심 분석</div><p style={{fontSize:13,color:"#444",margin:0,lineHeight:1.8}}>{a.triangle}</p></div>
-      <div style={{marginTop:8,padding:"10px 13px",background:"#e8f5e0",borderRadius:10}}><div style={{fontSize:11,color:"#2d6a2d",fontWeight:700,marginBottom:3}}>스텔리움(Stellium)</div><p style={{fontSize:13,color:"#333",margin:0,lineHeight:1.7}}>{a.stellium}</p></div>
+      <div style={{marginTop:10,padding:"11px 13px",background:"#f3e5f5",borderRadius:10}}><div style={{fontSize:11,color:"#4a148c",fontWeight:700,marginBottom:4}}>삼각 핵심 분석</div><p style={{fontSize:13,color:"#444",margin:0,lineHeight:1.8,textAlign:"justify"}}>{astroAI?.triangle||a.triangle}</p></div>
       {(a.yearTransit||[]).length>0&&<div style={{marginTop:12}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>주요 트랜짓 {CY}~{CY+4}</div>
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
-          {a.yearTransit.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}><span style={{fontSize:13,fontWeight:900,color:"#111"}}>{y.year}년</span><span style={{fontSize:11,color:"#5e35b1",fontWeight:700}}>{y.planet}</span></div><div style={{fontSize:12,color:"#555",lineHeight:1.6}}>{y.desc}</div></div></div>)}
+          {a.yearTransit.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}><span style={{fontSize:13,fontWeight:900,color:"#111"}}>{y.year}년</span><span style={{fontSize:11,color:"#5e35b1",fontWeight:700}}>{y.planet}</span></div><div style={{fontSize:12,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
         </div>
       </div>}
     </section>
     <section style={S.card}>
       <ST icon="🃏" title="타로 · 수비학"/>
-      <p style={{fontSize:13,color:"#666",lineHeight:1.78,margin:"10px 0 12px",borderLeft:"3px solid #e8e8e8",paddingLeft:10}}>{t.calc}</p>
+      <p style={{fontSize:13,color:"#666",lineHeight:1.78,margin:"10px 0 12px",borderLeft:"3px solid #e8e8e8",paddingLeft:10,textAlign:"justify"}}>{t.calc}</p>
       <div style={{display:"flex",gap:10,marginBottom:10}}>
         <div style={{flex:1,padding:"13px",background:"linear-gradient(135deg,#e3f2fd,#f3e5f5)",borderRadius:12,textAlign:"center"}}>
           <div style={{fontSize:10,color:"#555",marginBottom:3}}>생명경로수</div>
@@ -1443,7 +1491,7 @@ function TabAstro({d}){
           <div style={{fontSize:20,fontWeight:900,color:"#5e35b1",marginTop:2}}>{t.lifePathCardNum}</div>
         </div>
       </div>
-      <p style={{fontSize:13,color:"#444",lineHeight:1.85,margin:"0 0 10px"}}>{t.lifePathDesc}</p>
+      <p style={{fontSize:13,color:"#444",lineHeight:1.85,textAlign:"justify",margin:"0 0 10px"}}>{t.lifePathDesc}</p>
       <div style={{display:"flex",gap:8,marginBottom:12}}>
         <div style={{flex:1,padding:"10px 11px",background:"#e3f2fd",borderRadius:10}}>
           <div style={{fontSize:10,color:"#0d47a1",fontWeight:700,marginBottom:2}}>영혼 카드(Soul)</div>
@@ -1453,7 +1501,11 @@ function TabAstro({d}){
         <div style={{flex:1,padding:"10px 11px",background:"#e8f5e0",borderRadius:10}}>
           <div style={{fontSize:10,color:"#2d6a2d",fontWeight:700,marginBottom:2}}>성취 카드(Achievement)</div>
           <div style={{fontSize:13,fontWeight:800,color:"#1b5e20"}}>{t.achieveCard}</div>
-          <div style={{fontSize:11,color:"#555",marginTop:3}}>{t.achieveDesc}</div>
+          {!tarotAI&&<button onClick={fetchTarotAchieve} disabled={loadingTarot}
+            style={{marginTop:6,width:"100%",padding:"6px 0",borderRadius:8,border:"1.5px solid #2d6a2d",fontSize:11,fontWeight:700,cursor:loadingTarot?"not-allowed":"pointer",background:loadingTarot?"#f5f5f5":"#fff",color:loadingTarot?"#aaa":"#2d6a2d",fontFamily:"inherit"}}>
+            {loadingTarot?"분석 중...":"AI 성취 카드 분석"}
+          </button>}
+          <div style={{fontSize:11,color:"#555",marginTop:3,textAlign:"justify"}}>{achieveDesc}</div>
         </div>
       </div>
       <div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>연도별 개인연도수 & 타로</div>
@@ -1472,7 +1524,7 @@ function TabAstro({d}){
                 <span style={{fontSize:11,color:y.num===22?"#c4b5fd":"#5e35b1",fontWeight:700}}>{y.card}</span>
                 <span style={{fontSize:12,fontWeight:900,color:sc(y.score)}}>{y.score}점</span>
               </div>
-              <div style={{fontSize:12,color:y.num===22?"#e0e7ff":"#555",lineHeight:1.6}}>{y.desc}</div>
+              <div style={{fontSize:12,color:y.num===22?"#e0e7ff":"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div>
             </div>
           </div>
         ))}
@@ -1537,22 +1589,22 @@ function TabMBTI({d}){
                 </div>
               </div>
             </div>
-            <div style={{fontSize:12,color:"#555",lineHeight:1.7}}>{ax.basis}</div>
+            <div style={{fontSize:12,color:"#555",lineHeight:1.7,textAlign:"justify"}}>{ax.basis}</div>
           </div>;
         })}
       </div>
     </section>
     <section style={S.card}>
       <ST icon="⚡" title="경계 기능 (F↔T)"/>
-      <div style={{padding:"12px 14px",background:"#fff8e1",borderRadius:11,border:"1px solid #ffe082",marginTop:10}}><p style={{fontSize:13,color:"#5d4037",margin:0,lineHeight:1.8}}>{m.borderline}</p></div>
+      <div style={{padding:"12px 14px",background:"#fff8e1",borderRadius:11,border:"1px solid #ffe082",marginTop:10}}><p style={{fontSize:13,color:"#5d4037",margin:0,lineHeight:1.8,textAlign:"justify"}}>{m.borderline}</p></div>
     </section>
     <section style={S.card}>
       <ST icon="🌟" title="강점·과제·최적 환경"/>
       <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:10}}>
-        <div style={{padding:"12px 14px",background:"#e8f5e0",borderRadius:11}}><div style={{fontSize:12,fontWeight:800,color:"#2d6a2d",marginBottom:7}}>강점(Strengths)</div>{(m.strengths||[]).map((s,i)=><div key={i} style={{fontSize:13,color:"#333",padding:"4px 0",borderBottom:i<m.strengths.length-1?"1px dashed #c8e6c9":"none",lineHeight:1.7}}><span style={{color:"#4caf50",fontWeight:700,marginRight:6}}>✓</span>{s}</div>)}</div>
-        <div style={{padding:"12px 14px",background:"#fdecea",borderRadius:11}}><div style={{fontSize:12,fontWeight:800,color:"#b71c1c",marginBottom:7}}>성장 과제(Challenges)</div>{(m.challenges||[]).map((s,i)=><div key={i} style={{fontSize:13,color:"#333",padding:"4px 0",borderBottom:i<m.challenges.length-1?"1px dashed #ffcdd2":"none",lineHeight:1.7}}><span style={{color:"#ef5350",fontWeight:700,marginRight:6}}>△</span>{s}</div>)}</div>
-        <div style={{padding:"12px 14px",background:"#e3f2fd",borderRadius:11}}><div style={{fontSize:12,fontWeight:800,color:"#0d47a1",marginBottom:5}}>최적 환경</div><p style={{fontSize:13,color:"#333",margin:0,lineHeight:1.75}}>{m.bestEnv}</p></div>
-        <div style={{padding:"12px 14px",background:"#f3e5f5",borderRadius:11}}><div style={{fontSize:12,fontWeight:800,color:"#4a148c",marginBottom:5}}>회복 방법</div><p style={{fontSize:13,color:"#333",margin:0,lineHeight:1.75}}>{m.recovery}</p></div>
+        <div style={{padding:"12px 14px",background:"#e8f5e0",borderRadius:11}}><div style={{fontSize:12,fontWeight:800,color:"#2d6a2d",marginBottom:7}}>강점(Strengths)</div>{(m.strengths||[]).map((s,i)=><div key={i} style={{fontSize:13,color:"#333",padding:"4px 0",borderBottom:i<m.strengths.length-1?"1px dashed #c8e6c9":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{color:"#4caf50",fontWeight:700,marginRight:6}}>✓</span>{s}</div>)}</div>
+        <div style={{padding:"12px 14px",background:"#fdecea",borderRadius:11}}><div style={{fontSize:12,fontWeight:800,color:"#b71c1c",marginBottom:7}}>성장 과제(Challenges)</div>{(m.challenges||[]).map((s,i)=><div key={i} style={{fontSize:13,color:"#333",padding:"4px 0",borderBottom:i<m.challenges.length-1?"1px dashed #ffcdd2":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{color:"#ef5350",fontWeight:700,marginRight:6}}>△</span>{s}</div>)}</div>
+        <div style={{padding:"12px 14px",background:"#e3f2fd",borderRadius:11}}><div style={{fontSize:12,fontWeight:800,color:"#0d47a1",marginBottom:5}}>최적 환경</div><p style={{fontSize:13,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{m.bestEnv}</p></div>
+        <div style={{padding:"12px 14px",background:"#f3e5f5",borderRadius:11}}><div style={{fontSize:12,fontWeight:800,color:"#4a148c",marginBottom:5}}>회복 방법</div><p style={{fontSize:13,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{m.recovery}</p></div>
       </div>
     </section>
   </>;
@@ -1737,7 +1789,7 @@ export default function SajuReport(){
 
 
 const S={
-  root:{fontFamily:"'Noto Sans KR','Apple SD Gothic Neo',sans-serif",maxWidth:480,margin:"0 auto",background:"#f4f4f6",minHeight:"100vh",paddingBottom:48},
+  root:{fontFamily:"'Noto Sans KR','Apple SD Gothic Neo',sans-serif",maxWidth:480,margin:"0 auto",background:"#f4f4f6",minHeight:"100vh",paddingBottom:48,textAlign:"justify"},
   header:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:"#fff",borderBottom:"1px solid #eee",position:"sticky",top:0,zIndex:20},
   navBtn:{background:"none",border:"none",fontSize:22,color:"#333",cursor:"pointer",width:32,padding:0},
   headerTitle:{fontSize:16,fontWeight:700,color:"#111"},
