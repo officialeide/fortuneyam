@@ -477,8 +477,8 @@ function buildSajuData(input){
   const gisinA_val = yongDB[vsKey].gisin;
 
   // 5년 운세 점수 (용신/기신 세운 기반)
-  const yongsinOList = yongsinA_val.replace(/[^가-힣]/g,"").split("").filter(o=>["목","화","토","금","수"].includes(o));
-  const gisinOList = gisinA_val.replace(/[^가-힣]/g,"").split("").filter(o=>["목","화","토","금","수"].includes(o));
+  const yongsinOList = (yongsinA_val||"").replace(/[^가-힣]/g,"").split("").filter(o=>["목","화","토","금","수"].includes(o));
+  const gisinOList = (gisinA_val||"").replace(/[^가-힣]/g,"").split("").filter(o=>["목","화","토","금","수"].includes(o));
   const KOR_O={갑:"목",을:"목",병:"화",정:"화",무:"토",기:"토",경:"금",신:"금",임:"수",계:"수"};
   function yearScore(yr){
     const yg=yearToGJ(yr);
@@ -1365,30 +1365,29 @@ export default function SajuReport(){
 
   function handleFormSubmit(formInput){
     setOpacity(0);
-    setTimeout(async()=>{
-      const data=buildSajuData(formInput);
+    setTimeout(()=>{
+      // 1. 사주 계산
+      let data;
+      try{
+        data=buildSajuData(formInput);
+      }catch(e){
+        console.error("buildSajuData 오류:", e);
+        setPhase("form");
+        setOpacity(1);
+        alert("분석 중 오류가 발생했어요. 입력값을 확인해주세요.");
+        return;
+      }
       setReportData(data);
       try{
         sessionStorage.setItem("fy_report",JSON.stringify(data));
         sessionStorage.setItem("fy_tab","요약");
       }catch{}
+
+      // 2. 로딩화면 즉시 시작
       setPhase("loading");
       setOpacity(1);
 
-      // Supabase 저장 (백그라운드)
-      try{
-        setSaveStatus("saving");
-        const {userId}=await saveUser(formInput);
-        await saveReport(userId, data);
-        setSaveStatus("saved");
-        // 최근 목록 갱신
-        const list=await getRecentReports(5);
-        setRecentList(list||[]);
-      }catch(e){
-        console.warn("저장 실패:", e.message);
-        setSaveStatus("error");
-      }
-
+      // 3. 로딩 1.8초 타이머 (Supabase와 독립)
       setTimeout(()=>{
         setOpacity(0);
         setTimeout(()=>{
@@ -1398,6 +1397,21 @@ export default function SajuReport(){
           window.scrollTo({top:0});
         },300);
       },1800);
+
+      // 4. Supabase 저장 (완전 백그라운드, 로딩 블로킹 안 함)
+      (async()=>{
+        try{
+          setSaveStatus("saving");
+          const {userId}=await saveUser(formInput);
+          await saveReport(userId, data);
+          setSaveStatus("saved");
+          const list=await getRecentReports(5);
+          setRecentList(list||[]);
+        }catch(e){
+          console.warn("저장 실패:", e.message);
+          setSaveStatus("error");
+        }
+      })();
     },350);
   }
 
@@ -1723,7 +1737,7 @@ function SajuInputForm({onSubmit, recentList=[], onSelectRecent}){
   if(step===1) return(
     <div style={SF.root}>
       <div style={SF.header}>
-        <button style={SF.back} onClick={()=>onSubmit(form)}>‹</button>
+        <div style={{width:32}}/>
         <div style={SF.title}>fortuneyam</div>
         <div style={{width:32}}/>
       </div>
