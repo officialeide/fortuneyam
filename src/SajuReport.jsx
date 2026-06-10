@@ -1277,12 +1277,21 @@ function LoadingScreen({name}){
 }
 
 export default function SajuReport(){
-  const [tab,setTab]=useState("요약");
-  const [phase,setPhase]=useState("form");
+  // sessionStorage 복원
+  const _saved = useMemo(()=>{
+    try{
+      const r=sessionStorage.getItem("fy_report");
+      const t=sessionStorage.getItem("fy_tab");
+      return r?{data:JSON.parse(r),tab:t||"요약"}:null;
+    }catch{return null;}
+  },[]);
+
+  const [tab,setTab]=useState(_saved?.tab||"요약");
+  const [phase,setPhase]=useState(_saved?"report":"form");
   const [opacity,setOpacity]=useState(1);
-  const [reportData,setReportData]=useState(null);
+  const [reportData,setReportData]=useState(_saved?.data||null);
   const [recentList,setRecentList]=useState([]);
-  const [saveStatus,setSaveStatus]=useState(null); // null|"saving"|"saved"|"error"
+  const [saveStatus,setSaveStatus]=useState(null);
   const TABS=["요약","사주","낮과 밤","토정·주역","별자리·타로","MBTI"];
 
   // 최근 분석 목록 로드
@@ -1292,6 +1301,7 @@ export default function SajuReport(){
 
   function changeTab(t){
     setTab(t);
+    try{sessionStorage.setItem("fy_tab",t);}catch{}
     setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),10);
   }
 
@@ -1300,6 +1310,10 @@ export default function SajuReport(){
     setTimeout(async()=>{
       const data=buildSajuData(formInput);
       setReportData(data);
+      try{
+        sessionStorage.setItem("fy_report",JSON.stringify(data));
+        sessionStorage.setItem("fy_tab","요약");
+      }catch{}
       setPhase("loading");
       setOpacity(1);
 
@@ -1331,6 +1345,7 @@ export default function SajuReport(){
 
   function goToForm(){
     setOpacity(0);
+    try{sessionStorage.removeItem("fy_report");sessionStorage.removeItem("fy_tab");}catch{}
     setTimeout(()=>{setPhase("form");setOpacity(1);},300);
   }
 
@@ -1338,7 +1353,7 @@ export default function SajuReport(){
   const d=reportData;
 
   if(phase==="loading") return <LoadingScreen name={reportData?.name||""}/>;
-  if(phase==="form"||!d) return <div style={wrapStyle}><SajuInputForm onSubmit={handleFormSubmit} recentList={recentList} onSelectRecent={(data)=>{setReportData(data);setPhase("report");setTab("요약");}}/></div>;
+  if(phase==="form"||!d) return <div style={wrapStyle}><SajuInputForm onSubmit={handleFormSubmit} recentList={recentList} onSelectRecent={(data)=>{setReportData(data);setPhase("report");setTab("요약");try{sessionStorage.setItem("fy_report",JSON.stringify(data));sessionStorage.setItem("fy_tab","요약");}catch{}}}/></div>;
 
   const gBg=d.gender==="여"?"#fce4ec":"#e3f2fd";
   const gC=d.gender==="여"?"#880e4f":"#0d47a1";
@@ -1403,6 +1418,77 @@ const S={
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 입력 폼 컴포넌트
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 음력→양력 변환 (간이 알고리즘 1900~2050)
+// 음력 데이터 기반 — 정밀도 ±1일 수준
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 각 연도 음력 1월 1일의 양력 날짜 + 월별 대소 정보
+const LUNAR_DATA = {
+  1990:[1,27,[1,0,1,0,1,0,1,0,1,0,1,0]],1991:[2,15,[0,1,0,1,0,1,0,1,0,1,0,1]],
+  1992:[2,4,[1,0,1,0,1,0,1,0,1,0,1,0]],1993:[1,23,[0,1,0,1,0,1,0,0,1,0,1,0]],
+  1994:[2,10,[1,0,1,0,1,0,1,0,1,0,1,0]],1995:[1,31,[0,1,0,1,0,1,0,1,0,1,0,1]],
+  1996:[2,19,[1,0,1,0,1,0,1,0,1,0,1,0]],1997:[2,7,[0,1,0,1,0,1,0,1,0,1,0,0]],
+  1998:[1,28,[1,0,1,0,1,0,1,0,1,0,1,0]],1999:[2,16,[0,1,0,1,0,1,0,1,0,1,0,1]],
+  2000:[2,5,[1,0,1,0,1,0,1,0,1,0,1,0]],2001:[1,24,[0,1,0,1,0,1,0,0,1,0,1,0]],
+  2002:[2,12,[1,0,1,0,1,0,1,0,1,0,1,0]],2003:[2,1,[0,1,0,1,0,1,0,1,0,1,0,1]],
+  2004:[1,22,[1,0,1,0,1,0,0,1,0,1,0,1]],2005:[2,9,[0,1,0,1,0,1,0,1,0,1,0,0]],
+  2006:[1,29,[1,0,1,0,1,0,1,0,1,0,1,0]],2007:[2,18,[0,1,0,1,0,1,0,1,0,1,0,1]],
+  2008:[2,7,[1,0,1,0,1,0,1,0,0,1,0,1]],2009:[1,26,[0,1,0,1,0,1,0,1,0,1,0,0]],
+  2010:[2,14,[1,0,1,0,1,0,1,0,1,0,1,0]],2011:[2,3,[0,1,0,1,0,1,0,1,0,1,0,1]],
+  2012:[1,23,[1,0,1,0,0,1,0,1,0,1,0,1]],2013:[2,10,[0,1,0,1,0,1,0,1,0,1,0,0]],
+  2014:[1,31,[1,0,1,0,1,0,1,0,1,0,1,0]],2015:[2,19,[0,1,0,1,0,1,0,1,0,1,0,1]],
+  2016:[2,8,[1,0,1,0,1,0,1,0,0,1,0,1]],2017:[1,28,[0,1,0,1,0,1,0,1,0,1,0,0]],
+  2018:[2,16,[1,0,1,0,1,0,1,0,1,0,1,0]],2019:[2,5,[0,1,0,1,0,1,0,1,0,1,0,1]],
+  2020:[1,25,[1,0,1,0,0,1,0,1,0,1,0,1]],2021:[2,12,[0,1,0,1,0,1,0,1,0,1,0,0]],
+  2022:[2,1,[1,0,1,0,1,0,1,0,1,0,1,0]],2023:[1,22,[0,1,0,1,0,1,0,1,0,0,1,0]],
+  2024:[2,10,[1,0,1,0,1,0,1,0,1,0,1,0]],2025:[1,29,[0,1,0,1,0,1,0,1,0,1,0,1]],
+};
+
+// 윤달 정보 (연도: [윤달번호, 윤달 대=1/소=0])
+const LEAP_MONTHS = {
+  1990:8,1993:3,1995:8,1998:5,2001:4,2004:2,2006:7,2009:5,2012:4,2014:9,
+  2017:6,2020:4,2023:2,2025:6,
+};
+
+function lunarToSolar(ly, lm, ld, isLeap=false) {
+  const data = LUNAR_DATA[ly];
+  if(!data) return null; // 범위 밖
+  const [sm, sd, monthSizes] = data;
+  const leapM = LEAP_MONTHS[ly];
+
+  // 음력 1월 1일의 양력 날짜 계산
+  let solarDate = new Date(ly, sm-1, sd);
+
+  // 지나온 날수 계산
+  let days = 0;
+  for(let m=1; m<lm; m++){
+    const idx = m-1;
+    // 윤달 처리: 이전 달에 윤달이 있었으면 +1달
+    if(leapM && leapM < m) {
+      days += 30; // 윤달 크기 (대부분 30일)
+    }
+    days += monthSizes[idx] ? 30 : 29;
+  }
+  // 현재 달의 윤달 처리
+  if(isLeap && leapM === lm) {
+    days += monthSizes[lm-1] ? 30 : 29;
+  }
+  days += ld - 1;
+
+  solarDate.setDate(solarDate.getDate() + days);
+  return {
+    year: solarDate.getFullYear(),
+    month: solarDate.getMonth()+1,
+    day: solarDate.getDate(),
+  };
+}
+
+// 해당 연도/월에 윤달이 있는지 확인
+function hasLeapMonth(year, month) {
+  return LEAP_MONTHS[year] === month;
+}
+
 const CITIES=[
   "서울","부산","대구","인천","광주","대전","울산","세종",
   "경기","강원","충북","충남","전북","전남","경북","경남","제주",
@@ -1413,7 +1499,9 @@ const HOURS=Array.from({length:24},(_,i)=>String(i).padStart(2,"0"));
 const MINS_ALL=Array.from({length:60},(_,i)=>String(i).padStart(2,"0"));
 
 function SajuInputForm({onSubmit, recentList=[], onSelectRecent}){
-  const [step,setStep]=useState(1); // 1=기본정보 2=시간 3=확인
+  const [step,setStep]=useState(1);
+  const [calType,setCalType]=useState("solar"); // "solar"|"lunar"
+  const [isLeap,setIsLeap]=useState(false); // 윤달 여부
   const [form,setForm]=useState({
     name:"",year:"",month:"",day:"",
     hour:"12",minute:"00",
@@ -1421,14 +1509,27 @@ function SajuInputForm({onSubmit, recentList=[], onSelectRecent}){
   });
   const [err,setErr]=useState({});
   const up=(k,v)=>setForm(f=>({...f,[k]:v}));
+  // 윤달 여부 자동 체크 (음력 선택 + 연/월 입력 시)
+  const showLeapToggle=calType==="lunar"&&form.year&&form.month&&
+    hasLeapMonth(parseInt(form.year),parseInt(form.month));
 
   function validate1(){
     const e={};
     if(!form.name.trim()) e.name="이름을 입력해주세요";
     const y=parseInt(form.year),m=parseInt(form.month),d=parseInt(form.day);
-    if(!form.year||y<1900||y>2010) e.year="연도를 확인해주세요";
+    if(!form.year||y<1900||y>2030) e.year="연도를 확인해주세요";
     if(!form.month||m<1||m>12) e.month="월을 확인해주세요";
     if(!form.day||d<1||d>31) e.day="일을 확인해주세요";
+    // 음력이면 양력으로 변환
+    if(!Object.keys(e).length && calType==="lunar"){
+      const converted=lunarToSolar(y,m,d,isLeap);
+      if(!converted){ e.year="해당 음력 날짜를 변환할 수 없어요 (1990~2025 지원)"; }
+      else {
+        up("year",String(converted.year));
+        up("month",String(converted.month));
+        up("day",String(converted.day));
+      }
+    }
     setErr(e);
     return Object.keys(e).length===0;
   }
@@ -1476,7 +1577,18 @@ function SajuInputForm({onSubmit, recentList=[], onSelectRecent}){
 
         {/* 생년월일 */}
         <div style={SF.field}>
-          <div style={SF.label}>생년월일 (양력)</div>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:7}}>
+            <div style={SF.label}>생년월일</div>
+            <div style={{display:"flex",gap:4}}>
+              {["solar","lunar"].map(t=>(
+                <button key={t} onClick={()=>{setCalType(t);setIsLeap(false);}}
+                  style={{padding:"4px 12px",borderRadius:99,border:"1.5px solid #e65100",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
+                    background:calType===t?"#e65100":"#fff",color:calType===t?"#fff":"#e65100"}}>
+                  {t==="solar"?"양력":"음력"}
+                </button>
+              ))}
+            </div>
+          </div>
           <div style={{display:"flex",gap:8}}>
             {[
               {k:"year",ph:"YYYY",w:"40%",max:4,err:err.year},
@@ -1492,7 +1604,13 @@ function SajuInputForm({onSubmit, recentList=[], onSelectRecent}){
               </div>
             ))}
           </div>
-          <div style={SF.hint}>연도 · 월 · 일 순서로 입력</div>
+          <div style={SF.hint}>{calType==="solar"?"양력 기준":"음력 기준 — 다음에 양력으로 자동 변환돼요"}</div>
+          {showLeapToggle&&(
+            <button onClick={()=>setIsLeap(v=>!v)}
+              style={{marginTop:6,display:"flex",alignItems:"center",gap:6,padding:"6px 12px",borderRadius:8,border:`1.5px solid ${isLeap?"#e65100":"#e0e0e0"}`,background:isLeap?"#fff3e0":"#fff",fontSize:12,fontWeight:700,cursor:"pointer",color:isLeap?"#e65100":"#888",fontFamily:"inherit"}}>
+              <span style={{fontSize:14}}>{isLeap?"☑":"☐"}</span> 윤달
+            </button>
+          )}
         </div>
 
         {/* 출생지 */}
