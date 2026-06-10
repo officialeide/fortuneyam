@@ -20,6 +20,7 @@ const OHK={木:"목",火:"화",土:"토",金:"금",水:"수"};
 const GWAN_O={木:"金",火:"水",土:"木",金:"火",水:"土"};
 // 일간별 인물 키워드 (자연 비유, 동물 X)
 const ILGAN_TITLE={갑:"곧게 뻗는 나무",을:"바람에 흔들리지 않는 덩굴",병:"환하게 빛나는 태양",정:"은은히 타는 촛불",무:"묵직한 큰 산",기:"포용하는 너른 들판",경:"단단하게 벼려진 쇠",신:"정교하게 세공된 보석",임:"유유히 흐르는 큰 강",계:"촉촉이 스며드는 이슬"};
+const ILGAN_PHILOSOPHY={갑:"성장의 진동: 곧게 뻗고자 하는 리더십 속에 혼자가 아닌 타자와의 조화를 배우는 과정이에요.",을:"적응과 유연: 외부의 압력 속에서도 중심을 잃지 않고, 천천히 감아 올라가는 생명력의 신비로워요.",병:"환함 뒤의 고독: 밝은 빛을 태우는 만큼, 그 열정이 식을 때의 고요함도 깊어요. 외로움을 알기에 더 따뜻해지는 거예요.",정:"침묵 속의 우주: 작은 촛불 같지만, 그 안엔 우주가 들어있어요. 조용함 뒤에는 깊은 명상과 성찰이 있어요.",무:"안정 뒤의 변화: 산처럼 묵직하지만, 오랜 침식 속에 새로운 형태로 재탄생하는 대지의 지혜예요.",기:"포용 뒤의 자기: 모든 것을 담으려 하다가, 결국 자신만의 영역을 깨닫는 성숙의 과정이에요.",경:"원칙과 통합: 단단한 쇠도 가열·냉각의 반복 속에 더욱 강해져요. 고통이 곧 성장의 불이에요.",신:"아름다움의 대가: 보석처럼 세공되기 위해서는 깎이고 닦여야 해요. 상처 속에 진정한 빛이 생겨나요.",임:"흐름 속의 지혜: 큰 강은 가만히 흐르지만, 모든 작은 물들을 담고 있어요. 침묵이 곧 포용이에요.",계:"이슬 같은 사랑: 촉촉이 스며드는 이슬처럼, 티 없이 조용하게 세상을 적시는 사랑이에요. 작음이 곧 전부예요."};
 // 지지 삼합/육합/충 (세운 변별용)
 const SAMHAP={인:["오","술"],오:["인","술"],술:["인","오"],해:["묘","미"],묘:["해","미"],미:["해","묘"],신:["자","진"],자:["신","진"],진:["신","자"],사:["유","축"],유:["사","축"],축:["사","유"]};
 const YUKHAP={자:"축",축:"자",인:"해",해:"인",묘:"술",술:"묘",진:"유",유:"진",사:"신",신:"사",오:"미",미:"오"};
@@ -111,7 +112,7 @@ function calcSeunAreas(yr,month,meta){
 // 해석 텍스트 DB
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// fortuneyam 사주 해석 텍스트 DB
+// Fortuneyam 사주 해석 텍스트 DB
 // buildSajuData()에서 참조하는 규칙 기반 텍스트
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -585,7 +586,8 @@ function buildSajuData(input){
   const bandSummary=sc=>sc>=82?YEAR_SUMMARIES.high:sc>=66?YEAR_SUMMARIES.mid:YEAR_SUMMARIES.low;
   const yearForecast=[CY,CY+1,CY+2,CY+3,CY+4].map(yr=>{
     const sc=calcSeunScore(yr,0,scoreMeta);
-    return{year:yr,score:sc,summary:bandSummary(sc)};
+    const areas=calcSeunAreas(yr,0,scoreMeta);
+    return{year:yr,score:sc,summary:bandSummary(sc),areas};
   });
   const yearCards=[CY,CY+1,CY+2,CY+3,CY+4].map((yr,i)=>{
     const py=getPersonalYear(yr);
@@ -626,12 +628,13 @@ function buildSajuData(input){
   // 일주 특성으로 headline
   const headline_text = iljuCharDesc;
 
-  // 성격 요약 persona
+  // 성격 요약 persona (3개: 일주 / 일간 / 신살)
+  const iljuDesc_long = iljuCharDesc + " " + (ILJU_CHAR[iljuKey] || "").replace(iljuCharDesc, "").trim(); // 기존 일주 설명 활용
+  const ilganDesc_long = `${ilju.gan.hanja}(${ilgan}) 일간은 ${OHK[ilO]} 기운의 에너지를 가지고 있어요. ${ilganDB.core} ${ilganDB[vsKey] || ""}`;
   const persona = [
-    {icon:"🔮",title:`${ilju.hanja}(${ilju.ko}) 일주`,desc:iljuCharDesc},
-    {icon:singang==="신강(身强)"?"💪":"🌱",title:singang,desc:`${OHK[ilO]} 기운의 일간이에요. ${ilganDB[vsKey]}`},
-    {icon:"⭐",title:"월령(月令)",desc:`${wolju.hanja}(${wolju.ko})월에 태어나, ${monthHelps?"태어난 달의 기운이 일간을 도와주는 든든한 구조":"태어난 달의 기운이 일간과 달라 균형을 맞추는 게 중요한 구조"}예요.`},
-    {icon:"🌟",title:"신살(神殺)",desc:sinsal.length>0?sinsal.map(s=>s.name).join("·")+" 발동":"특별한 신살이 없는 안정적 구조예요."},
+    {icon:"🔮",title:`${ilju.hanja}(${ilju.ko}) 일주`,desc:iljuDesc_long},
+    {icon:"⭐",title:`${ilgan} 일간 (${OHK[ilO]} 기운)`,desc:ilganDesc_long},
+    {icon:"✨",title:"신살(神殺)",desc:sinsal.length>0?sinsal.map(s=>s.name).join("·")+" 발동":"특별한 신살이 없는 안정적인 구조예요."},
   ];
 
   // 당사주 종합 기질 — 4별성 + 일간/신강신약을 엮은 요약 (이슈12)
@@ -679,7 +682,7 @@ function buildSajuData(input){
       persona,
       yearForecast,
       sixSystems:[
-        {system:"사주",key:`${ilju.hanja} 일주`,desc:`${OHK[ilO]} 기운의 일간: ${singang}이에요.`,insight:ilganDB.core},
+        {system:"사주",key:`${ilju.hanja} 일주`,desc:`${OHK[ilO]} 기운의 일간: ${singang}이에요.`,insight:ILGAN_PHILOSOPHY[ilgan]||ilganDB.core},
         {system:"토정비결",key:sajaDB.saja,desc:`${sajaDB.saja} 기운이에요.`,insight:sajaDB.desc},
         {system:"주역",key:ichingData.name,desc:ichingData.nature,insight:""},
         {system:"당사주",key:dansajuPillars.map(p=>p.byeolseong.split("(")[0]).join("·"),desc:dansajuPillars.map(p=>`${p.byeolseong.split("(")[0]}(${p.palace.replace("궁","").replace("주","")})` ).join(" · "),insight:""},
@@ -687,7 +690,7 @@ function buildSajuData(input){
         {system:"타로수비학",key:`생명경로수 ${lp}`,desc:`생명경로수 ${lp}번의 에너지예요.`,insight:""},
         {system:"MBTI",key:mbtiType,desc:mbtiDesc,insight:""},
       ],
-      sevenInsight:`일간 ${ilju.hanja}(${ilju.ko})는 ${OHK[ilO]} 기운으로 ${singang} 구조예요. ${ilganDB.core} ${singang==="신강(身强)"?"에너지가 넘치는 만큼, 용신인 "+yongsinA_val+"을 통해 균형을 맞추는 것이 핵심이에요.":"내면의 에너지를 키우는 것이 중요해요. 용신인 "+yongsinA_val+"이 도움이 돼요."}`,
+      sevenInsight:`${OHK[ilO]} 기운의 ${singang} 구조로, 내면의 에너지를 키우는 것이 중요해요. 용신인 ${yongsinA_val}이 도움이 돼요. 앞으로의 운세를 보면, ${yearForecast[0].year}년은 ${yearForecast[0].summary}, ${yearForecast[1].year}년은 ${yearForecast[1].summary}, ${yearForecast[2].year}년은 ${yearForecast[2].summary}. 향후 5년간 새로운 기회가 계속 열려있을 거예요.`,
     },
     sinsal,hap:[],hyeong:[],chung:[],
     daeun,daeunStart:startAge,daeunDir:forward?"순행(順行)":"역행(逆行)",
@@ -800,7 +803,9 @@ function TabSummary({d,changeTab}){return <>
     <ST icon="📆" title={`향후 5년 흐름 (${CY}~${CY+4})`}/>
     <GT>6체계 교차 분석 종합 운기 점수입니다.</GT>
     <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
-      {(d.summary?.yearForecast||[]).map((yf,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:scBg(yf.score),borderRadius:11}}><Ring score={yf.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}><span style={{fontSize:14,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>{yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}</div><div style={{fontSize:12,color:"#444",lineHeight:1.6}}>{yf.summary}</div></div></div>)}
+      {(d.summary?.yearForecast||[]).map((yf,i)=><div key={i} style={{display:"flex",flexDirection:"column",gap:6,padding:"10px 12px",background:scBg(yf.score),borderRadius:11}}><div style={{display:"flex",alignItems:"center",gap:10}}><Ring score={yf.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}><span style={{fontSize:14,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>{yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}</div><div style={{fontSize:12,color:"#444",lineHeight:1.6}}>{yf.summary}</div></div></div>{yf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.1)"}}>
+        {Object.entries(yf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.6)",color:sc(v),fontWeight:700}}>{k.slice(0,2)} {v}</div>)}
+      </div>}</div>)}
     </div>
   </section>
   <section style={S.card}>
@@ -835,7 +840,7 @@ function Manseryeok({d}){
   const b=d.boundary;
   return <section style={S.card}>
     <ST icon="📋" title="사주 명식" sub="태어난 연·월·일·시의 네 기둥"/>
-    <GT>사주는 태어난 연·월·일·시: 네 개의 기둥으로 이루어집니다. 이 중 <strong>일주</strong>가 나 자신을 나타내는 중심이에요.</GT>
+    <GT>사주는 태어난 연·월·일·시 네 개의 기둥으로 이루어집니다. 이 중 <strong>일주</strong>가 나 자신을 나타내는 중심이에요.</GT>
     {b.isBoundary&&<div style={{display:"flex",gap:6,marginTop:10}}>{[{k:"A",l:`자정 ${b.std.hanja}`},{k:"B",l:`야자시 ${b.mid.hanja}`}].map(o=><button key={o.k} onClick={()=>setW(o.k)} style={{flex:1,padding:"7px 6px",borderRadius:9,border:"1.5px solid #ffb300",fontSize:11,fontWeight:700,cursor:"pointer",background:w===o.k?"#7b5800":"#fff",color:w===o.k?"#fff":"#7b5800"}}>{o.l}</button>)}</div>}
     <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6,marginTop:10}}>
       {active.map((p,i)=>{const isI=p.name==="일주";return <div key={i} style={{display:"flex",flexDirection:"column",gap:5,alignItems:"center",position:"relative",...(isI?{border:"2px solid #ffb300",borderRadius:15,background:"#fffde7",padding:"4px 3px 7px"}:{})}}>{isI&&<div style={{position:"absolute",top:-10,left:"50%",transform:"translateX(-50%)",background:"#e65100",color:"#fff",fontSize:9,fontWeight:800,padding:"2px 7px",borderRadius:99,zIndex:1,whiteSpace:"nowrap"}}>나</div>}<div style={{fontSize:10,color:"#aaa",fontWeight:600}}>{p.name}</div><GCard g={p.gan} s={p.gan.sibsong}/><JCard j={p.ji} s={p.ji.sibsong}/></div>;})}
@@ -984,32 +989,39 @@ function Seun({reportData}){
       </div>}
       {st==="month"&&<div style={{display:"flex",flexDirection:"column",gap:7,marginTop:12}}>
         {ms.map((s,i)=>{
-          const score=calcSeunScore(s.year,s.month,reportData?.scoreMeta),cg=gc(s.gan.ko),cj=jc(s.ji.ko);
-                const memo=getMonthMemo_dynamic(s.gan.ko,s.ji.ko,reportData);
-                return <button key={i} onClick={()=>setSel(s)}
-            style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:11,
+          const score=calcSeunScore(s.year,s.month,reportData?.scoreMeta);
+          const detail=calcSeunAreas(s.year,s.month,reportData?.scoreMeta);
+          const cg=gc(s.gan.ko),cj=jc(s.ji.ko);
+          const memo=getMonthMemo_dynamic(s.gan.ko,s.ji.ko,reportData);
+          return <button key={i} onClick={()=>setSel(s)}
+            style={{display:"flex",flexDirection:"column",gap:8,padding:"10px 12px",borderRadius:11,
               border:s.isThis?"2px solid #4caf50":"1px solid #ebebeb",
               background:s.isThis?"#f9fff8":"#fafafa",
               cursor:"pointer",textAlign:"left",width:"100%",fontFamily:"inherit"}}>
-            <div style={{minWidth:44,textAlign:"center",flexShrink:0}}>
-              <div style={{fontSize:10,color:"#aaa",fontWeight:600}}>{s.year}</div>
-              <div style={{fontSize:13,fontWeight:900,color:s.isThis?"#2e7d32":"#111"}}>{MON[s.month-1]}</div>
-              {s.isThis&&<div style={{fontSize:9,background:"#4caf50",color:"#fff",borderRadius:99,padding:"1px 5px",marginTop:1,fontWeight:700}}>현재</div>}
-            </div>
-            <div style={{flex:1,minWidth:0}}>
-              <div style={{display:"flex",gap:4,marginBottom:4}}>
-                {[{g:s.gan,isG:true,c:cg},{g:s.ji,isG:false,c:cj}].map(({g,isG,c},pi)=>(
-                  <div key={pi} style={{background:c.bg,color:c.text,border:`1px solid ${c.border}`,fontSize:11,padding:"4px 7px",borderRadius:7,fontWeight:700,position:"relative",paddingTop:12}}>
-                    <span style={{position:"absolute",top:1,right:2,fontSize:9}}>{yyE(g.ko,isG)}</span>
-                    {g.hanja}({g.ko})
-                  </div>
-                ))}
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div style={{minWidth:44,textAlign:"center",flexShrink:0}}>
+                <div style={{fontSize:10,color:"#aaa",fontWeight:600}}>{s.year}</div>
+                <div style={{fontSize:13,fontWeight:900,color:s.isThis?"#2e7d32":"#111"}}>{MON[s.month-1]}</div>
+                {s.isThis&&<div style={{fontSize:9,background:"#4caf50",color:"#fff",borderRadius:99,padding:"1px 5px",marginTop:1,fontWeight:700}}>현재</div>}
               </div>
-              <div style={{fontSize:11,color:"#555",lineHeight:1.5}}>{memo}</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{display:"flex",gap:4,marginBottom:4}}>
+                  {[{g:s.gan,isG:true,c:cg},{g:s.ji,isG:false,c:cj}].map(({g,isG,c},pi)=>(
+                    <div key={pi} style={{background:c.bg,color:c.text,border:`1px solid ${c.border}`,fontSize:11,padding:"4px 7px",borderRadius:7,fontWeight:700,position:"relative",paddingTop:12}}>
+                      <span style={{position:"absolute",top:1,right:2,fontSize:9}}>{yyE(g.ko,isG)}</span>
+                      {g.hanja}({g.ko})
+                    </div>
+                  ))}
+                </div>
+                <div style={{fontSize:11,color:"#555",lineHeight:1.5}}>{memo}</div>
+              </div>
+              <div style={{flexShrink:0}}>
+                <Ring score={score} size={42}/>
+              </div>
             </div>
-            <div style={{flexShrink:0,display:"flex",alignItems:"center",gap:4}}>
-              <Ring score={score} size={42}/>
-              <span style={{fontSize:16,color:"#d0d0d0"}}>›</span>
+            {/* 영역별 점수 표시 */}
+            <div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid #e0e0e0"}}>
+              {Object.entries(detail).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:scBg(v),color:sc(v),fontWeight:700}}>{k.slice(0,2)} {v}</div>)}
             </div>
           </button>;
         })}
@@ -1513,7 +1525,7 @@ export default function SajuReport(){
   return <div style={{...wrapStyle,...S.root}}>
     <div style={S.header}>
       <button style={S.navBtn} onClick={goToForm}>‹</button>
-      <div style={S.headerTitle}>fortuneyam</div>
+      <div style={S.headerTitle}>Fortuneyam</div>
       <div style={{display:"flex",alignItems:"center",gap:6}}>
         {saveStatus==="saving"&&<span style={{fontSize:10,color:"#aaa"}}>저장 중…</span>}
         {saveStatus==="saved"&&<span style={{fontSize:10,color:"#4caf50"}}>✓ 저장됨</span>}
@@ -1543,7 +1555,7 @@ export default function SajuReport(){
       {tab==="MBTI"        && <TabMBTI d={d}/>}
     </div>
     <div style={{textAlign:"center",fontSize:10,color:"#ccc",padding:"20px 0 8px"}}>
-      ✦ fortuneyam · Today {CY}.{String(CM).padStart(2,"0")}.{String(CD).padStart(2,"0")}
+      ✦ Fortuneyam · Today {CY}.{String(CM).padStart(2,"0")}.{String(CD).padStart(2,"0")}
       <span onClick={()=>setShowAdmin(true)} style={{marginLeft:8,cursor:"pointer",color:"#e0e0e0"}}>· 관리자</span>
     </div>
   </div>;
@@ -1661,7 +1673,7 @@ function AdminPage({onClose}){
   const [list,setList]=useState([]);
   const [loading,setLoading]=useState(false);
   const [sel,setSel]=useState(null);
-  const ADMIN_PW=import.meta.env.VITE_ADMIN_PW||"fortuneyam2024"; // Netlify 환경변수 VITE_ADMIN_PW로 변경 권장
+  const ADMIN_PW=import.meta.env.VITE_ADMIN_PW||"Fortuneyam2024"; // Netlify 환경변수 VITE_ADMIN_PW로 변경 권장
 
   function tryLogin(){
     if(pw===ADMIN_PW){setAuthed(true);loadList();}
@@ -1696,7 +1708,7 @@ function AdminPage({onClose}){
     <div style={{position:"fixed",inset:0,zIndex:100,background:"#f4f4f6",display:"flex",alignItems:"center",justifyContent:"center"}}>
       <div style={{background:"#fff",borderRadius:20,padding:"32px 24px",width:320,boxShadow:"0 8px 32px rgba(0,0,0,0.12)"}}>
         <div style={{fontSize:20,fontWeight:900,color:"#111",marginBottom:6}}>🔐 관리자</div>
-        <div style={{fontSize:13,color:"#888",marginBottom:20}}>fortuneyam 분석 데이터 조회</div>
+        <div style={{fontSize:13,color:"#888",marginBottom:20}}>Fortuneyam 분석 데이터 조회</div>
         <input type="password" placeholder="비밀번호" value={pw}
           onChange={e=>setPw(e.target.value)}
           onKeyDown={e=>e.key==="Enter"&&tryLogin()}
@@ -1818,7 +1830,7 @@ function SajuInputForm({onSubmit}){
     <div style={SF.root}>
       <div style={SF.header}>
         <div style={{width:32}}/>
-        <div style={SF.title}>fortuneyam</div>
+        <div style={SF.title}>Fortuneyam</div>
         <div style={{width:32}}/>
       </div>
       <div style={SF.progress}>
@@ -1915,7 +1927,7 @@ function SajuInputForm({onSubmit}){
     <div style={SF.root}>
       <div style={SF.header}>
         <button style={SF.back} onClick={()=>setStep(1)}>‹</button>
-        <div style={SF.title}>fortuneyam</div>
+        <div style={SF.title}>Fortuneyam</div>
         <div style={{width:32}}/>
       </div>
       <div style={SF.progress}>
@@ -2007,7 +2019,7 @@ function SajuInputForm({onSubmit}){
     <div style={SF.root}>
       <div style={SF.header}>
         <button style={SF.back} onClick={()=>setStep(2)}>‹</button>
-        <div style={SF.title}>fortuneyam</div>
+        <div style={SF.title}>Fortuneyam</div>
         <div style={{width:32}}/>
       </div>
       <div style={SF.progress}>
@@ -2046,7 +2058,7 @@ function SajuInputForm({onSubmit}){
 
         <button style={{...SF.btn,fontSize:16,padding:"16px 0",background:"linear-gradient(135deg,#e65100,#bf360c)"}}
           onClick={()=>onSubmit(form)}>
-          🔮 fortuneyam 보기
+          🔮 Fortuneyam 보기
         </button>
         <button style={{...SF.btn,background:"#f5f5f5",color:"#555",marginTop:8}} onClick={()=>setStep(1)}>
           ← 다시 입력
