@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
+import { saveUser, saveReport, getRecentReports } from "./supabase.js";
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 1. 오행·간지 기초
@@ -1280,7 +1281,14 @@ export default function SajuReport(){
   const [phase,setPhase]=useState("form");
   const [opacity,setOpacity]=useState(1);
   const [reportData,setReportData]=useState(null);
+  const [recentList,setRecentList]=useState([]);
+  const [saveStatus,setSaveStatus]=useState(null); // null|"saving"|"saved"|"error"
   const TABS=["요약","사주","낮과 밤","토정·주역","별자리·타로","MBTI"];
+
+  // 최근 분석 목록 로드
+  useEffect(()=>{
+    getRecentReports(5).then(list=>setRecentList(list||[]));
+  },[]);
 
   function changeTab(t){
     setTab(t);
@@ -1289,11 +1297,26 @@ export default function SajuReport(){
 
   function handleFormSubmit(formInput){
     setOpacity(0);
-    setTimeout(()=>{
+    setTimeout(async()=>{
       const data=buildSajuData(formInput);
       setReportData(data);
       setPhase("loading");
       setOpacity(1);
+
+      // Supabase 저장 (백그라운드)
+      try{
+        setSaveStatus("saving");
+        const {userId}=await saveUser(formInput);
+        await saveReport(userId, data);
+        setSaveStatus("saved");
+        // 최근 목록 갱신
+        const list=await getRecentReports(5);
+        setRecentList(list||[]);
+      }catch(e){
+        console.warn("저장 실패:", e.message);
+        setSaveStatus("error");
+      }
+
       setTimeout(()=>{
         setOpacity(0);
         setTimeout(()=>{
@@ -1315,7 +1338,7 @@ export default function SajuReport(){
   const d=reportData;
 
   if(phase==="loading") return <LoadingScreen name={reportData?.name||""}/>;
-  if(phase==="form"||!d) return <div style={wrapStyle}><SajuInputForm onSubmit={handleFormSubmit}/></div>;
+  if(phase==="form"||!d) return <div style={wrapStyle}><SajuInputForm onSubmit={handleFormSubmit} recentList={recentList} onSelectRecent={(data)=>{setReportData(data);setPhase("report");setTab("요약");}}/></div>;
 
   const gBg=d.gender==="여"?"#fce4ec":"#e3f2fd";
   const gC=d.gender==="여"?"#880e4f":"#0d47a1";
@@ -1324,7 +1347,12 @@ export default function SajuReport(){
     <div style={S.header}>
       <button style={S.navBtn} onClick={goToForm}>‹</button>
       <div style={S.headerTitle}>fortuneyam</div>
-      <button style={S.navBtn} onClick={()=>changeTab("요약")}>⌂</button>
+      <div style={{display:"flex",alignItems:"center",gap:6}}>
+        {saveStatus==="saving"&&<span style={{fontSize:10,color:"#aaa"}}>저장 중…</span>}
+        {saveStatus==="saved"&&<span style={{fontSize:10,color:"#4caf50"}}>✓ 저장됨</span>}
+        {saveStatus==="error"&&<span style={{fontSize:10,color:"#ef5350"}}>저장 실패</span>}
+        <button style={S.navBtn} onClick={()=>changeTab("요약")}>⌂</button>
+      </div>
     </div>
     <div style={S.profileBar}>
       <div>
@@ -1384,7 +1412,7 @@ const CITIES=[
 const HOURS=Array.from({length:24},(_,i)=>String(i).padStart(2,"0"));
 const MINS_ALL=Array.from({length:60},(_,i)=>String(i).padStart(2,"0"));
 
-function SajuInputForm({onSubmit}){
+function SajuInputForm({onSubmit, recentList=[], onSelectRecent}){
   const [step,setStep]=useState(1); // 1=기본정보 2=시간 3=확인
   const [form,setForm]=useState({
     name:"",year:"",month:"",day:"",
@@ -1476,6 +1504,24 @@ function SajuInputForm({onSubmit}){
         </div>
 
         <button style={SF.btn} onClick={next}>다음 →</button>
+        {recentList.length>0&&(
+          <div style={{marginTop:20}}>
+            <div style={{fontSize:12,fontWeight:700,color:"#888",marginBottom:8}}>최근 분석</div>
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              {recentList.map((r,i)=>(
+                <button key={i} onClick={()=>r.full_data_json&&onSelectRecent(r.full_data_json)}
+                  style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fff",border:"1px solid #eee",borderRadius:12,cursor:"pointer",textAlign:"left",fontFamily:"inherit",opacity:r.full_data_json?1:0.5}}>
+                  <span style={{fontSize:18}}>{r.users?.gender==="여"?"👩":"👨"}</span>
+                  <div>
+                    <div style={{fontSize:13,fontWeight:800,color:"#111"}}>{r.users?.name}</div>
+                    <div style={{fontSize:11,color:"#aaa"}}>{r.users?.birth_date}</div>
+                  </div>
+                  <span style={{marginLeft:"auto",fontSize:11,color:"#ccc"}}>›</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
