@@ -1198,7 +1198,7 @@ function TabSummary({d,changeTab}){return <>
     <GT>사주·토정비결·주역·당사주·타로수비학 통합 운기 점수예요.</GT>
     <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
       {(d.summary?.yearForecast||[]).map((yf,i)=><div key={i} style={{display:"flex",flexDirection:"column",gap:6,padding:"10px 12px",background:scBg(yf.score),borderRadius:11}}><div style={{display:"flex",alignItems:"center",gap:10}}><Ring score={yf.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}><span style={{fontSize:13,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>{yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}</div><div style={{fontSize:11,color:"#444",lineHeight:1.6,textAlign:"justify"}}>{yf.summary}</div></div></div>{yf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.1)"}}>
-        {Object.entries(yf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.6)",color:sc(v),fontWeight:700}}>{k.slice(0,3)} {v}</div>)}
+        {Object.entries(yf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.85)",color:sc(v),fontWeight:800,border:`1px solid ${sc(v)}44`}}>{k.slice(0,3)} {v}</div>)}
       </div>}</div>)}
     </div>
   </section>
@@ -1999,9 +1999,10 @@ export default function SajuReport(){
       try{
         const cached = await findCachedReport(formInput);
         if(cached){
-          // 캐시 히트 → 이름만 현재 입력자로 교체 후 바로 결과 표시
           const cachedWithName = {...cached, name: formInput.name};
           setReportData(cachedWithName);
+          if(cached._astroAI) setParentAstroAI(cached._astroAI);
+          if(cached._tarotAI) setParentTarotAI(cached._tarotAI);
           try{
             sessionStorage.setItem("fy_report", JSON.stringify(cachedWithName));
             sessionStorage.setItem("fy_tab", "요약");
@@ -2038,8 +2039,8 @@ export default function SajuReport(){
       })();
 
       // 3. 네이탈차트 + 성취카드 API 병렬 호출 (로딩 중)
-      const cacheKey=`fy_astro_v4_${data.birth}`;
-      const cacheTarotKey=`fy_tarot_v4_${data.birth}`;
+      const cacheKey=`fy_astro_v5_${data.birth}`;
+      const cacheTarotKey=`fy_tarot_v5_${data.birth}`;
       let astroResult=null, tarotResult=null;
 
       // sessionStorage 캐시 확인
@@ -2096,7 +2097,7 @@ JSON만 응답: {"achieveDesc":"..."}`;
         }catch(e){console.warn("tarot API:", e);}
       };
 
-      const cacheSevenKey=`fy_seven_v5_${data.birth}`;
+      const cacheSevenKey=`fy_seven_v6_${data.birth}`;
       let sevenResult=null;
       try{const cs=sessionStorage.getItem(cacheSevenKey);if(cs)sevenResult=JSON.parse(cs);}catch{}
 
@@ -2241,8 +2242,8 @@ const S={
   profileBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 18px",background:"#fff",borderBottom:"1px solid #f0f0f0"},
   pName:{fontSize:22,fontWeight:900,color:"#111",letterSpacing:-.5},
   pBirth:{fontSize:11,color:"#999",marginTop:2},
-  tabBar:{display:"flex",background:"#fff",borderBottom:"2px solid #f0f0f0",position:"sticky",top:49,zIndex:19},
-  tab:{flex:1,padding:"11px 4px",fontSize:10,fontWeight:600,background:"none",border:"none",color:"#bbb",cursor:"pointer",borderBottom:"2.5px solid transparent",marginBottom:-2,transition:"color .2s,border-color .2s",textAlign:"center",letterSpacing:"-0.3px"},
+  tabBar:{display:"flex",background:"#fff",borderBottom:"2px solid #f0f0f0",position:"sticky",top:49,zIndex:19,justifyContent:"space-around"},
+  tab:{flex:"0 0 auto",padding:"11px 6px",fontSize:10,fontWeight:600,background:"none",border:"none",color:"#bbb",cursor:"pointer",borderBottom:"2.5px solid transparent",marginBottom:-2,transition:"color .2s,border-color .2s",textAlign:"center",letterSpacing:"-0.2px"},
   tabA:{color:"#e65100",borderBottomColor:"#e65100"},
   content:{padding:"12px 14px",display:"flex",flexDirection:"column",gap:11},
   card:{background:"#fff",borderRadius:16,padding:"16px",border:"1px solid #ebebeb",boxShadow:"0 1px 5px rgba(0,0,0,0.04)"},
