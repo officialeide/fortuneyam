@@ -2096,7 +2096,7 @@ JSON만 응답: {"achieveDesc":"..."}`;
         }catch(e){console.warn("tarot API:", e);}
       };
 
-      const cacheSevenKey=`fy_seven_v4_${data.birth}`;
+      const cacheSevenKey=`fy_seven_v5_${data.birth}`;
       let sevenResult=null;
       try{const cs=sessionStorage.getItem(cacheSevenKey);if(cs)sevenResult=JSON.parse(cs);}catch{}
 
@@ -2109,7 +2109,7 @@ JSON만 응답: {"achieveDesc":"..."}`;
           const today=yf[0]||{};
           const best=[...yf].sort((a,b)=>b.score-a.score)[0]||{};
           const astroDesc=astroResult?`태양 ${stripDegree(astroResult.sun||"")} — ${(astroResult.sunDesc||"").slice(0,60)}`:"(분석 중)";
-          const prompt=`다음은 한 사람의 7가지 운명 분석 결과야.
+          const prompt=`다음은 ${data.name}님의 7가지 운명 분석 결과야.
 사주 일주: ${sys[0]?.key||""} / ${sys[0]?.desc||""}
 토정비결 총운: ${sys[1]?.key||""} — ${sys[1]?.desc||""}
 주역 본명괘: ${sys[2]?.key||""} — ${sys[2]?.desc||""}
@@ -2120,12 +2120,12 @@ MBTI: ${sys[6]?.key||""} / ${sys[6]?.desc||""}
 올해(${today.year||CY}년) 운세: ${today.score||""}점
 향후 가장 빛나는 해: ${best.year||""}년 ${best.score||""}점
 
-이 7가지 체계를 깊이 교차 분석해서 이 사람의 본질을 운세 에세이처럼 써줘.
+이 7가지 체계를 깊이 교차 분석해서 ${data.name}님의 본질을 운세 에세이처럼 써줘.
 
 [규칙 — 반드시 지킬 것]
 1. 반드시 ~이에요, ~해요 체(언니체)로 작성
-2. 총 400자 내외. 첫 문단(성격·성향 130자): 7체계 공통 메시지를 하나의 인물 서사로 녹여서 서술. "ENTJ와 무술 일주와 당사주의…" 같은 단순 나열 절대 금지. 이 사람이 어떤 사람인지를 한 편의 글처럼 자연스럽게 써줘.
-3. 둘째 문단(운세 흐름 270자): 올해부터 가장 빛나는 해까지의 흐름을 연결된 서사로 써줘. 연도를 나열하지 말고, 지금 어떤 시기인지 → 어떻게 변화하는지 → 언제 정점을 맞는지를 흐름으로 표현해줘. 구체적인 조언 1개 포함.
+2. 총 400자 내외. 첫 문단(성격·성향 130자): 7체계 공통 메시지를 하나의 인물 서사로 녹여서 서술. "ENTJ와 무술 일주와 당사주의…" 같은 단순 나열 절대 금지. ${data.name}님이 어떤 사람인지를 한 편의 글처럼 자연스럽게 써줘. "당신" 대신 반드시 "${data.name}님"으로 지칭해줘.
+3. 둘째 문단(운세 흐름 270자): 올해부터 가장 빛나는 해까지의 흐름을 연결된 서사로 써줘. 연도를 나열하지 말고, 지금 어떤 시기인지 → 어떻게 변화하는지 → 언제 정점을 맞는지를 흐름으로 표현해줘. 구체적인 조언 1개 포함. "당신" 대신 반드시 "${data.name}님"으로 지칭해줘.
 4. 두 문단 사이에 빈 줄 하나
 5. 마크다운, 이모지, 특수문자, 한자 단독 사용 금지
 JSON만 응답: {"sevenInsight":"..."}`;
