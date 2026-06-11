@@ -819,66 +819,85 @@ function buildSajuData(input){
   // 오행 분포 합계
   const _od=ohaengDist;
   const _total=Object.values(_od).reduce((a,b)=>a+b,0)||1;
-  // 목화 vs 금수 비율 → N↔S (목화=직관·이상, 금수=감각·현실)
-  const _mokHwa=((_od["木"]||0)+(_od["火"]||0))/_total;  // 높을수록 N
-  const _geumSu=((_od["金"]||0)+(_od["水"]||0))/_total;  // 높을수록 S
-  // 음간 vs 양간 개수 → F↔T
+  // 목화 vs 금수 비율 → N↔S
+  const _mokHwa=((_od["木"]||0)+(_od["火"]||0))/_total;
+  const _geumSu=((_od["金"]||0)+(_od["水"]||0))/_total;
   const _yangGan=["갑","병","무","경","임"];
   const _eumGan=["을","정","기","신","계"];
-  const _allGan=pillars.map(p=>p.gan.ko);
+  const _allGan=pillars.map(p=>p.gan.ko); // 4주 천간
   const _yangCnt=_allGan.filter(g=>_yangGan.includes(g)).length;
   const _eumCnt=_allGan.filter(g=>_eumGan.includes(g)).length;
-  // 신강→T·S 보정 +7%, 신약→F·N 보정 +7%
+  // 신강→T·S 보정, 신약→F·N 보정
   const _isSingang=singang.includes("신강");
   const _sBonus=_isSingang?0.07:-0.07;
-  // E↔I: 목화 일간=E, 금수토 일간=I 기반 + 오행비율 보정
-  const _eBase=["갑","을","병","정"].includes(ilgan)?0.65:["무","기"].includes(ilgan)?0.55:0.45;
-  const _eRaw=(_eBase+(_mokHwa-0.4)*0.3)*100; // 클램핑 전 원시값
-  const _eWins=_eRaw>=50; // 원시값으로 승패 판정
+
+  // ━━ E↔I: 천간 4개, 일간 2배 가중 (총 5점), 양간 비율로 판정 ━━
+  // 일간은 "나 자신"이므로 가중치 2배 부여
+  const _ilganYang=_yangGan.includes(ilgan);
+  const _eYangScore=_allGan.reduce((acc,g,i)=>{
+    const w=(i===2)?2:1; // 인덱스2=일간, 2배
+    return acc+((_yangGan.includes(g)?w:0));
+  },0);
+  const _eTotalScore=5; // 일간 2배 포함 항상 5점
+  const _eRaw=(_eYangScore/_eTotalScore)*100;
+  const _eWins=_eRaw>=50;
   const _eScore=Math.round(Math.min(92,Math.max(52,_eRaw)));
-  // N↔S: 목화 많으면 N, 금수 많으면 S + 신강신약 보정
+
+  // N↔S: 목화 vs 금수 오행 비율 + 신강신약 보정
   const _nBase=_mokHwa-_geumSu+_sBonus*-1;
   const _nRaw=(0.55+_nBase*0.6)*100;
   const _nWins=_nRaw>=50;
   const _nScore=Math.round(Math.min(92,Math.max(52,_nRaw)));
-  // F↔T: 음간 많으면 F, 양간 많으면 T + 신강신약 보정
+
+  // F↔T: 음간 vs 양간 + 신강신약 보정
   const _fBase=(_eumCnt-_yangCnt)/(_allGan.length||4);
   const _fRaw=(0.5+_fBase*0.5+_sBonus*-1)*100;
   const _fWins=_fRaw>=50;
   const _fScore=Math.round(Math.min(92,Math.max(52,_fRaw)));
-  // J↔P: 토·금 많으면 J, 목·수 많으면 P
-  const _jBase=((_od["土"]||0)+(_od["金"]||0)-(_od["木"]||0)-(_od["水"]||0))/_total;
-  const _jRaw=(0.55+_jBase*0.5)*100;
+
+  // ━━ J↔P: 일지 십이운성(60%) + 월간 음양(40%) ━━
+  const STAGE_JP={
+    "장생(長生)":-2,"목욕(沐浴)":-1,"관대(冠帶)":-1,"건록(建祿)":-1,"제왕(帝旺)":-2,
+    "태(胎)":-1,"양(養)":-1,
+    "쇠(衰)":1,"병(病)":2,"사(死)":2,"묘(墓)":1,"절(絶)":2,
+  };
+  const _iljiStage=getStage(ilgan,ilju.ji.ko);
+  const _stageScore=STAGE_JP[_iljiStage]||0; // -2~+2
+  const _monthGanYang=_yangGan.includes(wolju.gan.ko); // 월간 양간=J, 음간=P
+  const _monthScore=_monthGanYang?1:-1;
+  // 합산: 일지 60% + 월간 40%, 범위 -2~+1.6 → 0~100 변환
+  const _jCombined=_stageScore*0.6+_monthScore*0.4;
+  const _jRaw=(0.5+_jCombined/6)*100; // 최대 범위 ±3.6이면 충분
   const _jWins=_jRaw>=50;
-  const _jScore=Math.round(Math.min(92,Math.max(52,_jRaw)));
+  const _jScore=Math.round(Math.min(92,Math.max(52,Math.abs(_jRaw-50)+50)));
+
   // 사주 추정 MBTI
   const _sajuType=`${_eWins?"E":"I"}${_nWins?"N":"S"}${_fWins?"F":"T"}${_jWins?"J":"P"}`;
-  // 자가보고 MBTI (입력값) — 사주 90 : 자가보고 10
+  // 자가보고 블렌딩 — E/I만 20%, 나머지 10%
   const _userMbti=(input?.mbti||"").toUpperCase().trim();
   const _validMbti=/^[EI][NS][FT][JP]$/.test(_userMbti);
-  const _blend=(sajuScore,axis,userType)=>{
+  const _blend=(sajuScore,axis,userType,ratio=0.1)=>{
     if(!_validMbti) return sajuScore;
     const userWins=(userType==="E"&&_userMbti[0]==="E")||(userType==="N"&&_userMbti[1]==="N")||
       (userType==="F"&&_userMbti[2]==="F")||(userType==="J"&&_userMbti[3]==="J");
-    const userScore=userWins?75:25;
-    return Math.round(sajuScore*0.9+userScore*0.1);
+    return Math.round(sajuScore*(1-ratio)+(userWins?75:25)*ratio);
   };
-  const _eBlend=_blend(_eScore,"E","E");
-  const _nBlend=_blend(_nScore,"N","N");
-  const _fBlend=_blend(_fScore,"F","F");
-  const _jBlend=_blend(_jScore,"J","J");
-  // 최종 MBTI 타입 (블렌딩 후 — 승패는 원시값 기준 유지)
+  const _eBlend=_blend(_eScore,"E","E",0.2); // E/I만 20%
+  const _nBlend=_blend(_nScore,"N","N",0.1);
+  const _fBlend=_blend(_fScore,"F","F",0.1);
+  const _jBlend=_blend(_jScore,"J","J",0.1);
+  // 최종 MBTI (승패는 원시값 기준)
   const mbtiType=`${_eWins?"E":"I"}${_nWins?"N":"S"}${_fWins?"F":"T"}${_jWins?"J":"P"}`;
   const mbtiDesc=MBTI_DESC_MAP[ilgan]||"사주 교차 분석 중이에요.";
   const mbtiAxes=[
-    {axis:`${_eBlend>=50?"E (외향)":"I (내향)"}`,score:_eBlend>=50?_eBlend:100-_eBlend,
-      basis:`${OHK[ilO]} 일간의 에너지 방향${_validMbti?" + 자가보고 반영":""}이에요.`},
-    {axis:`${_nBlend>=50?"N (직관)":"S (감각)"}`,score:_nBlend>=50?_nBlend:100-_nBlend,
-      basis:`사주 오행 목화(${Math.round(_mokHwa*100)}%) vs 금수(${Math.round(_geumSu*100)}%) 비율이에요.`},
-    {axis:`${_fBlend>=50?"F (감정)":"T (사고)"}`,score:_fBlend>=50?_fBlend:100-_fBlend,
-      basis:`음간 ${_eumCnt}개 vs 양간 ${_yangCnt}개 + ${_isSingang?"신강(의지·논리)":"신약(감성·공감)"} 보정이에요.`},
-    {axis:`${_jBlend>=50?"J (판단)":"P (인식)"}`,score:_jBlend>=50?_jBlend:100-_jBlend,
-      basis:`토·금(${Math.round(((_od["土"]||0)+(_od["金"]||0))/_total*100)}%) vs 목·수(${Math.round(((_od["木"]||0)+(_od["水"]||0))/_total*100)}%) 비율이에요.`},
+    {axis:`${_eWins?"E (외향)":"I (내향)"}`,score:_eBlend>=50?_eBlend:100-_eBlend,
+      basis:`천간 양간 ${_eYangScore}점/5점 (일간 ${ilgan}·2배 가중)${_validMbti?" + 자가보고 20%":""}이에요.`},
+    {axis:`${_nWins?"N (직관)":"S (감각)"}`,score:_nBlend>=50?_nBlend:100-_nBlend,
+      basis:`목화(${Math.round(_mokHwa*100)}%) vs 금수(${Math.round(_geumSu*100)}%) 오행 비율이에요.`},
+    {axis:`${_fWins?"F (감정)":"T (사고)"}`,score:_fBlend>=50?_fBlend:100-_fBlend,
+      basis:`음간 ${_eumCnt}개 vs 양간 ${_yangCnt}개 + ${_isSingang?"신강":"신약"} 보정이에요.`},
+    {axis:`${_jWins?"J (판단)":"P (인식)"}`,score:_jBlend>=50?_jBlend:100-_jBlend,
+      basis:`일지 ${_iljiStage} (60%) + 월간 ${wolju.gan.ko}(${_monthGanYang?"양":"음"}간) (40%)이에요.`},
   ];
   // 타로 연도별 개인연도수
   function getPersonalYear(yr){
@@ -1091,15 +1110,15 @@ function buildSajuData(input){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 4. 공통 UI
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const GT=({children})=><p style={{fontSize:13,color:"#666",lineHeight:1.78,margin:"8px 0 0",borderLeft:"3px solid #e8e8e8",paddingLeft:10,textAlign:"justify"}}>{children}</p>;
-const ST=({icon,title,sub})=><div style={{marginBottom:6}}><div style={{fontSize:16,fontWeight:800,color:"#1a1a1a",display:"flex",alignItems:"center",gap:6}}><span>{icon}</span><span>{title}</span></div>{sub&&<div style={{fontSize:11,color:"#aaa",marginTop:1}}>{sub}</div>}</div>;
+const GT=({children})=><p style={{fontSize:12,color:"#666",lineHeight:1.78,margin:"8px 0 0",borderLeft:"3px solid #e8e8e8",paddingLeft:10,textAlign:"justify"}}>{children}</p>;
+const ST=({icon,title,sub})=><div style={{marginBottom:6}}><div style={{fontSize:15,fontWeight:800,color:"#1a1a1a",display:"flex",alignItems:"center",gap:6}}><span>{icon}</span><span>{title}</span></div>{sub&&<div style={{fontSize:10,color:"#aaa",marginTop:1}}>{sub}</div>}</div>;
 const Ring=({score,size=52})=>{const r=18,c2=2*Math.PI*r,col=score>=75?"#4caf50":score>=60?"#ffb300":"#ef5350";return <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{flexShrink:0}}><circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#eee" strokeWidth={3.5}/><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={col} strokeWidth={3.5} strokeDasharray={`${(score/100)*c2} ${c2}`} strokeLinecap="round" transform={`rotate(-90 ${size/2} ${size/2})`}/><text x={size/2} y={size/2+4} textAnchor="middle" fontSize={size<=44?10:12} fontWeight={800} fill={col}>{score}</text></svg>;};
 const sc=s=>s>=75?"#2e7d32":s>=60?"#e65100":"#b71c1c";
 const scBg=s=>s>=75?"#e8f5e0":s>=60?"#fff8e1":"#fdecea";
 function GCard({g,s}){
   const c=gc(g.ko);
   return <div style={{width:"100%",borderRadius:11,padding:"11px 4px 8px",border:`1.5px solid ${c.border}`,background:c.bg,color:c.text,textAlign:"center",position:"relative",boxSizing:"border-box"}}>
-    <span style={{position:"absolute",top:3,right:4,fontSize:14}}>{yyE(g.ko,true)}</span>
+    <span style={{position:"absolute",top:3,right:4,fontSize:13}}>{yyE(g.ko,true)}</span>
     <div style={{fontSize:9,opacity:.6,fontWeight:600,marginBottom:1}}>{s}</div>
     <div style={{fontSize:24,fontWeight:900,lineHeight:1.1}}>{g.hanja}</div>
     <div style={{fontSize:10,fontWeight:700,marginTop:2}}>{g.ko}</div>
@@ -1108,7 +1127,7 @@ function GCard({g,s}){
 function JCard({j,s}){
   const c=jc(j.ko);
   return <div style={{width:"100%",borderRadius:11,padding:"11px 4px 8px",border:`1.5px solid ${c.border}`,background:c.bg,color:c.text,textAlign:"center",position:"relative",boxSizing:"border-box"}}>
-    <span style={{position:"absolute",top:3,right:4,fontSize:14}}>{yyE(j.ko,false)}</span>
+    <span style={{position:"absolute",top:3,right:4,fontSize:13}}>{yyE(j.ko,false)}</span>
     <div style={{fontSize:9,opacity:.6,fontWeight:600,marginBottom:1}}>{s}</div>
     <div style={{fontSize:24,fontWeight:900,lineHeight:1.1}}>{j.hanja}</div>
     <div style={{fontSize:10,fontWeight:700,marginTop:2}}>{j.ko}</div>
@@ -1126,18 +1145,18 @@ function Acc({items}){
             <div style={{flex:1}}>
               {item.badge&&<span style={{fontSize:10,background:item.badge.bg,color:item.badge.text,padding:"2px 7px",borderRadius:99,fontWeight:700,marginRight:6,display:"inline-block",marginBottom:3}}>{item.badge.label}</span>}
               <div style={{display:"flex",alignItems:"center",gap:5,flexWrap:"wrap",marginBottom:2}}>
-                <span style={{fontSize:14,fontWeight:800,color:"#111"}}>{item.title}</span>
-                {item.sub&&<span style={{fontSize:11,color:"#bbb"}}>({item.sub})</span>}
+                <span style={{fontSize:13,fontWeight:800,color:"#111"}}>{item.title}</span>
+                {item.sub&&<span style={{fontSize:10,color:"#bbb"}}>({item.sub})</span>}
               </div>
-              {item.easy&&<div style={{fontSize:12,color:"#e65100",fontWeight:600}}>{item.easy}</div>}
+              {item.easy&&<div style={{fontSize:11,color:"#e65100",fontWeight:600}}>{item.easy}</div>}
             </div>
             <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4,marginLeft:8}}>
               {item.tag&&<span style={{fontSize:10,color:"#e65100",background:"#fff3e0",padding:"2px 8px",borderRadius:99,fontWeight:700,whiteSpace:"nowrap"}}>{item.tag}</span>}
-              <span style={{fontSize:13,color:"#ccc"}}>{op?"▲":"▼"}</span>
+              <span style={{fontSize:12,color:"#ccc"}}>{op?"▲":"▼"}</span>
             </div>
           </div>
         </button>
-        {op&&<div style={{padding:"12px 14px",background:"#fff",fontSize:13,color:"#444",lineHeight:1.85,borderTop:"1px solid #f0f0f0"}}>{item.desc}</div>}
+        {op&&<div style={{padding:"12px 14px",background:"#fff",fontSize:12,color:"#444",lineHeight:1.85,borderTop:"1px solid #f0f0f0"}}>{item.desc}</div>}
       </div>;
     })}
   </div>;
@@ -1152,7 +1171,7 @@ function TabSummary({d,changeTab}){return <>
     <GT>일곱 가지 운명 분석 체계가 공통으로 가리키는 핵심 주제입니다.</GT>
     <div style={{marginTop:10,padding:"14px 16px",background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderRadius:12,marginBottom:10}}>
       {cleanText(d.summary?.sevenInsight||"").split("\n\n").map((para,i)=>(
-        <p key={i} style={{fontSize:13,color:"#e0e7ff",lineHeight:1.9,margin:i>0?"12px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}>{para}</p>
+        <p key={i} style={{fontSize:12,color:"#e0e7ff",lineHeight:1.9,margin:i>0?"12px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}>{para}</p>
       ))}
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:6}}>
@@ -1160,8 +1179,8 @@ function TabSummary({d,changeTab}){return <>
         <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}>
           <div style={{width:60,fontSize:10,fontWeight:700,color:"#e65100",background:"#fff3e0",padding:"3px 5px",borderRadius:6,textAlign:"center",flexShrink:0,lineHeight:1.5}}>{s.system}</div>
           <div style={{flex:1}}>
-            <div style={{fontSize:13,fontWeight:800,color:"#111",marginBottom:2}}>{s.key}</div>
-            <div style={{fontSize:12,color:"#666",lineHeight:1.5,whiteSpace:"pre-line"}}>{s.desc}</div>
+            <div style={{fontSize:12,fontWeight:800,color:"#111",marginBottom:2}}>{s.key}</div>
+            <div style={{fontSize:11,color:"#666",lineHeight:1.5,whiteSpace:"pre-line"}}>{s.desc}</div>
           </div>
         </div>
       ))}
@@ -1171,13 +1190,13 @@ function TabSummary({d,changeTab}){return <>
     <ST icon="📆" title={`향후 5년 흐름 (${CY}~${CY+4})`}/>
     <GT>6체계 교차 분석 종합 운기 점수입니다.</GT>
     <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
-      {(d.summary?.yearForecast||[]).map((yf,i)=><div key={i} style={{display:"flex",flexDirection:"column",gap:6,padding:"10px 12px",background:scBg(yf.score),borderRadius:11}}><div style={{display:"flex",alignItems:"center",gap:10}}><Ring score={yf.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}><span style={{fontSize:14,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>{yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}</div><div style={{fontSize:12,color:"#444",lineHeight:1.6,textAlign:"justify"}}>{yf.summary}</div></div></div>{yf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.1)"}}>
+      {(d.summary?.yearForecast||[]).map((yf,i)=><div key={i} style={{display:"flex",flexDirection:"column",gap:6,padding:"10px 12px",background:scBg(yf.score),borderRadius:11}}><div style={{display:"flex",alignItems:"center",gap:10}}><Ring score={yf.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}><span style={{fontSize:13,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>{yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}</div><div style={{fontSize:11,color:"#444",lineHeight:1.6,textAlign:"justify"}}>{yf.summary}</div></div></div>{yf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.1)"}}>
         {Object.entries(yf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.6)",color:sc(v),fontWeight:700}}>{k.slice(0,3)} {v}</div>)}
       </div>}</div>)}
     </div>
   </section>
   <section style={S.card}>
-    <ST icon="🗓" title="향후 1년 흐름"/>
+    <ST icon="📆" title="향후 1년 흐름"/>
     <GT>이번 달부터 12개월 월별 운기 점수예요.</GT>
     <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
       {(d.summary?.monthForecast||[]).map((mf,i)=>(
@@ -1186,11 +1205,11 @@ function TabSummary({d,changeTab}){return <>
             <Ring score={mf.score} size={40}/>
             <div style={{flex:1}}>
               <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2}}>
-                <span style={{fontSize:13,fontWeight:900,color:mf.isThis?"#2e7d32":"#111"}}>{mf.year}년 {mf.month}월</span>
+                <span style={{fontSize:12,fontWeight:900,color:mf.isThis?"#2e7d32":"#111"}}>{mf.year}년 {mf.month}월</span>
                 <span style={{fontSize:10,color:"#888",fontWeight:600}}>{mf.ganji}</span>
                 {mf.isThis&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>이번 달</span>}
               </div>
-              <div style={{fontSize:11,color:"#555",lineHeight:1.5}}>{mf.summary}</div>
+              <div style={{fontSize:10,color:"#555",lineHeight:1.5}}>{mf.summary}</div>
             </div>
           </div>
           {mf.areas&&<div style={{display:"flex",gap:3,flexWrap:"nowrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.08)"}}>
@@ -1211,13 +1230,13 @@ function BndBanner({b}){
   if(!b?.isBoundary) return null;
   return <div style={{background:"#fff8e1",border:"1.5px solid #ffb300",borderRadius:12,padding:"12px 14px"}}>
     <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:7}}>
-      <span>⚠️</span><span style={{fontSize:13,fontWeight:800,color:"#7b5800"}}>경계 일주 감지</span>
+      <span>⚠️</span><span style={{fontSize:12,fontWeight:800,color:"#7b5800"}}>경계 일주 감지</span>
       <span style={{fontSize:9,background:"#e65100",color:"#fff",padding:"2px 7px",borderRadius:99,fontWeight:700,marginLeft:"auto"}}>자시(子時) 경계</span>
     </div>
     <div style={{display:"flex",gap:8,marginBottom:8}}>
-      {[{l:"자정 기준",g:b.std,c:"#1565c0",bg:"#e3f2fd"},{l:"야자시 기준",g:b.mid,c:"#7b5800",bg:"#fff8e1"}].map(({l,g,c,bg})=><div key={l} style={{flex:1,padding:"8px 10px",background:bg,borderRadius:9}}><div style={{fontSize:10,color:"#888",marginBottom:2}}>{l}</div><div style={{fontSize:15,fontWeight:900,color:c}}>{g.hanja}({g.ko})</div></div>)}
+      {[{l:"자정 기준",g:b.std,c:"#1565c0",bg:"#e3f2fd"},{l:"야자시 기준",g:b.mid,c:"#7b5800",bg:"#fff8e1"}].map(({l,g,c,bg})=><div key={l} style={{flex:1,padding:"8px 10px",background:bg,borderRadius:9}}><div style={{fontSize:10,color:"#888",marginBottom:2}}>{l}</div><div style={{fontSize:14,fontWeight:900,color:c}}>{g.hanja}({g.ko})</div></div>)}
     </div>
-    <p style={{fontSize:12,color:"#7b5800",margin:0,lineHeight:1.75}}>자시(子時) 경계 구간: 두 일주 에너지를 모두 가진 복합형으로, 상황에 따라 번갈아 발동해요.</p>
+    <p style={{fontSize:11,color:"#7b5800",margin:0,lineHeight:1.75}}>자시(子時) 경계 구간: 두 일주 에너지를 모두 가진 복합형으로, 상황에 따라 번갈아 발동해요.</p>
   </div>;
 }
 
@@ -1228,12 +1247,12 @@ function Manseryeok({d}){
   return <section style={S.card}>
     <ST icon="📋" title="사주 명식" sub="태어난 연·월·일·시의 네 기둥"/>
     <GT>사주는 태어난 연·월·일·시 네 개의 기둥으로 이루어져요. 이 중 <strong>일주</strong>가 나 자신을 나타내는 중심이에요.</GT>
-    {b.isBoundary&&<div style={{display:"flex",gap:6,marginTop:10}}>{[{k:"A",l:`자정 ${b.std.hanja}`},{k:"B",l:`야자시 ${b.mid.hanja}`}].map(o=><button key={o.k} onClick={()=>setW(o.k)} style={{flex:1,padding:"7px 6px",borderRadius:9,border:"1.5px solid #ffb300",fontSize:11,fontWeight:700,cursor:"pointer",background:w===o.k?"#7b5800":"#fff",color:w===o.k?"#fff":"#7b5800"}}>{o.l}</button>)}</div>}
+    {b.isBoundary&&<div style={{display:"flex",gap:6,marginTop:10}}>{[{k:"A",l:`자정 ${b.std.hanja}`},{k:"B",l:`야자시 ${b.mid.hanja}`}].map(o=><button key={o.k} onClick={()=>setW(o.k)} style={{flex:1,padding:"7px 6px",borderRadius:9,border:"1.5px solid #ffb300",fontSize:10,fontWeight:700,cursor:"pointer",background:w===o.k?"#7b5800":"#fff",color:w===o.k?"#fff":"#7b5800"}}>{o.l}</button>)}</div>}
     <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6,marginTop:10}}>
       {active.map((p,i)=>{const isI=p.name==="일주";return <div key={i} style={{display:"flex",flexDirection:"column",gap:5,alignItems:"center",position:"relative",...(isI?{border:"2px solid #ffb300",borderRadius:15,background:"#fffde7",padding:"4px 3px 7px"}:{})}}>{isI&&<div style={{position:"absolute",top:-10,left:"50%",transform:"translateX(-50%)",background:"#e65100",color:"#fff",fontSize:9,fontWeight:800,padding:"2px 7px",borderRadius:99,zIndex:1,whiteSpace:"nowrap"}}>나</div>}<div style={{fontSize:10,color:"#aaa",fontWeight:600}}>{p.name}</div><GCard g={p.gan} s={p.gan.sibsong}/><JCard j={p.ji} s={p.ji.sibsong}/></div>;})}
     </div>
-    {b.isBoundary&&<div style={{marginTop:10,padding:"10px 12px",background:"#f9f9f9",borderRadius:9,fontSize:12,color:"#555",lineHeight:1.78,borderLeft:"3px solid #ffb300"}}>{w==="A"?b.standardDesc:b.midnightDesc}</div>}
-    <div style={{marginTop:8,fontSize:11,color:"#ccc",textAlign:"center"}}>☀️ 양(陽) 적극·외향 &nbsp;·&nbsp; 🌙 음(陰) 수용·내향</div>
+    {b.isBoundary&&<div style={{marginTop:10,padding:"10px 12px",background:"#f9f9f9",borderRadius:9,fontSize:11,color:"#555",lineHeight:1.78,borderLeft:"3px solid #ffb300"}}>{w==="A"?b.standardDesc:b.midnightDesc}</div>}
+    <div style={{marginTop:8,fontSize:10,color:"#ccc",textAlign:"center"}}>☀️ 양(陽) 적극·외향 &nbsp;·&nbsp; 🌙 음(陰) 수용·내향</div>
   </section>;
 }
 
@@ -1252,16 +1271,16 @@ function Ohaeng({d}){
         <text x={cx} y={cy+14} textAnchor="middle" fontSize={20} fontWeight={900} fill={OC[dom].text}>{dist[dom]||0}개</text>
       </svg>
       <div style={{flex:1,display:"flex",flexDirection:"column",gap:7}}>
-        {order.map(o=>{const c=OC[o],v=dist[o]||0,p=Math.round((v/total)*100);return <div key={o} style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:9,height:9,borderRadius:2,background:c.chart,flexShrink:0}}/><div style={{fontSize:12,color:c.text,fontWeight:700,minWidth:44}}>{c.name}</div><div style={{flex:1,height:5,background:"#f0f0f0",borderRadius:99,overflow:"hidden"}}><div style={{width:`${p}%`,height:"100%",background:c.chart,borderRadius:99}}/></div><div style={{fontSize:12,color:"#888",minWidth:24,textAlign:"right"}}>{v}개</div></div>;})}
+        {order.map(o=>{const c=OC[o],v=dist[o]||0,p=Math.round((v/total)*100);return <div key={o} style={{display:"flex",alignItems:"center",gap:6}}><div style={{width:9,height:9,borderRadius:2,background:c.chart,flexShrink:0}}/><div style={{fontSize:11,color:c.text,fontWeight:700,minWidth:44}}>{c.name}</div><div style={{flex:1,height:5,background:"#f0f0f0",borderRadius:99,overflow:"hidden"}}><div style={{width:`${p}%`,height:"100%",background:c.chart,borderRadius:99}}/></div><div style={{fontSize:11,color:"#888",minWidth:24,textAlign:"right"}}>{v}개</div></div>;})}
       </div>
     </div>
-    <div style={{marginTop:10,padding:"10px 14px",background:"#e3f2fd",borderRadius:10,fontSize:13,color:"#0d47a1",lineHeight:1.75}}>{d.ohaengNote||""}</div>
+    <div style={{marginTop:10,padding:"10px 14px",background:"#e3f2fd",borderRadius:10,fontSize:12,color:"#0d47a1",lineHeight:1.75}}>{d.ohaengNote||""}</div>
     <div style={{marginTop:8,padding:"10px 12px",background:"#f0f4ff",borderRadius:10,border:"1px solid #c5cae9",marginBottom:8}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,flexWrap:"nowrap"}}>
-        <span style={{fontSize:11,color:"#5c6bc0",fontWeight:700,whiteSpace:"nowrap"}}>신강·신약</span>
-        <span style={{fontSize:13,fontWeight:900,color:"#1565c0",whiteSpace:"nowrap"}}>{d.singang}</span>
+        <span style={{fontSize:10,color:"#5c6bc0",fontWeight:700,whiteSpace:"nowrap"}}>신강·신약</span>
+        <span style={{fontSize:12,fontWeight:900,color:"#1565c0",whiteSpace:"nowrap"}}>{d.singang}</span>
       </div>
-      <div style={{fontSize:11,color:"#555",lineHeight:1.7}}>{d.singang==="신강(身强)"?"일간을 돕는 기운이 넉넉한 구조예요.":"사주 8글자 중 나를 도와주는 기운보다 소모시키는 기운이 더 많은 구조예요. 에너지를 쓰는 만큼 채우는 것이 중요한 체질이에요."}</div>
+      <div style={{fontSize:10,color:"#555",lineHeight:1.7}}>{d.singang==="신강(身强)"?"일간을 돕는 기운이 넉넉한 구조예요.":"사주 8글자 중 나를 도와주는 기운보다 소모시키는 기운이 더 많은 구조예요. 에너지를 쓰는 만큼 채우는 것이 중요한 체질이에요."}</div>
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:7}}>
       {[
@@ -1282,8 +1301,8 @@ function Ohaeng({d}){
             {items.map(({name,sub,val,pillBg,pillTc,valC})=>(
               <div key={name} style={{display:"flex",flexDirection:"column",alignItems:"flex-start",gap:4}}>
                 <div style={{display:"flex",alignItems:"center",gap:7}}>
-                  <span style={{background:pillBg,color:pillTc,fontSize:11,fontWeight:800,padding:"4px 10px",borderRadius:8,whiteSpace:"nowrap"}}>{name}</span>
-                  <span style={{fontSize:14,fontWeight:900,color:valC,whiteSpace:"nowrap"}}>{val}</span>
+                  <span style={{background:pillBg,color:pillTc,fontSize:10,fontWeight:800,padding:"4px 10px",borderRadius:8,whiteSpace:"nowrap"}}>{name}</span>
+                  <span style={{fontSize:13,fontWeight:900,color:valC,whiteSpace:"nowrap"}}>{val}</span>
                 </div>
                 <span style={{fontSize:10,color:"#999",fontWeight:500}}>{sub}</span>
               </div>
@@ -1336,20 +1355,20 @@ function SeunSheet({item,onClose,reportData}){
     <div style={{background:"#fff",borderRadius:"20px 20px 0 0",padding:"12px 20px 36px",width:"100%",maxWidth:480,margin:"0 auto",maxHeight:"88vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
       <div style={{width:36,height:4,background:"#e0e0e0",borderRadius:99,margin:"0 auto 16px"}}/>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
-        <div><div style={{fontSize:11,color:"#aaa",marginBottom:2}}>{title} 세운(歲運)</div>
+        <div><div style={{fontSize:10,color:"#aaa",marginBottom:2}}>{title} 세운(歲運)</div>
           <div style={{fontSize:18,fontWeight:900,color:"#111"}}>{item.hanja||gj.hanja}({item.ko||gj.ko})</div></div>
         <Ring score={score} size={50}/>
       </div>
       {/* 간지 설명 */}
       {item.month&&<div style={{display:"flex",gap:8,marginBottom:10}}>
-        {[{g:gj.gan,isG:true,c:gc(gj.gan.ko)},{g:gj.ji,isG:false,c:jc(gj.ji.ko)}].map(({g,isG,c},pi)=><div key={pi} style={{flex:1,padding:"8px 10px",background:c.bg,borderRadius:9,border:`1px solid ${c.border}`,textAlign:"center"}}><div style={{fontSize:10,color:c.text,fontWeight:600,marginBottom:2}}>{isG?"천간(天干)":"지지(地支)"}</div><div style={{fontSize:16,fontWeight:900,color:c.text}}>{g.hanja}({g.ko})</div></div>)}
+        {[{g:gj.gan,isG:true,c:gc(gj.gan.ko)},{g:gj.ji,isG:false,c:jc(gj.ji.ko)}].map(({g,isG,c},pi)=><div key={pi} style={{flex:1,padding:"8px 10px",background:c.bg,borderRadius:9,border:`1px solid ${c.border}`,textAlign:"center"}}><div style={{fontSize:10,color:c.text,fontWeight:600,marginBottom:2}}>{isG?"천간(天干)":"지지(地支)"}</div><div style={{fontSize:15,fontWeight:900,color:c.text}}>{g.hanja}({g.ko})</div></div>)}
       </div>}
-      <p style={{fontSize:13,color:"#444",lineHeight:1.85,textAlign:"justify",margin:"0 0 14px",background:"#fafafa",padding:"11px 13px",borderRadius:10}}>{getYMEMO(item.year, reportData)}</p>
-      <div style={{fontSize:12,color:"#aaa",fontWeight:700,marginBottom:9}}>분야별 운기</div>
+      <p style={{fontSize:12,color:"#444",lineHeight:1.85,textAlign:"justify",margin:"0 0 14px",background:"#fafafa",padding:"11px 13px",borderRadius:10}}>{getYMEMO(item.year, reportData)}</p>
+      <div style={{fontSize:11,color:"#aaa",fontWeight:700,marginBottom:9}}>분야별 운기</div>
       <div style={{display:"flex",flexDirection:"column",gap:10}}>
-        {AREAS.map(a=>{const s=detail[a.k],c=s>=75?"#4caf50":s>=60?"#ffb300":"#ef5350";return <div key={a.k} style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:18,width:24}}>{a.i}</span><span style={{fontSize:13,fontWeight:700,width:46,color:"#333"}}>{a.k}</span><div style={{flex:1,height:8,background:"#f0f0f0",borderRadius:99,overflow:"hidden"}}><div style={{width:`${s}%`,height:"100%",background:c,borderRadius:99}}/></div><span style={{fontSize:13,fontWeight:800,color:c,width:26,textAlign:"right"}}>{s}</span></div>;})}
+        {AREAS.map(a=>{const s=detail[a.k],c=s>=75?"#4caf50":s>=60?"#ffb300":"#ef5350";return <div key={a.k} style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:18,width:24}}>{a.i}</span><span style={{fontSize:12,fontWeight:700,width:46,color:"#333"}}>{a.k}</span><div style={{flex:1,height:8,background:"#f0f0f0",borderRadius:99,overflow:"hidden"}}><div style={{width:`${s}%`,height:"100%",background:c,borderRadius:99}}/></div><span style={{fontSize:12,fontWeight:800,color:c,width:26,textAlign:"right"}}>{s}</span></div>;})}
       </div>
-      <button style={{marginTop:20,width:"100%",padding:"13px 0",background:"#f5f5f5",border:"none",borderRadius:12,fontSize:14,fontWeight:700,color:"#555",cursor:"pointer"}} onClick={onClose}>닫기</button>
+      <button style={{marginTop:20,width:"100%",padding:"13px 0",background:"#f5f5f5",border:"none",borderRadius:12,fontSize:13,fontWeight:700,color:"#555",cursor:"pointer"}} onClick={onClose}>닫기</button>
     </div>
   </div>;
 }
@@ -1361,7 +1380,7 @@ function Seun({reportData}){
     <section style={S.card}>
       <ST icon="📅" title="세운(歲運)" sub={`Today ${CY}.${CM}.${CD} 기준 자동 계산`}/>
       <GT>세운은 매년·매월 바뀌는 간지(干支) 에너지입니다. 오늘 날짜 기준으로 자동 계산됩니다.</GT>
-      <div style={{display:"flex",gap:6,marginTop:10}}>{[["year",`연도별 ${CY}~${CY+4}`],["month","월별 12개월"]].map(([k,l])=><button key={k} onClick={()=>setSt(k)} style={{flex:1,padding:"7px 0",borderRadius:9,border:"1.5px solid #e65100",fontSize:12,fontWeight:700,cursor:"pointer",background:st===k?"#e65100":"#fff",color:st===k?"#fff":"#e65100"}}>{l}</button>)}</div>
+      <div style={{display:"flex",gap:6,marginTop:10}}>{[["year",`연도별 ${CY}~${CY+4}`],["month","월별 12개월"]].map(([k,l])=><button key={k} onClick={()=>setSt(k)} style={{flex:1,padding:"7px 0",borderRadius:9,border:"1.5px solid #e65100",fontSize:11,fontWeight:700,cursor:"pointer",background:st===k?"#e65100":"#fff",color:st===k?"#fff":"#e65100"}}>{l}</button>)}</div>
       {st==="year"&&<div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
         {ys.map((s,i)=>{
           const score=calcSeunScore(s.year,0,reportData?.scoreMeta);
@@ -1373,11 +1392,11 @@ function Seun({reportData}){
               <Ring score={score} size={48}/>
               <div style={{flex:1,minWidth:0}}>
                 <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:2,flexWrap:"wrap"}}>
-                  <span style={{fontSize:14,fontWeight:900,color:"#111"}}>{s.year}년</span>
-                  <span style={{fontSize:11,fontWeight:700,padding:"2px 7px",borderRadius:7,background:cg.bg,color:cg.text}}>{s.hanja}({s.ko})</span>
+                  <span style={{fontSize:13,fontWeight:900,color:"#111"}}>{s.year}년</span>
+                  <span style={{fontSize:10,fontWeight:700,padding:"2px 7px",borderRadius:7,background:cg.bg,color:cg.text}}>{s.hanja}({s.ko})</span>
                   {s.isThis&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}
                 </div>
-                <div style={{fontSize:12,color:"#555",lineHeight:1.5}}>{getYMEMO(s.year, reportData)}</div>
+                <div style={{fontSize:11,color:"#555",lineHeight:1.5}}>{getYMEMO(s.year, reportData)}</div>
               </div>
             </div>
             <div style={{display:"flex",gap:4,flexWrap:"wrap",borderTop:"1px solid #e8e8e8",paddingTop:6}}>
@@ -1399,18 +1418,18 @@ function Seun({reportData}){
             <div style={{display:"flex",alignItems:"center",gap:10}}>
               <div style={{minWidth:44,textAlign:"center",flexShrink:0}}>
                 <div style={{fontSize:10,color:"#aaa",fontWeight:600}}>{s.year}</div>
-                <div style={{fontSize:13,fontWeight:900,color:s.isThis?"#2e7d32":"#111"}}>{MON[s.month-1]}</div>
+                <div style={{fontSize:12,fontWeight:900,color:s.isThis?"#2e7d32":"#111"}}>{MON[s.month-1]}</div>
                 {s.isThis&&<div style={{fontSize:9,background:"#4caf50",color:"#fff",borderRadius:99,padding:"1px 5px",marginTop:1,fontWeight:700}}>현재</div>}
               </div>
               <div style={{flex:1,minWidth:0}}>
                 <div style={{display:"flex",gap:4,marginBottom:4}}>
                   {[{g:s.gan,isG:true,c:cg},{g:s.ji,isG:false,c:cj}].map(({g,isG,c},pi)=>(
-                    <div key={pi} style={{background:c.bg,color:c.text,border:`1px solid ${c.border}`,fontSize:11,padding:"4px 7px",borderRadius:7,fontWeight:700}}>
+                    <div key={pi} style={{background:c.bg,color:c.text,border:`1px solid ${c.border}`,fontSize:10,padding:"4px 7px",borderRadius:7,fontWeight:700}}>
                       {g.hanja}({g.ko})
                     </div>
                   ))}
                 </div>
-                <div style={{fontSize:11,color:"#555",lineHeight:1.5}}>{memo}</div>
+                <div style={{fontSize:10,color:"#555",lineHeight:1.5}}>{memo}</div>
               </div>
               <div style={{flexShrink:0}}>
                 <Ring score={score} size={42}/>
@@ -1443,7 +1462,7 @@ function TabSaju({d,reportData}){
         ...d.hap.map(h=>({title:h.pair,easy:h.easy,desc:h.desc,badge:{label:h.type,bg:"#e8f5e0",text:"#2d6a2d"}})),
         ...(d.hyeong||[]).map(h=>({title:h.name,easy:"무은지형: 믿는 사람에게 배신당하는 에너지",desc:h.desc,badge:{label:h.type,bg:"#fdecea",text:"#b71c1c"}})),
       ]}/>
-      {(d.chung||[]).length===0&&<div style={{marginTop:10,padding:"10px 14px",background:"#f9fbe7",borderRadius:10,fontSize:13,color:"#558b2f",lineHeight:1.75}}>✅ 충(沖) 없음: 원국 내 큰 충돌 에너지가 없는 구조예요.</div>}
+      {(d.chung||[]).length===0&&<div style={{marginTop:10,padding:"10px 14px",background:"#f9fbe7",borderRadius:10,fontSize:12,color:"#558b2f",lineHeight:1.75}}>✅ 충(沖) 없음: 원국 내 큰 충돌 에너지가 없는 구조예요.</div>}
     </section>}
     <section style={S.card}>
       <ST icon="🌊" title="대운(大運)" sub={`${d.daeunDir} · 만 ${d.daeunStart}세 시작`}/>
@@ -1466,11 +1485,11 @@ function TabSaju({d,reportData}){
                     <span style={{...S.dBadge,background:j.bg,color:j.text,borderColor:j.border}}>{dv.hanja[1]}({dv.label[1]})</span>
                   </div>
                   <div>
-                    <div style={{fontSize:12,fontWeight:800,color:"#222"}}>{dv.period}</div>
+                    <div style={{fontSize:11,fontWeight:800,color:"#222"}}>{dv.period}</div>
                     <div style={{fontSize:10,color:"#999"}}>{OC[dv.ohaeng]?.name} 기운</div>
                   </div>
                 </div>
-                <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.75,textAlign:"justify"}}>{dv.desc}</p>
+                <p style={{fontSize:11,color:"#555",margin:0,lineHeight:1.75,textAlign:"justify"}}>{dv.desc}</p>
               </div>
             </div>
           );
@@ -1495,8 +1514,8 @@ function TabDayNight({d}){
           {t:"사회에서 쓰는 가면",c:"#f3e5f5",tc:"#4a148c",v:dn.day.mask},
         ].map(({t,c,tc,v})=>(
           <div key={t} style={{minHeight:72,padding:"10px 14px",background:c,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
-            <div style={{fontSize:12,fontWeight:800,color:tc,marginBottom:v?4:0}}>{t}</div>
-            {v&&<p style={{fontSize:13,color:"#444",margin:0,lineHeight:1.75,textAlign:"justify"}}>{v}</p>}
+            <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:v?4:0}}>{t}</div>
+            {v&&<p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.75,textAlign:"justify"}}>{v}</p>}
           </div>
         ))}
       </div>
@@ -1512,11 +1531,11 @@ function TabDayNight({d}){
           {key:"real",bg:"#0f172a",tc:"#86efac",label:"실제 궁합",v:dn.night.idealType2},
         ].map(({key,bg,tc,label,v,v2,triggers})=>(
           <div key={key} style={{minHeight:72,padding:"10px 14px",background:bg,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
-            <div style={{fontSize:12,fontWeight:800,color:tc,marginBottom:(v||v2||triggers?.length)?5:0}}>{label}</div>
-            {v&&<p style={{fontSize:13,color:"#ddd",margin:0,lineHeight:1.75}}>{v}</p>}
-            {v2&&<p style={{fontSize:13,color:"#c4b5fd",margin:"8px 0 0",lineHeight:1.75,borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:8}}>{v2}</p>}
+            <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:(v||v2||triggers?.length)?5:0}}>{label}</div>
+            {v&&<p style={{fontSize:12,color:"#ddd",margin:0,lineHeight:1.75}}>{v}</p>}
+            {v2&&<p style={{fontSize:12,color:"#c4b5fd",margin:"8px 0 0",lineHeight:1.75,borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:8}}>{v2}</p>}
             {triggers&&(triggers||[]).map((t,i)=>(
-              <div key={i} style={{fontSize:13,color:"#e0e7ff",padding:"4px 0",borderBottom:i<triggers.length-1?"1px dashed #ffffff22":"none",lineHeight:1.6}}>
+              <div key={i} style={{fontSize:12,color:"#e0e7ff",padding:"4px 0",borderBottom:i<triggers.length-1?"1px dashed #ffffff22":"none",lineHeight:1.6}}>
                 <span style={{color:tc,fontWeight:700,marginRight:6}}>{i+1}.</span>{t}
               </div>
             ))}
@@ -1540,20 +1559,20 @@ function TabTojung({d}){
       <ST icon="📜" title="토정비결(土亭秘訣)"/>
       <GT>토정비결은 조선 중기 이지함 선생이 집대성한 민간 예언서입니다. 사주를 수리화하여 한 해의 길흉과 본명 총운을 사자성어로 풀어냅니다.</GT>
       <div style={{marginTop:10,padding:"14px 15px",background:"#e8f5e0",borderRadius:11,border:"1px solid #a5d6a7"}}>
-        <div style={{fontSize:11,color:"#2d6a2d",fontWeight:700,marginBottom:5}}>본명 총운 사자성어</div>
+        <div style={{fontSize:10,color:"#2d6a2d",fontWeight:700,marginBottom:5}}>본명 총운 사자성어</div>
         <div style={{fontSize:20,fontWeight:900,color:"#1b5e20",marginBottom:6}}>{tj.saja}</div>
-        <p style={{fontSize:13,color:"#388e3c",margin:0,lineHeight:1.78,textAlign:"justify"}}>{tj.bonunDesc}</p>
+        <p style={{fontSize:12,color:"#388e3c",margin:0,lineHeight:1.78,textAlign:"justify"}}>{tj.bonunDesc}</p>
       </div>
-      <div style={{marginTop:12}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>연도별 운세 ({CY}~{CY+4})</div>
+      <div style={{marginTop:12}}><div style={{fontSize:11,fontWeight:800,color:"#333",marginBottom:8}}>연도별 운세 ({CY}~{CY+4})</div>
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
           {tj.yearFlow.map((y,i)=><div key={i} style={{padding:"11px 13px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:7}}><Ring score={y.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",marginBottom:2}}><span style={{fontSize:14,fontWeight:900,color:y.year===CY?"#2e7d32":"#111"}}>{y.year}년</span>{y.year===CY&&<span style={{fontSize:9,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}<span style={{fontSize:10,background:"#fff8e1",color:"#7b5800",padding:"2px 7px",borderRadius:99,fontWeight:700}}>{y.month}</span></div><div style={{fontSize:12,color:"#555"}}>{y.desc}</div></div></div>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:7}}><Ring score={y.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",marginBottom:2}}><span style={{fontSize:13,fontWeight:900,color:y.year===CY?"#2e7d32":"#111"}}>{y.year}년</span>{y.year===CY&&<span style={{fontSize:9,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}<span style={{fontSize:10,background:"#fff8e1",color:"#7b5800",padding:"2px 7px",borderRadius:99,fontWeight:700}}>{y.month}</span></div><div style={{fontSize:11,color:"#555"}}>{y.desc}</div></div></div>
             <div style={{display:"flex",gap:3,flexWrap:"nowrap"}}>{Object.entries(y.areas).map(([k,v])=><div key={k} style={{flex:1,fontSize:9,padding:"2px 2px",borderRadius:7,background:scBg(v),color:sc(v),fontWeight:700,textAlign:"center",whiteSpace:"nowrap"}}>{k} {v}</div>)}</div>
           </div>)}
         </div>
       </div>
-      <div style={{marginTop:12}}><button onClick={()=>setShowM(!showM)} style={{width:"100%",padding:"10px 14px",background:"#f5f5f5",border:"1px solid #e0e0e0",borderRadius:10,fontSize:13,fontWeight:700,color:"#333",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",fontFamily:"inherit"}}><span>2026년 월별 길흉</span><span style={{fontSize:14,color:"#aaa"}}>{showM?"▲":"▼"}</span></button>
-        {showM&&<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginTop:8}}>{(tj.month2026||[]).map((m,i)=><div key={i} style={{padding:"8px",background:scBg(m.score),borderRadius:9,textAlign:"center"}}><div style={{fontSize:11,fontWeight:800,color:sc(m.score)}}>{m.m}월</div><div style={{fontSize:18,fontWeight:900,color:sc(m.score)}}>{m.score}</div><div style={{fontSize:10,color:"#666",marginTop:2,lineHeight:1.4}}>{m.desc}</div></div>)}</div>}
+      <div style={{marginTop:12}}><button onClick={()=>setShowM(!showM)} style={{width:"100%",padding:"10px 14px",background:"#f5f5f5",border:"1px solid #e0e0e0",borderRadius:10,fontSize:12,fontWeight:700,color:"#333",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",fontFamily:"inherit"}}><span>2026년 월별 길흉</span><span style={{fontSize:13,color:"#aaa"}}>{showM?"▲":"▼"}</span></button>
+        {showM&&<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginTop:8}}>{(tj.month2026||[]).map((m,i)=><div key={i} style={{padding:"8px",background:scBg(m.score),borderRadius:9,textAlign:"center"}}><div style={{fontSize:10,fontWeight:800,color:sc(m.score)}}>{m.m}월</div><div style={{fontSize:18,fontWeight:900,color:sc(m.score)}}>{m.score}</div><div style={{fontSize:10,color:"#666",marginTop:2,lineHeight:1.4}}>{m.desc}</div></div>)}</div>}
       </div>
     </section>
     {/* 주역 */}
@@ -1563,15 +1582,15 @@ function TabTojung({d}){
       <div style={{marginTop:12,padding:"16px",background:"linear-gradient(135deg,#e3f2fd,#e8eaf6)",borderRadius:12,textAlign:"center"}}>
         <div style={{fontSize:44,marginBottom:4,letterSpacing:4}}>{ic.gaeSymbol}</div>
         <div style={{fontSize:18,fontWeight:900,color:"#1565c0"}}>{ic.bonmyeonggae}</div>
-        <div style={{fontSize:11,color:"#5c6bc0",marginTop:3}}>{ic.gaeNature}</div>
-        <div style={{fontSize:11,color:"#888",marginTop:4}}>상괘 {ic.gaeUpper} / 하괘 {ic.gaeLower}</div>
+        <div style={{fontSize:10,color:"#5c6bc0",marginTop:3}}>{ic.gaeNature}</div>
+        <div style={{fontSize:10,color:"#888",marginTop:4}}>상괘 {ic.gaeUpper} / 하괘 {ic.gaeLower}</div>
       </div>
-      <p style={{fontSize:13,color:"#444",lineHeight:1.85,textAlign:"justify",margin:"10px 0 0"}}>{ic.gaeDesc}</p>
-      <div style={{marginTop:10,padding:"11px 13px",background:"#e3f2fd",borderRadius:10}}><div style={{fontSize:11,color:"#0d47a1",fontWeight:700,marginBottom:3}}>현재 변괘 ({ic.currentYear})</div><div style={{fontSize:15,fontWeight:900,color:"#1565c0"}}>{ic.currentGae}</div><p style={{fontSize:12,color:"#555",margin:"5px 0 0",lineHeight:1.7,textAlign:"justify"}}>{ic.currentDesc}</p></div>
-      <div style={{marginTop:10,padding:"11px 13px",background:"#f9f9f9",borderRadius:10}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:7}}>주역이 전하는 인생 전략 3가지</div>{ic.strategy.map((s,i)=><div key={i} style={{fontSize:13,color:"#555",padding:"5px 0",borderBottom:i<2?"1px dashed #eee":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{fontWeight:700,color:"#e65100",marginRight:6}}>{i+1}.</span>{s}</div>)}</div>
-      <div style={{marginTop:10}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>연도별 괘 에너지</div>
+      <p style={{fontSize:12,color:"#444",lineHeight:1.85,textAlign:"justify",margin:"10px 0 0"}}>{ic.gaeDesc}</p>
+      <div style={{marginTop:10,padding:"11px 13px",background:"#e3f2fd",borderRadius:10}}><div style={{fontSize:10,color:"#0d47a1",fontWeight:700,marginBottom:3}}>현재 변괘 ({ic.currentYear})</div><div style={{fontSize:14,fontWeight:900,color:"#1565c0"}}>{ic.currentGae}</div><p style={{fontSize:11,color:"#555",margin:"5px 0 0",lineHeight:1.7,textAlign:"justify"}}>{ic.currentDesc}</p></div>
+      <div style={{marginTop:10,padding:"11px 13px",background:"#f9f9f9",borderRadius:10}}><div style={{fontSize:11,fontWeight:800,color:"#333",marginBottom:7}}>주역이 전하는 인생 전략 3가지</div>{ic.strategy.map((s,i)=><div key={i} style={{fontSize:12,color:"#555",padding:"5px 0",borderBottom:i<2?"1px dashed #eee":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{fontWeight:700,color:"#e65100",marginRight:6}}>{i+1}.</span>{s}</div>)}</div>
+      <div style={{marginTop:10}}><div style={{fontSize:11,fontWeight:800,color:"#333",marginBottom:8}}>연도별 괘 에너지</div>
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
-          {ic.yearFlow.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}><span style={{fontSize:13,fontWeight:900,color:"#111"}}>{y.year}년</span><span style={{fontSize:11,color:"#888"}}>{y.gae}</span></div><div style={{fontSize:12,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
+          {ic.yearFlow.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}><span style={{fontSize:12,fontWeight:900,color:"#111"}}>{y.year}년</span><span style={{fontSize:10,color:"#888"}}>{y.gae}</span></div><div style={{fontSize:11,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
         </div>
       </div>
     </section>
@@ -1585,26 +1604,26 @@ function TabTojung({d}){
           return <div key={i} style={{padding:"12px 14px",background:"#fafafa",borderRadius:12,border:"1px solid #eee"}}>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:7}}>
               <div style={{width:36,height:36,borderRadius:10,background:jColor.bg,border:`1.5px solid ${jColor.border}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
-                <div style={{fontSize:14,fontWeight:900,color:jColor.text}}>{JH[JL.indexOf(p.ji)]}</div>
+                <div style={{fontSize:13,fontWeight:900,color:jColor.text}}>{JH[JL.indexOf(p.ji)]}</div>
                 <div style={{fontSize:9,color:jColor.text,opacity:.7}}>{p.ji}</div>
               </div>
               <div>
                 <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:2}}>
-                  <span style={{fontSize:13,fontWeight:800,color:"#111"}}>{p.byeolseong}</span>
-                  <span style={{fontSize:11,color:"#e65100",background:"#fff3e0",padding:"1px 7px",borderRadius:99,fontWeight:700}}>{p.stage}</span>
+                  <span style={{fontSize:12,fontWeight:800,color:"#111"}}>{p.byeolseong}</span>
+                  <span style={{fontSize:10,color:"#e65100",background:"#fff3e0",padding:"1px 7px",borderRadius:99,fontWeight:700}}>{p.stage}</span>
                 </div>
-                <div style={{fontSize:11,color:"#888"}}>{p.palace}</div>
+                <div style={{fontSize:10,color:"#888"}}>{p.palace}</div>
               </div>
             </div>
-            <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.75,textAlign:"justify"}}>{p.desc}</p>
-            {p.stageDesc&&<p style={{fontSize:11,color:"#888",margin:"6px 0 0",lineHeight:1.7,textAlign:"justify",paddingTop:6,borderTop:"1px dashed #eee"}}><span style={{color:"#e65100",fontWeight:700}}>{p.stage} </span>{p.stageDesc}</p>}
+            <p style={{fontSize:11,color:"#555",margin:0,lineHeight:1.75,textAlign:"justify"}}>{p.desc}</p>
+            {p.stageDesc&&<p style={{fontSize:10,color:"#888",margin:"6px 0 0",lineHeight:1.7,textAlign:"justify",paddingTop:6,borderTop:"1px dashed #eee"}}><span style={{color:"#e65100",fontWeight:700}}>{p.stage} </span>{p.stageDesc}</p>}
           </div>;
         })}
       </div>
-      <div style={{marginTop:10,padding:"11px 13px",background:"#e8f5e0",borderRadius:10}}><div style={{fontSize:12,fontWeight:800,color:"#2d6a2d",marginBottom:5}}>당사주 종합 기질</div><p style={{fontSize:13,color:"#333",margin:0,lineHeight:1.8,textAlign:"justify"}}>{ds.overall}</p></div>
-      <div style={{marginTop:10}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>연도별 운세</div>
+      <div style={{marginTop:10,padding:"11px 13px",background:"#e8f5e0",borderRadius:10}}><div style={{fontSize:11,fontWeight:800,color:"#2d6a2d",marginBottom:5}}>당사주 종합 기질</div><p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.8,textAlign:"justify"}}>{ds.overall}</p></div>
+      <div style={{marginTop:10}}><div style={{fontSize:11,fontWeight:800,color:"#333",marginBottom:8}}>연도별 운세</div>
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
-          {ds.yearFlow.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{fontSize:13,fontWeight:900,color:"#111",marginBottom:2}}>{y.year}년</div><div style={{fontSize:12,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
+          {ds.yearFlow.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{fontSize:12,fontWeight:900,color:"#111",marginBottom:2}}>{y.year}년</div><div style={{fontSize:11,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
         </div>
       </div>
     </section>
@@ -1717,69 +1736,69 @@ JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
         ].map((item,i)=>(
           <div key={i} style={{padding:"10px 13px",background:item.bg,borderRadius:10}}>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
-              <span style={{fontSize:11,fontWeight:700,color:item.c,minWidth:72,flexShrink:0}}>{item.l}</span>
+              <span style={{fontSize:10,fontWeight:700,color:item.c,minWidth:72,flexShrink:0}}>{item.l}</span>
               {loadingAstro
                 ? <Skel h={14} w="60%" r={4}/>
-                : <span style={{fontSize:13,fontWeight:900,color:"#111"}}>{stripDegree(cleanText(item.v))}</span>}
+                : <span style={{fontSize:12,fontWeight:900,color:"#111"}}>{stripDegree(cleanText(item.v))}</span>}
             </div>
             <div style={{fontSize:10,color:"#999",marginBottom:4}}>{item.meaning}</div>
             {loadingAstro
               ? <><Skel h={11} w="100%"/><Skel h={11} w="80%"/></>
-              : <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.65,textAlign:"justify"}}>{cleanText(item.desc)}</p>}
+              : <p style={{fontSize:11,color:"#555",margin:0,lineHeight:1.65,textAlign:"justify"}}>{cleanText(item.desc)}</p>}
           </div>
         ))}
       </div>
       <div style={{marginTop:10,padding:"11px 13px",background:"#f3e5f5",borderRadius:10}}>
-        <div style={{fontSize:11,color:"#4a148c",fontWeight:700,marginBottom:4}}>삼각 핵심 분석</div>
+        <div style={{fontSize:10,color:"#4a148c",fontWeight:700,marginBottom:4}}>삼각 핵심 분석</div>
         {loadingAstro
           ? <><Skel h={12} w="100%"/><Skel h={12} w="90%"/><Skel h={12} w="70%"/></>
-          : <p style={{fontSize:13,color:"#444",margin:0,lineHeight:1.8,textAlign:"justify"}}>{cleanText(astroAI?.triangle||a.triangle)}</p>}
+          : <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.8,textAlign:"justify"}}>{cleanText(astroAI?.triangle||a.triangle)}</p>}
       </div>
-      {errAstro&&<div style={{marginTop:8,padding:"11px 12px",background:"#fdecea",borderRadius:10,fontSize:12,color:"#b71c1c",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      {errAstro&&<div style={{marginTop:8,padding:"11px 12px",background:"#fdecea",borderRadius:10,fontSize:11,color:"#b71c1c",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <span>네이탈 차트 분석을 불러오지 못했어요.</span>
-        <button onClick={()=>fetchNatalRef.current&&fetchNatalRef.current()} style={{fontSize:11,fontWeight:700,color:"#b71c1c",background:"none",border:"1px solid #b71c1c",borderRadius:6,padding:"3px 8px",cursor:"pointer",fontFamily:"inherit"}}>다시 시도</button>
+        <button onClick={()=>fetchNatalRef.current&&fetchNatalRef.current()} style={{fontSize:10,fontWeight:700,color:"#b71c1c",background:"none",border:"1px solid #b71c1c",borderRadius:6,padding:"3px 8px",cursor:"pointer",fontFamily:"inherit"}}>다시 시도</button>
       </div>}
-      {(a.yearTransit||[]).length>0&&<div style={{marginTop:12}}><div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>주요 트랜짓 {CY}~{CY+4}</div>
+      {(a.yearTransit||[]).length>0&&<div style={{marginTop:12}}><div style={{fontSize:11,fontWeight:800,color:"#333",marginBottom:8}}>주요 트랜짓 {CY}~{CY+4}</div>
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
-          {a.yearTransit.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}><span style={{fontSize:13,fontWeight:900,color:"#111"}}>{y.year}년</span><span style={{fontSize:11,color:"#5e35b1",fontWeight:700}}>{y.planet}</span></div><div style={{fontSize:12,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
+          {a.yearTransit.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}><span style={{fontSize:12,fontWeight:900,color:"#111"}}>{y.year}년</span><span style={{fontSize:10,color:"#5e35b1",fontWeight:700}}>{y.planet}</span></div><div style={{fontSize:11,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
         </div>
       </div>}
     </section>
     <section style={S.card}>
       <ST icon="🃏" title="타로수비학"/>
-      <p style={{fontSize:13,color:"#666",lineHeight:1.78,margin:"10px 0 12px",borderLeft:"3px solid #e8e8e8",paddingLeft:10,textAlign:"justify"}}>{t.calc}</p>
+      <p style={{fontSize:12,color:"#666",lineHeight:1.78,margin:"10px 0 12px",borderLeft:"3px solid #e8e8e8",paddingLeft:10,textAlign:"justify"}}>{t.calc}</p>
       <div style={{display:"flex",gap:10,marginBottom:10}}>
         <div style={{flex:1,padding:"13px",background:"linear-gradient(135deg,#e3f2fd,#f3e5f5)",borderRadius:12,textAlign:"center"}}>
           <div style={{fontSize:10,color:"#555",marginBottom:3}}>생명경로수</div>
           <div style={{fontSize:34,fontWeight:900,color:"#1565c0"}}>{t.lifePath}</div>
         </div>
         <div style={{flex:2,padding:"13px",background:"#fafafa",borderRadius:12,border:"1px solid #eee"}}>
-          <div style={{fontSize:11,color:"#888",marginBottom:3}}>본명 타로 카드</div>
-          <div style={{fontSize:15,fontWeight:900,color:"#111"}}>{t.lifePathCard}</div>
+          <div style={{fontSize:10,color:"#888",marginBottom:3}}>본명 타로 카드</div>
+          <div style={{fontSize:14,fontWeight:900,color:"#111"}}>{t.lifePathCard}</div>
           <div style={{fontSize:20,fontWeight:900,color:"#5e35b1",marginTop:2}}>{t.lifePathCardNum}</div>
         </div>
       </div>
       <div style={{display:"flex",gap:8,marginBottom:12}}>
         <div style={{flex:1,padding:"10px 11px",background:"#e3f2fd",borderRadius:10}}>
           <div style={{fontSize:10,color:"#0d47a1",fontWeight:700,marginBottom:2}}>영혼 카드(Soul)</div>
-          <div style={{fontSize:13,fontWeight:800,color:"#1565c0"}}>{t.soulCard}</div>
-          <div style={{fontSize:11,color:"#555",marginTop:3,textAlign:"justify",lineHeight:1.7}}>{cleanText(t.soulDesc)}</div>
+          <div style={{fontSize:12,fontWeight:800,color:"#1565c0"}}>{t.soulCard}</div>
+          <div style={{fontSize:10,color:"#555",marginTop:3,textAlign:"justify",lineHeight:1.7}}>{cleanText(t.soulDesc)}</div>
         </div>
         <div style={{flex:1,padding:"10px 11px",background:"#e8f5e0",borderRadius:10}}>
           <div style={{fontSize:10,color:"#2d6a2d",fontWeight:700,marginBottom:2}}>성취 카드(Achievement)</div>
-          <div style={{fontSize:13,fontWeight:800,color:"#1b5e20"}}>{t.achieveCard}</div>
-          <div style={{fontSize:11,color:"#555",marginTop:3,textAlign:"justify",lineHeight:1.7}}>
+          <div style={{fontSize:12,fontWeight:800,color:"#1b5e20"}}>{t.achieveCard}</div>
+          <div style={{fontSize:10,color:"#555",marginTop:3,textAlign:"justify",lineHeight:1.7}}>
             {loadingTarot
               ? <><Skel h={11} w="100%"/><Skel h={11} w="90%"/><Skel h={11} w="70%"/></>
               : cleanText(achieveDesc)}
           </div>
-          {errTarot&&<div style={{fontSize:11,color:"#b71c1c",marginTop:4,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          {errTarot&&<div style={{fontSize:10,color:"#b71c1c",marginTop:4,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
             <span>분석 실패</span>
             <button onClick={()=>fetchTarotRef.current&&fetchTarotRef.current()} style={{fontSize:10,fontWeight:700,color:"#b71c1c",background:"none",border:"1px solid #b71c1c",borderRadius:5,padding:"2px 6px",cursor:"pointer",fontFamily:"inherit"}}>재시도</button>
           </div>}
         </div>
       </div>
-      <div style={{fontSize:12,fontWeight:800,color:"#333",marginBottom:8}}>연도별 개인연도수 & 타로</div>
+      <div style={{fontSize:11,fontWeight:800,color:"#333",marginBottom:8}}>연도별 개인연도수 & 타로</div>
       <div style={{display:"flex",flexDirection:"column",gap:7}}>
         {(t.yearCards||[]).map((y,i)=>(
           <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",
@@ -1788,14 +1807,14 @@ JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
             <div style={{minWidth:28,height:28,borderRadius:"50%",
               background:y.num===22?"#ffd700":"linear-gradient(135deg,#7c4dff,#e040fb)",
               display:"flex",alignItems:"center",justifyContent:"center",
-              fontSize:11,fontWeight:900,color:y.num===22?"#1a1a1a":"#fff",flexShrink:0}}>{y.num}</div>
+              fontSize:10,fontWeight:900,color:y.num===22?"#1a1a1a":"#fff",flexShrink:0}}>{y.num}</div>
             <div style={{flex:1}}>
               <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}>
-                <span style={{fontSize:13,fontWeight:900,color:y.num===22?"#ffd700":"#111"}}>{y.year}년</span>
-                <span style={{fontSize:11,color:y.num===22?"#c4b5fd":"#5e35b1",fontWeight:700}}>{y.card}</span>
-                <span style={{fontSize:12,fontWeight:900,color:sc(y.score)}}>{y.score}점</span>
+                <span style={{fontSize:12,fontWeight:900,color:y.num===22?"#ffd700":"#111"}}>{y.year}년</span>
+                <span style={{fontSize:10,color:y.num===22?"#c4b5fd":"#5e35b1",fontWeight:700}}>{y.card}</span>
+                <span style={{fontSize:11,fontWeight:900,color:sc(y.score)}}>{y.score}점</span>
               </div>
-              <div style={{fontSize:12,color:y.num===22?"#e0e7ff":"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div>
+              <div style={{fontSize:11,color:y.num===22?"#e0e7ff":"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div>
             </div>
           </div>
         ))}
@@ -1816,7 +1835,7 @@ function TabMBTI({d}){
           {m.estimated}
         </div>
         <div style={{flex:1}}>
-          <div style={{fontSize:11,color:"#a5b4fc",marginBottom:3}}>사주 기반 추정 MBTI</div>
+          <div style={{fontSize:10,color:"#a5b4fc",marginBottom:3}}>사주 기반 추정 MBTI</div>
           <div style={{fontSize:20,fontWeight:900,color:"#e0e7ff"}}>{m.estimated}</div>
         </div>
       </div>
@@ -1832,13 +1851,13 @@ function TabMBTI({d}){
         </div>
       </div>
       {m.userType&&m.userType!=="모름"&&(
-        <div style={{padding:"10px 12px",background:"rgba(255,255,255,0.07)",borderRadius:10,marginBottom:10,fontSize:12,color:"#c4b5fd",lineHeight:1.7}}>
+        <div style={{padding:"10px 12px",background:"rgba(255,255,255,0.07)",borderRadius:10,marginBottom:10,fontSize:11,color:"#c4b5fd",lineHeight:1.7}}>
           {m.userType===m.estimated
             ? `✓ 자가보고(${m.userType})와 사주 분석(${m.estimated})이 일치해요. 타고난 기질과 스스로 인식하는 모습이 잘 맞아떨어지는 경우예요.`
             : `💡 자가보고(${m.userType})와 사주 분석(${m.estimated})이 달라요. 겉으로 드러내는 모습(${m.userType})과 타고난 기질(${m.estimated})이 다른 경우로, 두 유형의 특성을 모두 가지고 있을 가능성이 높아요.`}
         </div>
       )}
-      <p style={{fontSize:12,color:"#c4b5fd",lineHeight:1.75,margin:0}}>{m.basis}</p>
+      <p style={{fontSize:11,color:"#c4b5fd",lineHeight:1.75,margin:0}}>{m.basis}</p>
     </section>
     <section style={S.card}>
       <ST icon="🧠" title="4축 분석"/>
@@ -1847,20 +1866,20 @@ function TabMBTI({d}){
           const pct=ax.score,c=pct>=70?"#5e35b1":"#0d47a1";
           return <div key={i} style={{padding:"12px 14px",background:"#fafafa",borderRadius:11,border:"1px solid #eee"}}>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
-              <div style={{width:44,height:44,borderRadius:10,background:"linear-gradient(135deg,#e8eaf6,#c5cae9)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,color:"#1a237e",flexShrink:0}}>
+              <div style={{width:44,height:44,borderRadius:10,background:"linear-gradient(135deg,#e8eaf6,#c5cae9)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:900,color:"#1a237e",flexShrink:0}}>
                 {ax.axis.split(" ")[0]}
               </div>
               <div style={{flex:1}}>
-                <div style={{fontSize:13,fontWeight:800,color:"#111"}}>{ax.axis}</div>
+                <div style={{fontSize:12,fontWeight:800,color:"#111"}}>{ax.axis}</div>
                 <div style={{display:"flex",alignItems:"center",gap:8,marginTop:4}}>
                   <div style={{flex:1,height:6,background:"#e8eaf6",borderRadius:99,overflow:"hidden"}}>
                     <div style={{width:`${pct}%`,height:"100%",background:c,borderRadius:99}}/>
                   </div>
-                  <span style={{fontSize:12,fontWeight:800,color:c}}>{pct}%</span>
+                  <span style={{fontSize:11,fontWeight:800,color:c}}>{pct}%</span>
                 </div>
               </div>
             </div>
-            <div style={{fontSize:12,color:"#555",lineHeight:1.7,textAlign:"justify"}}>{ax.basis}</div>
+            <div style={{fontSize:11,color:"#555",lineHeight:1.7,textAlign:"justify"}}>{ax.basis}</div>
           </div>;
         })}
       </div>
@@ -1868,10 +1887,10 @@ function TabMBTI({d}){
     <section style={S.card}>
       <ST icon="🌟" title="강점·과제·최적 환경"/>
       <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:10}}>
-        <div style={{padding:"12px 14px",background:"#e8f5e0",borderRadius:11}}><div style={{fontSize:12,fontWeight:800,color:"#2d6a2d",marginBottom:7}}>강점(Strengths)</div>{(m.strengths||[]).map((s,i)=><div key={i} style={{fontSize:13,color:"#333",padding:"4px 0",borderBottom:i<m.strengths.length-1?"1px dashed #c8e6c9":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{color:"#4caf50",fontWeight:700,marginRight:6}}>✓</span>{s}</div>)}</div>
-        <div style={{padding:"12px 14px",background:"#fdecea",borderRadius:11}}><div style={{fontSize:12,fontWeight:800,color:"#b71c1c",marginBottom:7}}>성장 과제(Challenges)</div>{(m.challenges||[]).map((s,i)=><div key={i} style={{fontSize:13,color:"#333",padding:"4px 0",borderBottom:i<m.challenges.length-1?"1px dashed #ffcdd2":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{color:"#ef5350",fontWeight:700,marginRight:6}}>△</span>{s}</div>)}</div>
-        <div style={{padding:"12px 14px",background:"#e3f2fd",borderRadius:11}}><div style={{fontSize:12,fontWeight:800,color:"#0d47a1",marginBottom:5}}>최적 환경</div><p style={{fontSize:13,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{m.bestEnv}</p></div>
-        <div style={{padding:"12px 14px",background:"#f3e5f5",borderRadius:11}}><div style={{fontSize:12,fontWeight:800,color:"#4a148c",marginBottom:5}}>회복 방법</div><p style={{fontSize:13,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{m.recovery}</p></div>
+        <div style={{padding:"12px 14px",background:"#e8f5e0",borderRadius:11}}><div style={{fontSize:11,fontWeight:800,color:"#2d6a2d",marginBottom:7}}>강점(Strengths)</div>{(m.strengths||[]).map((s,i)=><div key={i} style={{fontSize:12,color:"#333",padding:"4px 0",borderBottom:i<m.strengths.length-1?"1px dashed #c8e6c9":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{color:"#4caf50",fontWeight:700,marginRight:6}}>✓</span>{s}</div>)}</div>
+        <div style={{padding:"12px 14px",background:"#fdecea",borderRadius:11}}><div style={{fontSize:11,fontWeight:800,color:"#b71c1c",marginBottom:7}}>성장 과제(Challenges)</div>{(m.challenges||[]).map((s,i)=><div key={i} style={{fontSize:12,color:"#333",padding:"4px 0",borderBottom:i<m.challenges.length-1?"1px dashed #ffcdd2":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{color:"#ef5350",fontWeight:700,marginRight:6}}>△</span>{s}</div>)}</div>
+        <div style={{padding:"12px 14px",background:"#e3f2fd",borderRadius:11}}><div style={{fontSize:11,fontWeight:800,color:"#0d47a1",marginBottom:5}}>최적 환경</div><p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{m.bestEnv}</p></div>
+        <div style={{padding:"12px 14px",background:"#f3e5f5",borderRadius:11}}><div style={{fontSize:11,fontWeight:800,color:"#4a148c",marginBottom:5}}>회복 방법</div><p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{m.recovery}</p></div>
       </div>
     </section>
   </>;
@@ -1924,8 +1943,8 @@ function LoadingScreen({name}){
         transition:"opacity 0.35s",
         opacity:visible?1:0,
       }}>{cur.label}</div>
-      <div style={{fontSize:13,color:"#888",fontWeight:600,marginBottom:4}}>{name||""}님의 사주를 분석하고 있어요</div>
-      <div style={{fontSize:11,color:"#bbb",marginBottom:16}}>별자리·타로수비학까지 모두 준비할게요</div>
+      <div style={{fontSize:12,color:"#888",fontWeight:600,marginBottom:4}}>{name||""}님의 사주를 분석하고 있어요</div>
+      <div style={{fontSize:10,color:"#bbb",marginBottom:16}}>별자리·타로수비학까지 모두 준비할게요</div>
       <div style={{display:"flex",gap:8,marginTop:4}}>
         {OHAENG_LOADING.map((o,i)=>(
           <div key={i} style={{
@@ -2179,11 +2198,11 @@ JSON만 응답: {"sevenInsight":"..."}`;
       <div>
         <div style={{display:"flex",alignItems:"baseline",gap:8}}>
           <div style={S.pName}>{d.name}</div>
-          <div style={{fontSize:12,color:"#e65100",fontWeight:700,background:"#fff3e0",padding:"2px 8px",borderRadius:99}}>{d.personaTitle}</div>
+          <div style={{fontSize:11,color:"#e65100",fontWeight:700,background:"#fff3e0",padding:"2px 8px",borderRadius:99}}>{d.personaTitle}</div>
         </div>
         <div style={S.pBirth}>{d.birth} 生</div>
       </div>
-      <div style={{padding:"4px 12px",borderRadius:99,fontSize:13,fontWeight:700,background:gBg,color:gC}}>{d.gender}성</div>
+      <div style={{padding:"4px 12px",borderRadius:99,fontSize:12,fontWeight:700,background:gBg,color:gC}}>{d.gender}성</div>
     </div>
     <div style={{...S.tabBar,overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}}>
       {TABS.map(t=><button key={t} onClick={()=>changeTab(t)} style={{...S.tab,minWidth:60,whiteSpace:"nowrap",...(tab===t?S.tabA:{})}}>{t}</button>)}
@@ -2208,17 +2227,17 @@ const S={
   root:{fontFamily:"'Noto Sans KR','Apple SD Gothic Neo',sans-serif",maxWidth:480,margin:"0 auto",background:"#f4f4f6",minHeight:"100vh",paddingBottom:48,textAlign:"justify"},
   header:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:"#fff",borderBottom:"1px solid #eee",position:"sticky",top:0,zIndex:20},
   navBtn:{background:"none",border:"none",fontSize:22,color:"#333",cursor:"pointer",width:32,padding:0},
-  headerTitle:{fontSize:16,fontWeight:700,color:"#111"},
+  headerTitle:{fontSize:15,fontWeight:700,color:"#111"},
   profileBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 18px",background:"#fff",borderBottom:"1px solid #f0f0f0"},
   pName:{fontSize:22,fontWeight:900,color:"#111",letterSpacing:-.5},
-  pBirth:{fontSize:12,color:"#999",marginTop:2},
+  pBirth:{fontSize:11,color:"#999",marginTop:2},
   tabBar:{display:"flex",background:"#fff",borderBottom:"2px solid #f0f0f0",position:"sticky",top:49,zIndex:19},
-  tab:{flex:1,padding:"11px 0",fontSize:11,fontWeight:600,background:"none",border:"none",color:"#bbb",cursor:"pointer",borderBottom:"2.5px solid transparent",marginBottom:-2,transition:"color .2s,border-color .2s"},
+  tab:{flex:1,padding:"11px 0",fontSize:10,fontWeight:600,background:"none",border:"none",color:"#bbb",cursor:"pointer",borderBottom:"2.5px solid transparent",marginBottom:-2,transition:"color .2s,border-color .2s"},
   tabA:{color:"#e65100",borderBottomColor:"#e65100"},
   content:{padding:"12px 14px",display:"flex",flexDirection:"column",gap:11},
   card:{background:"#fff",borderRadius:16,padding:"16px",border:"1px solid #ebebeb",boxShadow:"0 1px 5px rgba(0,0,0,0.04)"},
   dCard:{background:"#fafafa",borderRadius:12,padding:"13px",border:"1px solid #eee",position:"relative"},
-  dBadge:{fontSize:12,fontWeight:700,padding:"4px 7px",borderRadius:8,border:"1px solid"},
+  dBadge:{fontSize:11,fontWeight:700,padding:"4px 7px",borderRadius:8,border:"1px solid"},
   sRow:{background:"#fafafa",borderRadius:12,padding:"13px",border:"1px solid #ebebeb"},
 };
 
@@ -2346,7 +2365,7 @@ function AdminPage({onClose}){
     <div style={{position:"fixed",inset:0,zIndex:100,background:"#f4f4f6",overflowY:"auto"}}>
       <div style={{position:"sticky",top:0,background:"#fff",borderBottom:"1px solid #eee",padding:"12px 16px",display:"flex",alignItems:"center",gap:12,zIndex:10}}>
         <button onClick={()=>setSel(null)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:"#333"}}>‹</button>
-        <div style={{fontSize:14,fontWeight:700}}>관리자: {sel.users?.name}</div>
+        <div style={{fontSize:13,fontWeight:700}}>관리자: {sel.users?.name}</div>
       </div>
       <SajuReport_Preview data={sel.full_data_json}/>
     </div>
@@ -2356,17 +2375,17 @@ function AdminPage({onClose}){
     <div style={{position:"fixed",inset:0,zIndex:100,background:"#f4f4f6",display:"flex",alignItems:"center",justifyContent:"center"}}>
       <div style={{background:"#fff",borderRadius:20,padding:"32px 24px",width:320,boxShadow:"0 8px 32px rgba(0,0,0,0.12)"}}>
         <div style={{fontSize:20,fontWeight:900,color:"#111",marginBottom:6}}>🔐 관리자</div>
-        <div style={{fontSize:13,color:"#888",marginBottom:20}}>Fortuneyam 분석 데이터 조회</div>
+        <div style={{fontSize:12,color:"#888",marginBottom:20}}>Fortuneyam 분석 데이터 조회</div>
         <input type="password" placeholder="비밀번호" value={pw}
           onChange={e=>setPw(e.target.value)}
           onKeyDown={e=>e.key==="Enter"&&tryLogin()}
-          style={{width:"100%",padding:"12px 14px",borderRadius:12,border:"1.5px solid #e0e0e0",fontSize:15,boxSizing:"border-box",outline:"none",marginBottom:10,fontFamily:"inherit"}}/>
+          style={{width:"100%",padding:"12px 14px",borderRadius:12,border:"1.5px solid #e0e0e0",fontSize:14,boxSizing:"border-box",outline:"none",marginBottom:10,fontFamily:"inherit"}}/>
         <button onClick={tryLogin}
-          style={{width:"100%",padding:"13px",borderRadius:12,border:"none",background:"#e65100",color:"#fff",fontSize:14,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>
+          style={{width:"100%",padding:"13px",borderRadius:12,border:"none",background:"#e65100",color:"#fff",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>
           입장
         </button>
         <button onClick={onClose}
-          style={{width:"100%",padding:"10px",marginTop:8,borderRadius:12,border:"none",background:"#f5f5f5",color:"#555",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>
+          style={{width:"100%",padding:"10px",marginTop:8,borderRadius:12,border:"none",background:"#f5f5f5",color:"#555",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>
           닫기
         </button>
       </div>
@@ -2376,14 +2395,14 @@ function AdminPage({onClose}){
   return(
     <div style={{position:"fixed",inset:0,zIndex:100,background:"#f4f4f6",overflowY:"auto"}}>
       <div style={{position:"sticky",top:0,background:"#fff",borderBottom:"1px solid #eee",padding:"12px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",zIndex:10}}>
-        <div style={{fontSize:16,fontWeight:800}}>관리자: 분석 목록</div>
+        <div style={{fontSize:15,fontWeight:800}}>관리자: 분석 목록</div>
         <div style={{display:"flex",gap:8}}>
-          <button onClick={()=>loadList(0)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid #e0e0e0",background:"#fff",fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>🔄 새로고침</button>
-          <button onClick={onClose} style={{padding:"6px 12px",borderRadius:8,border:"none",background:"#e65100",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>닫기</button>
+          <button onClick={()=>loadList(0)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid #e0e0e0",background:"#fff",fontSize:11,cursor:"pointer",fontFamily:"inherit"}}>🔄 새로고침</button>
+          <button onClick={onClose} style={{padding:"6px 12px",borderRadius:8,border:"none",background:"#e65100",color:"#fff",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>닫기</button>
         </div>
       </div>
       <div style={{padding:"16px"}}>
-        {list.length>0&&<div style={{fontSize:11,color:"#aaa",marginBottom:8,textAlign:"right"}}>총 {list.length}개 표시 중</div>}
+        {list.length>0&&<div style={{fontSize:10,color:"#aaa",marginBottom:8,textAlign:"right"}}>총 {list.length}개 표시 중</div>}
         {loading&&page===0&&<div style={{textAlign:"center",padding:"40px",color:"#aaa"}}>불러오는 중...</div>}
         {!loading&&list.length===0&&<div style={{textAlign:"center",padding:"40px",color:"#aaa"}}>분석 데이터가 없어요.</div>}
         <div style={{display:"flex",flexDirection:"column",gap:8}}>
@@ -2392,22 +2411,22 @@ function AdminPage({onClose}){
               style={{display:"flex",alignItems:"center",gap:12,padding:"14px 16px",background:"#fff",border:"1px solid #eee",borderRadius:14,cursor:"pointer",textAlign:"left",fontFamily:"inherit",width:"100%"}}>
               <span style={{fontSize:22}}>{r.users?.gender==="여"?"👩":"👨"}</span>
               <div style={{flex:1}}>
-                <div style={{fontSize:14,fontWeight:800,color:"#111"}}>{r.users?.name}</div>
-                <div style={{fontSize:11,color:"#888",marginTop:2}}>{r.users?.birth_date} · {r.users?.city}</div>
+                <div style={{fontSize:13,fontWeight:800,color:"#111"}}>{r.users?.name}</div>
+                <div style={{fontSize:10,color:"#888",marginTop:2}}>{r.users?.birth_date} · {r.users?.city}</div>
               </div>
               <div style={{textAlign:"right"}}>
-                <div style={{fontSize:11,color:"#aaa"}}>{new Date(r.created_at).toLocaleDateString("ko")}</div>
+                <div style={{fontSize:10,color:"#aaa"}}>{new Date(r.created_at).toLocaleDateString("ko")}</div>
                 <div style={{fontSize:10,color:"#ccc",marginTop:1}}>{new Date(r.created_at).toLocaleTimeString("ko",{hour:"2-digit",minute:"2-digit"})}</div>
               </div>
-              <span style={{fontSize:16,color:"#ddd"}}>›</span>
+              <span style={{fontSize:15,color:"#ddd"}}>›</span>
             </button>
           ))}
         </div>
         {hasMore&&<button onClick={()=>loadList(page+1)} disabled={loading}
-          style={{width:"100%",marginTop:12,padding:"12px",borderRadius:12,border:"1px solid #e0e0e0",background:"#fff",fontSize:13,fontWeight:700,color:"#555",cursor:"pointer",fontFamily:"inherit"}}>
+          style={{width:"100%",marginTop:12,padding:"12px",borderRadius:12,border:"1px solid #e0e0e0",background:"#fff",fontSize:12,fontWeight:700,color:"#555",cursor:"pointer",fontFamily:"inherit"}}>
           {loading?"불러오는 중...":"더 보기 (+50개)"}
         </button>}
-        {!hasMore&&list.length>0&&<div style={{textAlign:"center",padding:"16px 0",fontSize:11,color:"#ccc"}}>전체 {list.length}개 · 끝</div>}
+        {!hasMore&&list.length>0&&<div style={{textAlign:"center",padding:"16px 0",fontSize:10,color:"#ccc"}}>전체 {list.length}개 · 끝</div>}
       </div>
     </div>
   );
@@ -2420,7 +2439,7 @@ function SajuReport_Preview({data}){
   if(!data) return <div style={{padding:20,color:"#aaa"}}>데이터 없음</div>;
   return(
     <div style={{maxWidth:480,margin:"0 auto"}}>
-      <div style={{padding:"10px 16px",background:"#fff3e0",fontSize:12,color:"#e65100",textAlign:"center",fontWeight:700}}>
+      <div style={{padding:"10px 16px",background:"#fff3e0",fontSize:11,color:"#e65100",textAlign:"center",fontWeight:700}}>
         관리자 미리보기: {data.name} ({data.birth})
       </div>
       <div style={{...S.tabBar,overflowX:"auto"}}>
@@ -2517,7 +2536,7 @@ function SajuInputForm({onSubmit}){
             <div style={{display:"flex",gap:4}}>
               {["solar","lunar"].map(t=>(
                 <button key={t} onClick={()=>{setCalType(t);setIsLeap(false);}}
-                  style={{padding:"4px 12px",borderRadius:99,border:"1.5px solid #e65100",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
+                  style={{padding:"4px 12px",borderRadius:99,border:"1.5px solid #e65100",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
                     background:calType===t?"#e65100":"#fff",color:calType===t?"#fff":"#e65100"}}>
                   {t==="solar"?"양력":"음력"}
                 </button>
@@ -2545,8 +2564,8 @@ function SajuInputForm({onSubmit}){
           <div style={SF.hint}>{calType==="solar"?"양력 기준":"음력 기준: 양력으로 자동 변환돼요"}</div>
           {showLeapToggle&&(
             <button onClick={()=>setIsLeap(v=>!v)}
-              style={{marginTop:6,display:"flex",alignItems:"center",gap:6,padding:"6px 12px",borderRadius:8,border:`1.5px solid ${isLeap?"#e65100":"#e0e0e0"}`,background:isLeap?"#fff3e0":"#fff",fontSize:12,fontWeight:700,cursor:"pointer",color:isLeap?"#e65100":"#888",fontFamily:"inherit"}}>
-              <span style={{fontSize:14}}>{isLeap?"☑":"☐"}</span> 윤달
+              style={{marginTop:6,display:"flex",alignItems:"center",gap:6,padding:"6px 12px",borderRadius:8,border:`1.5px solid ${isLeap?"#e65100":"#e0e0e0"}`,background:isLeap?"#fff3e0":"#fff",fontSize:11,fontWeight:700,cursor:"pointer",color:isLeap?"#e65100":"#888",fontFamily:"inherit"}}>
+              <span style={{fontSize:13}}>{isLeap?"☑":"☐"}</span> 윤달
             </button>
           )}
         </div>
@@ -2555,7 +2574,7 @@ function SajuInputForm({onSubmit}){
         <div style={SF.field}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:7}}>
             <div style={SF.label}>태어난 시간</div>
-            <span style={{fontSize:11,color:"#aaa",fontWeight:400}}>모르면 비워도 돼요</span>
+            <span style={{fontSize:10,color:"#aaa",fontWeight:400}}>모르면 비워도 돼요</span>
           </div>
           <input ref={timeInputRef} style={{...SF.input,...(err.time?SF.inputErr:{})}}
             placeholder="22:25" value={form.timeRaw||""} maxLength={5} inputMode="numeric"
@@ -2571,7 +2590,7 @@ function SajuInputForm({onSubmit}){
             }}/>
           {err.time&&<div style={SF.errMsg}>{err.time}</div>}
           {(form.hour==="23"||form.hour==="00")&&(
-            <div style={{marginTop:6,padding:"8px 11px",background:"#fff8e1",borderRadius:9,border:"1px solid #ffb300",fontSize:11,color:"#7b5800",lineHeight:1.6}}>
+            <div style={{marginTop:6,padding:"8px 11px",background:"#fff8e1",borderRadius:9,border:"1px solid #ffb300",fontSize:10,color:"#7b5800",lineHeight:1.6}}>
               ⚠️ 자시(子時) 경계 구간: 두 가지 일주를 함께 분석해드려요.
             </div>
           )}
@@ -2607,18 +2626,18 @@ function SajuInputForm({onSubmit}){
         <div style={{...SF.field}}>
           <div style={{...SF.label,display:"flex",justifyContent:"space-between"}}>
             <span>MBTI</span>
-            <span style={{fontSize:11,color:"#aaa",fontWeight:400}}>선택사항</span>
+            <span style={{fontSize:10,color:"#aaa",fontWeight:400}}>선택사항</span>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6}}>
             {["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"].map(t=>(
               <button key={t} onClick={()=>up("mbti",form.mbti===t?"":t)}
-                style={{padding:"7px 0",borderRadius:8,border:"1.5px solid #e0e0e0",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",textAlign:"center",
+                style={{padding:"7px 0",borderRadius:8,border:"1.5px solid #e0e0e0",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"inherit",textAlign:"center",
                   background:form.mbti===t?"#e65100":"#fff",color:form.mbti===t?"#fff":"#666"}}>
                 {t}
               </button>
             ))}
             <button onClick={()=>up("mbti",form.mbti==="모름"?"":"모름")}
-              style={{gridColumn:"span 4",padding:"7px 0",borderRadius:8,border:"1.5px solid #e0e0e0",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
+              style={{gridColumn:"span 4",padding:"7px 0",borderRadius:8,border:"1.5px solid #e0e0e0",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
                 background:form.mbti==="모름"?"#888":"#fff",color:form.mbti==="모름"?"#fff":"#999"}}>
               잘 모르겠어요
             </button>
@@ -2659,20 +2678,20 @@ function SajuInputForm({onSubmit}){
             <div key={label} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 16px",borderBottom:i<arr.length-1?"1px solid #f5f5f5":"none"}}>
               <span style={{fontSize:18,width:24}}>{icon}</span>
               <div style={{flex:1}}>
-                <div style={{fontSize:11,color:"#aaa",fontWeight:600}}>{label}</div>
-                <div style={{fontSize:15,fontWeight:800,color:"#111",marginTop:1}}>{value}</div>
+                <div style={{fontSize:10,color:"#aaa",fontWeight:600}}>{label}</div>
+                <div style={{fontSize:14,fontWeight:800,color:"#111",marginTop:1}}>{value}</div>
               </div>
               <button onClick={()=>setStep(s)}
-                style={{fontSize:11,color:"#e65100",background:"#fff3e0",border:"none",padding:"4px 10px",borderRadius:99,cursor:"pointer",fontWeight:700}}>
+                style={{fontSize:10,color:"#e65100",background:"#fff3e0",border:"none",padding:"4px 10px",borderRadius:99,cursor:"pointer",fontWeight:700}}>
                 수정
               </button>
             </div>
           ))}
         </div>
-        <div style={{padding:"12px 14px",background:"#e3f2fd",borderRadius:12,marginBottom:16,fontSize:12,color:"#0d47a1",lineHeight:1.7}}>
+        <div style={{padding:"12px 14px",background:"#e3f2fd",borderRadius:12,marginBottom:16,fontSize:11,color:"#0d47a1",lineHeight:1.7}}>
           ✨ 입력 정보로 사주팔자를 계산하고 종합 운세 리포트를 생성해요.
         </div>
-        <button style={{...SF.btn,fontSize:16,padding:"16px 0",background:"linear-gradient(135deg,#e65100,#bf360c)"}}
+        <button style={{...SF.btn,fontSize:15,padding:"16px 0",background:"linear-gradient(135deg,#e65100,#bf360c)"}}
           onClick={()=>onSubmit(form)}>
           🔮 Fortuneyam 보기
         </button>
@@ -2688,19 +2707,19 @@ const SF={
   root:{fontFamily:"'Noto Sans KR','Apple SD Gothic Neo',sans-serif",maxWidth:480,margin:"0 auto",background:"#f4f4f6",minHeight:"100vh"},
   header:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:"#fff",borderBottom:"1px solid #eee",position:"sticky",top:0,zIndex:20},
   back:{background:"none",border:"none",fontSize:22,color:"#333",cursor:"pointer",width:32,padding:0},
-  title:{fontSize:16,fontWeight:700,color:"#111"},
+  title:{fontSize:15,fontWeight:700,color:"#111"},
   progress:{display:"flex",gap:6,justifyContent:"center",padding:"12px 0 4px"},
   dot:{width:28,height:4,borderRadius:99,transition:"background .3s"},
   content:{padding:"20px 16px"},
-  stepLabel:{fontSize:11,color:"#e65100",fontWeight:700,letterSpacing:1,marginBottom:4},
+  stepLabel:{fontSize:10,color:"#e65100",fontWeight:700,letterSpacing:1,marginBottom:4},
   heading:{fontSize:22,fontWeight:900,color:"#111",marginBottom:20,lineHeight:1.3},
   field:{marginBottom:18},
-  label:{fontSize:13,fontWeight:700,color:"#444",marginBottom:7},
-  input:{width:"100%",padding:"13px 14px",borderRadius:12,border:"1.5px solid #e0e0e0",fontSize:16,boxSizing:"border-box",outline:"none",fontFamily:"inherit",background:"#fff"},
+  label:{fontSize:12,fontWeight:700,color:"#444",marginBottom:7},
+  input:{width:"100%",padding:"13px 14px",borderRadius:12,border:"1.5px solid #e0e0e0",fontSize:15,boxSizing:"border-box",outline:"none",fontFamily:"inherit",background:"#fff"},
   inputErr:{borderColor:"#ef5350",background:"#fff8f8"},
-  errMsg:{fontSize:11,color:"#ef5350",marginTop:4,fontWeight:600},
-  hint:{fontSize:11,color:"#aaa",marginTop:5},
-  select:{width:"100%",padding:"13px 14px",borderRadius:12,border:"1.5px solid #e0e0e0",fontSize:15,background:"#fff",outline:"none",fontFamily:"inherit",appearance:"none",WebkitAppearance:"none"},
-  gBtn:{flex:1,padding:"13px 0",borderRadius:12,border:"1.5px solid #e0e0e0",fontSize:14,fontWeight:600,cursor:"pointer",background:"#fff",color:"#555",fontFamily:"inherit"},
-  btn:{width:"100%",padding:"14px 0",borderRadius:14,border:"none",fontSize:14,fontWeight:800,cursor:"pointer",background:"#e65100",color:"#fff",fontFamily:"inherit"},
+  errMsg:{fontSize:10,color:"#ef5350",marginTop:4,fontWeight:600},
+  hint:{fontSize:10,color:"#aaa",marginTop:5},
+  select:{width:"100%",padding:"13px 14px",borderRadius:12,border:"1.5px solid #e0e0e0",fontSize:14,background:"#fff",outline:"none",fontFamily:"inherit",appearance:"none",WebkitAppearance:"none"},
+  gBtn:{flex:1,padding:"13px 0",borderRadius:12,border:"1.5px solid #e0e0e0",fontSize:13,fontWeight:600,cursor:"pointer",background:"#fff",color:"#555",fontFamily:"inherit"},
+  btn:{width:"100%",padding:"14px 0",borderRadius:14,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",background:"#e65100",color:"#fff",fontFamily:"inherit"},
 };
