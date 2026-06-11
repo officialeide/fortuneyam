@@ -919,11 +919,11 @@ function buildSajuData(input){
     "위험·도전·거듭되는 시련":-3,"빛이 가려짐·인내·내면의 빛을 지킴":-2,
   };
   const ichingBonus=ICHING_BONUS_MAP[ichingData?.nature]||0;
-  // 당사주: 일주(2번째 당사주 pillars) 십이운성 길흉 ±3
+  // 당사주: 일주(2번째 당사주 pillars) 십이운성 길흉 ±3 — dansajuPillars는 아래에서 정의됨
   const STAGE_BONUS={"장생(長生)":3,"관대(冠帶)":2,"건록(建祿)":3,"제왕(帝旺)":3,"목욕(沐浴)":1,
     "쇠(衰)":-1,"병(病)":-2,"사(死)":-2,"묘(墓)":-1,"절(絶)":-3,"태(胎)":1,"양(養)":2};
-  const dansajuIlju=dansajuPillars?.[2];
-  const dansajuBonus=STAGE_BONUS[dansajuIlju?.stage]||0;
+  // dansajuBonus는 scoreMeta 이후에 계산 (dansajuPillars 정의 후)
+  const dansajuBonus_placeholder=0;
   // 타로: 현재 개인연도수와 생명경로수 관계 ±4
   const personalYearNow=lp; // 이미 계산됨 — lp를 currentYear 기준으로 재계산
   const pyNow=(()=>{const digits=[...String(CY),...String(m).padStart(2,"0"),...String(d).padStart(2,"0")].map(Number);let sv=digits.reduce((a,b)=>a+b,0);while(sv>9&&![11,22,33].includes(sv))sv=String(sv).split("").reduce((a,b)=>a+parseInt(b),0);return sv;})();
@@ -932,7 +932,7 @@ function buildSajuData(input){
     yongsinO:_yongO, huisinO:_huiO, gisinO:_giO,
     daeunO: curDaeun?_GANO[curDaeun.label[0]]:"",
     dayJi: ilju.ji.ko,
-    tojungBonus, ichingBonus, dansajuBonus, tarotBonus,
+    tojungBonus, ichingBonus, dansajuBonus:dansajuBonus_placeholder, tarotBonus,
   };
   const YEAR_SUMMARIES={
     high:"용신 기운이 살아나는 해예요. 준비한 것이 결실을 맺기 좋은 시기예요.",
@@ -996,12 +996,13 @@ function buildSajuData(input){
     const stage = getStage(ilgan,ji);
     return {ji,byeolseong:bs.name,kw:bs.kw||"",stage,stageDesc:STAGE_DESC[stage]||"",palace,desc:bs.desc};
   });
+  // dansajuPillars 정의 후 scoreMeta에 dansajuBonus 반영
+  scoreMeta.dansajuBonus = STAGE_BONUS[dansajuPillars[2]?.stage]||0;
 
   // 주역 본명괘 (사주 최다오행→상괘, 일간을 극하는 관성오행→하괘)
-  const relO_kor = GWAN_O[OHK[ilO]] || "목"; // ilO는 한자(木), OHK로 한글 변환 후 GWAN_O 조회
-  const relO_hanja = Object.keys(OHK).find(k=>OHK[k]===relO_kor) || relO_kor; // 한자로 다시 변환
-  const relO = relO_hanja; // iching key는 한자 기반이므로 한자로 유지
-  // TRIGRAM은 한글 키라 OHK[domOForIching], OHK[relO_hanja] 필요 없음 — 직접 한글로
+  const KOR_TO_HANJA={목:"木",화:"火",토:"土",금:"金",수:"水"};
+  const relO_kor = GWAN_O[OHK[ilO]] || "목";
+  const relO = KOR_TO_HANJA[relO_kor] || "木";
   const domO_kor = OHK[domOForIching] || "목";
   const ichingData = getIching(domOForIching, relO);
 
