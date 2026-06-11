@@ -27,6 +27,15 @@ const cleanText=(s)=>(s||"")
   .trim();
 // 별자리 표기에서 도수(숫자) 제거: "궁수자리 4도" / "전갈자리 8°" → 별자리 이름만
 const stripDegree=(s)=>(s||"").replace(/\s*\d+\s*도\s*$/,"").replace(/\s*\d+\s*°.*$/,"").replace(/\s*\d+\s*$/,"").trim();
+// 한자+괄호를 연하게 렌더링: "갑목(甲木)" → 갑목 + (甲木) 연한색
+const HJ=({children,color})=>{
+  if(!children) return null;
+  const parts=String(children).split(/(\([^)]+\))/g);
+  return <>{parts.map((p,i)=>i%2===1
+    ?<span key={i} style={{color:color||"inherit",opacity:0.42,fontSize:"0.92em"}}>{p}</span>
+    :p
+  )}</>;
+};
 // 관성(官星) 오행 = 일간을 극(剋)하는 오행
 const GWAN_O={목:"금",화:"수",토:"목",금:"화",수:"토"};
 // 일간별 인물 키워드 (자연 비유, 동물 X)
@@ -1226,7 +1235,7 @@ function TabSummary({d,changeTab}){return <>
     <GT>일곱 가지 운명 분석 체계가 공통으로 가리키는 핵심 주제입니다.</GT>
     <div style={{marginTop:10,padding:"14px 16px",background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderRadius:12,marginBottom:10}}>
       {cleanText(d.summary?.sevenInsight||"").split("\n\n").map((para,i)=>(
-        <p key={i} style={{fontSize:12,color:"#e0e7ff",lineHeight:1.9,margin:i>0?"12px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}>{para}</p>
+        <p key={i} style={{fontSize:12,color:"#e0e7ff",lineHeight:1.9,margin:i>0?"12px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}><HJ color="#e0e7ff">{para}</HJ></p>
       ))}
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:6}}>
@@ -1650,7 +1659,7 @@ function TabWhy({d}){
       <ST icon="💸" title="돈이 없는 이유"/>
       <GT>사주·별자리·수비학으로 보는 재물 에너지예요.</GT>
       {ai
-        ? <div style={{marginTop:10,padding:"14px 16px",background:"#fffbeb",borderRadius:12,border:"1px solid #fde68a"}}>
+        ? <div style={{marginTop:10,padding:"14px 18px",background:"#fffbeb",borderRadius:12,border:"1px solid #fde68a"}}>
             {cleanText(ai.moneyReason||"").split("\n\n").map((para,i)=>(
               <p key={i} style={{fontSize:12,color:"#444",margin:i>0?"10px 0 0":"0",lineHeight:1.85,textAlign:"justify"}}>{para}</p>
             ))}
@@ -1848,7 +1857,7 @@ function TabAstro({d,parentAstroAI,setParentAstroAI,parentTarotAI,setParentTarot
         <div style={{fontSize:10,color:"#4a148c",fontWeight:700,marginBottom:4}}>삼각 핵심 분석</div>
         {loadingAstro
           ? <><Skel h={12} w="100%"/><Skel h={12} w="90%"/><Skel h={12} w="70%"/></>
-          : <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.8,textAlign:"justify"}}>{cleanText(astroAI?.triangle||a.triangle)}</p>}
+          : <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.8,textAlign:"justify"}}><HJ>{cleanText(astroAI?.triangle||a.triangle)}</HJ></p>}
       </div>
       {errAstro&&<div style={{marginTop:8,padding:"11px 12px",background:"#fdecea",borderRadius:10,fontSize:11,color:"#b71c1c",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <span>네이탈 차트 분석을 불러오지 못했어요.</span>
@@ -2058,7 +2067,7 @@ export default function SajuReport(){
   // sessionStorage 복원
   const _saved = useMemo(()=>{
     try{
-      const r=sessionStorage.getItem("fy_report");
+      const r=sessionStorage.getItem("fy_report_v2");
       const t=sessionStorage.getItem("fy_tab");
       return r?{data:JSON.parse(r),tab:t||"요약"}:null;
     }catch{return null;}
@@ -2092,7 +2101,7 @@ export default function SajuReport(){
           if(cached._astroAI) setParentAstroAI(cached._astroAI);
           if(cached._tarotAI) setParentTarotAI(cached._tarotAI);
           try{
-            sessionStorage.setItem("fy_report", JSON.stringify(cachedWithName));
+            sessionStorage.setItem("fy_report_v2", JSON.stringify(cachedWithName));
             sessionStorage.setItem("fy_tab", "요약");
           }catch{}
           setPhase("report");
@@ -2278,7 +2287,7 @@ JSON만 응답:
       if(astroResult) setParentAstroAI(astroResult);
       if(tarotResult) setParentTarotAI(tarotResult);
       try{
-        sessionStorage.setItem("fy_report",JSON.stringify(enrichedData));
+        sessionStorage.setItem("fy_report_v2",JSON.stringify(enrichedData));
         sessionStorage.setItem("fy_tab","요약");
       }catch{}
 
@@ -2295,7 +2304,7 @@ JSON만 응답:
 
   function goToForm(){
     setOpacity(0);
-    try{sessionStorage.removeItem("fy_report");sessionStorage.removeItem("fy_tab");}catch{}
+    try{sessionStorage.removeItem("fy_report_v2");sessionStorage.removeItem("fy_tab");}catch{}
     setTimeout(()=>{setPhase("form");setOpacity(1);},300);
   }
 
@@ -2318,9 +2327,9 @@ JSON만 응답:
     <div style={S.profileBar}>
       <div>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <img src={(()=>{const gan=d.pillars?.[2]?.gan?.ko||"무";const o=_GANO[gan]||"토";return{"목":"/characters/wood.png","화":"/characters/fire.png","토":"/characters/earth.png","금":"/characters/metal.png","수":"/characters/water.png"}[o];})()} alt="" style={{width:28,height:28,objectFit:"contain",flexShrink:0}}/>
           <div style={S.pName}>{d.name}</div>
-          <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#e65100",fontWeight:700,background:"#fff3e0",padding:"2px 8px 2px 4px",borderRadius:99}}>
-            <img src={(()=>{const gan=d.pillars?.[2]?.gan?.ko||"무";const o=_GANO[gan]||"토";return{"목":"/characters/wood.png","화":"/characters/fire.png","토":"/characters/earth.png","금":"/characters/metal.png","수":"/characters/water.png"}[o];})()} alt="" style={{width:20,height:20,objectFit:"contain"}}/>
+          <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#e65100",fontWeight:700,background:"#fff3e0",padding:"2px 10px",borderRadius:99}}>
             {d.personaTitle}
           </div>
         </div>
@@ -2457,11 +2466,11 @@ async function callNetlify(body){
 }
 
 function buildAstroPrompt(pillarsStr, ilganKo, ilganHanja, birth){
-  return `사주 명식: ${pillarsStr}. 일간: ${ilganKo}(${ilganHanja}). 생년월일: ${birth}.
+  return `사주 명식: ${pillarsStr}. 일간(천간, 나 자신): ${ilganKo}(${ilganHanja}) — 이것이 일간이에요. 생년월일: ${birth}.
 이 사람의 서양 점성술 네이탈 차트를 사주 오행 에너지와 교차 분석해줘.
 출생 데이터를 기반으로 가장 가능성 높은 행성 위치를 추정하고, 각 행성이 사주 일간의 기질과 어떻게 공명하는지 설명해줘.
 각 행성 설명은 2~3문장. 삼각 핵심 분석(태양·달·ASC 관계)은 3~4문장.
-반드시 ~이에요, ~해요 체로 작성해줘. 한자는 반드시 한글(한자) 형식으로 병기해줘.
+반드시 ~이에요, ~해요 체로 작성해줘. 한자는 반드시 한글(한자) 형식으로 병기해줘. 일간 한자는 반드시 ${ilganHanja}로만 표기해줘.
 별자리 이름은 반드시 한국어 "○○자리" 형식으로만 표기해줘 (예: 궁수자리, 전갈자리, 천칭자리, 처녀자리, 게자리). 도수(숫자)는 절대 표기하지 말고 별자리 이름만 써줘. 영어나 한자, 궁(宮) 표기 금지.
 이모지나 특수문자 사용 금지.
 JSON만 응답 (다른 텍스트 없음):
