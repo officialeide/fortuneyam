@@ -892,67 +892,13 @@ function buildSajuData(input){
 
   // ━━ DB에서 텍스트 가져오기 ━━
   const ilganDB = ILGAN_DESC[ilgan] || ILGAN_DESC["무"];
-  const iljuKey = ilju.ko; // 갑자, 무술 등
+  const iljuKey = ilju.ko;
   const iljuCharDesc = ILJU_CHAR[iljuKey] || `${ilju.hanja}(${ilju.ko}) 일주예요.`;
   const vsKey = singang==="신강(身强)"?"strong":"weak";
   const yongDB = YONGSIN_TABLE[ilO] || YONGSIN_TABLE["土"];
   const yongsinA_val = yongDB[vsKey].yongsin;
   const huisinA_val = yongDB[vsKey].huisin;
   const gisinA_val = yongDB[vsKey].gisin;
-
-  // ━━ 세운 점수 메타 (전 탭 공유: 용신/희신/기신 + 현재 대운 + 일지) ━━
-  const curDaeun=daeun.find(dv=>dv.cur);
-  // 방법A: 다체계 보정값 계산
-  // 토정비결: 사자성어 총운 길흉 ±5
-  const TOJUNG_BONUS={
-    "일출동방(日出東方)":5,"만화방창(萬化方暢)":5,"입신양명(立身揚名)":5,"순풍거범(順風擧帆)":5,
-    "고목봉춘(枯木逢春)":4,"전정만리(前程萬里)":4,"용약재연(龍躍在淵)":3,
-    "수뢰둔(水雷屯)":-3,"풍파(風波)":-4,"암야행인(暗夜行人)":-5,
-  };
-  const tojungBonus=TOJUNG_BONUS[sajaDB?.saja]||0;
-  // 주역: 본명괘 nature 길흉 ±3
-  const ICHING_BONUS_MAP={
-    "완성·성취·균형의 유지":3,"형통·소통·막힘이 뚫림":3,"포용·수용·대지의 힘":3,
-    "기쁨·열정·준비된 행동":3,"연대·협력·친밀한 관계":2,"해방·풀림·막혔던 것이 해소":2,
-    "회복·새 출발·본래로 돌아감":2,"기다림·준비·때를 기다리는 지혜":1,
-    "조직·리더십·군중을 이끄는 힘":1,"어려운 탄생·씨앗·고통 뒤의 성장":-2,
-    "위험·도전·거듭되는 시련":-3,"빛이 가려짐·인내·내면의 빛을 지킴":-2,
-  };
-  const ichingBonus=ICHING_BONUS_MAP[ichingData?.nature]||0;
-  // 당사주: 일주(2번째 당사주 pillars) 십이운성 길흉 ±3 — dansajuPillars는 아래에서 정의됨
-  const STAGE_BONUS={"장생(長生)":3,"관대(冠帶)":2,"건록(建祿)":3,"제왕(帝旺)":3,"목욕(沐浴)":1,
-    "쇠(衰)":-1,"병(病)":-2,"사(死)":-2,"묘(墓)":-1,"절(絶)":-3,"태(胎)":1,"양(養)":2};
-  // dansajuBonus는 scoreMeta 이후에 계산 (dansajuPillars 정의 후)
-  const dansajuBonus_placeholder=0;
-  // 타로: 현재 개인연도수와 생명경로수 관계 ±4
-  const personalYearNow=lp; // 이미 계산됨 — lp를 currentYear 기준으로 재계산
-  const pyNow=(()=>{const digits=[...String(CY),...String(m).padStart(2,"0"),...String(d).padStart(2,"0")].map(Number);let sv=digits.reduce((a,b)=>a+b,0);while(sv>9&&![11,22,33].includes(sv))sv=String(sv).split("").reduce((a,b)=>a+parseInt(b),0);return sv;})();
-  const tarotBonus=pyNow===lp?4:pyNow===22||pyNow===11?3:[1,lp+1,lp-1].includes(pyNow)?2:0;
-  const scoreMeta={
-    yongsinO:_yongO, huisinO:_huiO, gisinO:_giO,
-    daeunO: curDaeun?_GANO[curDaeun.label[0]]:"",
-    dayJi: ilju.ji.ko,
-    tojungBonus, ichingBonus, dansajuBonus:dansajuBonus_placeholder, tarotBonus,
-  };
-  const YEAR_SUMMARIES={
-    high:"용신 기운이 살아나는 해예요. 준비한 것이 결실을 맺기 좋은 시기예요.",
-    mid:"흐름이 무난한 해예요. 큰 욕심 없이 꾸준히 나아가면 좋아요.",
-    low:"기신 기운이 강한 해예요. 무리한 확장보다 내실을 다지는 시기예요."
-  };
-  const bandSummary=sc=>sc>=82?YEAR_SUMMARIES.high:sc>=66?YEAR_SUMMARIES.mid:YEAR_SUMMARIES.low;
-  const yearForecast=[CY,CY+1,CY+2,CY+3,CY+4].map(yr=>{
-    const sc=calcSeunScore(yr,0,scoreMeta);
-    const areas=calcSeunAreas(yr,0,scoreMeta);
-    return{year:yr,score:sc,summary:bandSummary(sc),areas};
-  });
-  // 향후 1년 흐름 월별 세운
-  const monthForecast=Array.from({length:12},(_,i)=>{
-    const r=CM+i,mo=(r-1)%12+1,yr=CY+Math.floor((CM-1+i)/12);
-    const sc=calcSeunScore(yr,mo,scoreMeta);
-    const areas=calcSeunAreas(yr,mo,scoreMeta);
-    const gj=mToGJ(yr,mo);
-    return{year:yr,month:mo,label:`${yr}.${mo}`,ganji:gj.ko,score:sc,summary:bandSummary(sc),areas,isThis:i===0};
-  });
   const yearCards=[CY,CY+1,CY+2,CY+3,CY+4].map((yr,i)=>{
     const py=getPersonalYear(yr);
     const score=Math.min(90,Math.max(55,65+(py===22?25:py===11?15:py===lp?10:0)+(i<2?5:0)));
@@ -996,10 +942,7 @@ function buildSajuData(input){
     const stage = getStage(ilgan,ji);
     return {ji,byeolseong:bs.name,kw:bs.kw||"",stage,stageDesc:STAGE_DESC[stage]||"",palace,desc:bs.desc};
   });
-  // dansajuPillars 정의 후 scoreMeta에 dansajuBonus 반영
-  scoreMeta.dansajuBonus = STAGE_BONUS[dansajuPillars[2]?.stage]||0;
-
-  // 주역 본명괘 (사주 최다오행→상괘, 일간을 극하는 관성오행→하괘)
+  // 주역 본명괘
   const KOR_TO_HANJA={목:"木",화:"火",토:"土",금:"金",수:"水"};
   const relO_kor = GWAN_O[OHK[ilO]] || "목";
   const relO = KOR_TO_HANJA[relO_kor] || "木";
@@ -1026,6 +969,34 @@ function buildSajuData(input){
   const _dsName=n=>n.split("(")[0];
   const dansajuOverall=`당사주는 인생의 네 영역에 별이 하나씩 자리 잡고 있어요. 뿌리·집안을 뜻하는 년주에 ${_dsName(dansajuPillars[0].byeolseong)}, 부모·성장기를 뜻하는 월주에 ${_dsName(dansajuPillars[1].byeolseong)}, 나 자신·배우자를 뜻하는 일주에 ${_dsName(dansajuPillars[2].byeolseong)}, 자녀·말년을 뜻하는 시주에 ${_dsName(dansajuPillars[3].byeolseong)}이 들어와 있어요. 중심이 되는 일주의 ${_dsName(dansajuPillars[2].byeolseong)}이 삶의 핵심 색깔을 만들고, 나머지 세 별이 시기별로 그 기운을 거들어요. ${ILGAN_TITLE[ilgan]} 같은 ${OHK[ilO]} 일간의 ${singang.replace(/\(.*\)/,"")} 기질과 어우러져, ${ilganDB.core.replace(/^[^:]*:\s*/,"")}`;
 
+
+  // ━━ 세운 점수 메타 — sajaDB, ichingData, dansajuPillars 모두 정의된 후에 계산 ━━
+  const curDaeun=daeun.find(dv=>dv.cur);
+  const TOJUNG_BONUS={"일출동방(日出東方)":5,"만화방창(萬化方暢)":5,"입신양명(立身揚名)":5,"순풍거범(順風擧帆)":5,"고목봉춘(枯木逢春)":4,"전정만리(前程萬里)":4,"용약재연(龍躍在淵)":3,"수뢰둔(水雷屯)":-3,"풍파(風波)":-4,"암야행인(暗夜行人)":-5};
+  const ICHING_BONUS_MAP={"완성·성취·균형의 유지":3,"형통·소통·막힘이 뚫림":3,"포용·수용·대지의 힘":3,"기쁨·열정·준비된 행동":3,"연대·협력·친밀한 관계":2,"해방·풀림·막혔던 것이 해소":2,"회복·새 출발·본래로 돌아감":2,"기다림·준비·때를 기다리는 지혜":1,"조직·리더십·군중을 이끄는 힘":1,"어려운 탄생·씨앗·고통 뒤의 성장":-2,"위험·도전·거듭되는 시련":-3,"빛이 가려짐·인내·내면의 빛을 지킴":-2};
+  const STAGE_BONUS={"장생(長生)":3,"관대(冠帶)":2,"건록(建祿)":3,"제왕(帝旺)":3,"목욕(沐浴)":1,"쇠(衰)":-1,"병(病)":-2,"사(死)":-2,"묘(墓)":-1,"절(絶)":-3,"태(胎)":1,"양(養)":2};
+  const pyNow=(()=>{const digits=[...String(CY),...String(m).padStart(2,"0"),...String(d).padStart(2,"0")].map(Number);let sv=digits.reduce((a,b)=>a+b,0);while(sv>9&&![11,22,33].includes(sv))sv=String(sv).split("").reduce((a,b)=>a+parseInt(b),0);return sv;})();
+  const scoreMeta={
+    yongsinO:_yongO, huisinO:_huiO, gisinO:_giO,
+    daeunO: curDaeun?_GANO[curDaeun.label[0]]:"",
+    dayJi: ilju.ji.ko,
+    tojungBonus: TOJUNG_BONUS[sajaDB?.saja]||0,
+    ichingBonus: ICHING_BONUS_MAP[ichingData?.nature]||0,
+    dansajuBonus: STAGE_BONUS[dansajuPillars[2]?.stage]||0,
+    tarotBonus: pyNow===lp?4:pyNow===22||pyNow===11?3:[1,lp+1,lp-1].includes(pyNow)?2:0,
+  };
+  const YEAR_SUMMARIES={high:"용신 기운이 살아나는 해예요. 준비한 것이 결실을 맺기 좋은 시기예요.",mid:"흐름이 무난한 해예요. 큰 욕심 없이 꾸준히 나아가면 좋아요.",low:"기신 기운이 강한 해예요. 무리한 확장보다 내실을 다지는 시기예요."};
+  const bandSummary=sc=>sc>=82?YEAR_SUMMARIES.high:sc>=66?YEAR_SUMMARIES.mid:YEAR_SUMMARIES.low;
+  const yearForecast=[CY,CY+1,CY+2,CY+3,CY+4].map(yr=>{
+    const sc=calcSeunScore(yr,0,scoreMeta);
+    return{year:yr,score:sc,summary:bandSummary(sc),areas:calcSeunAreas(yr,0,scoreMeta)};
+  });
+  const monthForecast=Array.from({length:12},(_,i)=>{
+    const r=CM+i,mo=(r-1)%12+1,yr=CY+Math.floor((CM-1+i)/12);
+    const sc=calcSeunScore(yr,mo,scoreMeta);
+    const gj=mToGJ(yr,mo);
+    return{year:yr,month:mo,label:`${yr}.${mo}`,ganji:gj.ko,score:sc,summary:bandSummary(sc),areas:calcSeunAreas(yr,mo,scoreMeta),isThis:i===0};
+  });
 
   // ━━ 연도별 흐름/월별 길흉 (전 탭 공유 점수 기반) ━━
   const yrs5=[CY,CY+1,CY+2,CY+3,CY+4];
@@ -2479,6 +2450,7 @@ function SajuInputForm({onSubmit}){
   });
   const [err,setErr]=useState({});
   const up=(k,v)=>setForm(f=>({...f,[k]:v}));
+  const timeInputRef=useRef(null);
   const showLeapToggle=calType==="lunar"&&form.year&&form.month&&
     hasLeapMonth(parseInt(form.year),parseInt(form.month));
 
@@ -2565,6 +2537,8 @@ function SajuInputForm({onSubmit}){
                 up("year",String(yy<=30?2000+yy:1900+yy));
                 up("month",String(parseInt(raw.slice(2,4))));
                 up("day",String(parseInt(raw.slice(4,6))));
+                // 생년월일 6자리 완성 → 시간 입력으로 자동 포커스
+                setTimeout(()=>timeInputRef.current?.focus(),50);
               }
             }}/>
           {(err.year||err.month||err.day)&&<div style={SF.errMsg}>{err.year||err.month||err.day}</div>}
@@ -2583,7 +2557,7 @@ function SajuInputForm({onSubmit}){
             <div style={SF.label}>태어난 시간</div>
             <span style={{fontSize:11,color:"#aaa",fontWeight:400}}>모르면 비워도 돼요</span>
           </div>
-          <input style={{...SF.input,...(err.time?SF.inputErr:{})}}
+          <input ref={timeInputRef} style={{...SF.input,...(err.time?SF.inputErr:{})}}
             placeholder="22:25" value={form.timeRaw||""} maxLength={5} inputMode="numeric"
             onChange={ev=>{
               const raw=ev.target.value.replace(/\D/g,"");
