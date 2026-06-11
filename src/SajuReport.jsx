@@ -704,6 +704,91 @@ const STAGE_DESC={
   "태(胎)":"잉태된 씨앗의 에너지예요. 아직 드러나지 않은 가능성이 가득해요.",
   "양(養)":"보호받으며 자라는 에너지예요. 포용과 성장의 기운이에요.",
 };
+// 별성 × 십이운성 조합 설명 DB
+// key: "별성이름_운성이름" (byeolseong 앞 2글자 + stage 앞 1글자 기준 아닌, 풀네임 키)
+const COMBO_DESC={
+  // ── 망신성 ──
+  "망신성_장생(長生)":"망신성의 변동 기운이 장생(長生)의 새 출발 에너지와 맞물려요. 예상치 못한 변화가 오히려 새로운 시작의 트리거가 되는 구조예요. 흔들릴 때마다 더 좋은 자리로 이동하는 패턴이에요.",
+  "망신성_목욕(沐浴)":"망신성과 목욕(沐浴)이 겹쳐 변화 앞에서 감각적이고 충동적인 선택을 하기 쉬운 구조예요. 직감이 날카로운 만큼 변화의 파도를 타는 능력도 뛰어나요. 다만 감정이 앞서지 않도록 한 템포 쉬어가는 것이 필요해요.",
+  "망신성_관대(冠帶)":"망신성의 변동 기운이 관대(冠帶)의 자기 표출 에너지와 만나요. 사회에 나서는 시기에 예상치 못한 변화가 생기기 쉽지만, 그 변화가 오히려 자신을 더 알리는 계기가 되는 구조예요.",
+  "망신성_건록(建祿)":"망신성의 이동·변동 기운이 건록(建祿)의 안정된 전성기와 긴장 관계를 이뤄요. 안정을 유지하려는 의지와 변화의 충동이 공존해요. 변화를 억누르기보다 계획적으로 수용하면 더 큰 도약이 돼요.",
+  "망신성_제왕(帝旺)":"망신성의 기운이 제왕(帝旺)의 강한 에너지에 눌려 잠잠해요. 큰 변화가 와도 흔들리지 않는 중심이 있어요. 다만 정점에 있을 때 방심하면 갑작스러운 전환이 오기 쉬우니 겸손함이 필요해요.",
+  "망신성_쇠(衰)":"망신성과 쇠(衰)가 만나 변화의 흐름이 완만하게 펼쳐져요. 갑작스럽기보다 서서히 바뀌는 이동과 전환이 찾아오는 구조예요. 변화를 미리 감지하고 준비하는 능력이 강점이에요.",
+  "망신성_병(病)":"망신성의 변동 에너지가 병(病)의 약한 기운과 겹쳐 몸과 마음이 지쳐있을 때 변화가 찾아오기 쉬운 구조예요. 변화를 억지로 막으려 하지 말고 잠시 쉬면서 방향을 다시 잡는 것이 현명해요.",
+  "망신성_사(死)":"망신성과 사(死)가 겹쳐 변화의 충격이 크지만, 그 소진이 완전한 탈피로 이어져요. 한 번 무너지면 더 단단하게 재건하는 패턴이에요. 끝처럼 느껴지는 순간이 실은 새로운 출발선이에요.",
+  "망신성_묘(墓)":"망신성의 변동 기운이 묘(墓)의 창고 에너지 안에 축적돼요. 겉으로는 잠잠해 보여도 내면에서 변화를 준비하고 있는 구조예요. 때가 되면 한꺼번에 크게 전환되는 패턴이에요.",
+  "망신성_절(絶)":"망신성의 이동·단절 기운이 절(絶)과 만나 완전한 리셋의 에너지가 돼요. 끊어낼 것은 과감히 끊어야 다음 문이 열리는 구조예요. 손실처럼 보이는 변화가 실은 최선의 선택이에요.",
+  "망신성_태(胎)":"망신성의 에너지가 태(胎)의 잠재된 가능성 안에 씨앗처럼 담겨 있어요. 아직 변화가 표면으로 드러나지 않지만, 언젠가 갑작스럽게 큰 전환이 찾아오는 구조예요.",
+  "망신성_양(養)":"망신성의 변동 기운이 양(養)의 보호막 안에서 자라나요. 갑작스러운 변화가 오더라도 주변의 도움으로 안착하는 구조예요. 변화의 충격보다 이후의 성장이 더 커요.",
+  // ── 도화성 ──
+  "도화성_장생(長生)":"도화성의 흡인력이 장생(長生)의 생명력과 만나 자연스럽고 싱그러운 매력이 돼요. 처음 만나는 자리에서 특히 빛나는 타입이에요. 새로운 인연을 끌어당기는 에너지가 강해요.",
+  "도화성_목욕(沐浴)":"도화성과 목욕(沐浴)이 겹쳐 매력이 두 배로 강해지는 조합이에요. 자연스럽고 솔직한 매력이 넘치지만, 감정 기복이 생길 때는 충동적인 선택을 조심해요. 감각적인 아름다움이 가장 강하게 드러나는 구조예요.",
+  "도화성_관대(冠帶)":"도화성의 매력이 관대(冠帶)의 사회적 등장 에너지와 만나 어디서나 눈에 띄는 존재감이 돼요. 나설수록 자연스럽게 사람들이 모이는 구조예요.",
+  "도화성_건록(建祿)":"도화성의 인기와 건록(建祿)의 안정감이 만나 사회적으로도 매력이 인정받는 구조예요. 커리어와 관계 모두에서 자연스럽게 빛나는 시기예요. 인기를 실력으로 연결하기 가장 좋은 조합이에요.",
+  "도화성_제왕(帝旺)":"도화성과 제왕(帝旺)이 만나 카리스마와 매력이 압도적으로 결합돼요. 존재 자체가 주목받는 구조예요. 다만 지나친 주목이 부담으로 바뀔 수 있으니 에너지 관리가 필요해요.",
+  "도화성_쇠(衰)":"도화성의 매력이 쇠(衰)의 원숙함과 만나 나이 들수록 더 깊어지는 아름다움이에요. 젊은 시절의 화사한 매력보다 경험이 쌓일수록 사람을 끌어당기는 힘이 강해져요.",
+  "도화성_병(病)":"도화성의 흡인력이 병(病)의 섬세한 감수성과 결합해요. 강렬하진 않지만 마음 깊이 스며드는 매력이에요. 아픈 사람을 돌보는 따뜻한 끌림이 있는 구조예요.",
+  "도화성_사(死)":"도화성의 매력이 사(死)를 만나 겉으로 잘 드러나지 않아요. 가까워질수록 깊어지는 은근한 매력이에요. 처음엔 모르다가 어느 순간 강하게 끌리는 타입이에요.",
+  "도화성_묘(墓)":"도화성의 에너지가 묘(墓) 안에 쌓여 있어요. 평소엔 잘 드러나지 않다가 특정 상황에서 폭발적으로 매력이 터지는 구조예요. 숨겨진 매력이 반전 포인트가 되는 타입이에요.",
+  "도화성_절(絶)":"도화성과 절(絶)이 만나 인연의 시작과 끝이 선명한 구조예요. 강하게 이끌리고 강하게 끊어지는 패턴이 반복될 수 있어요. 관계에서 집착보다 흐름을 받아들이는 연습이 필요해요.",
+  "도화성_태(胎)":"도화성의 매력이 태(胎)의 잠재 에너지 안에 씨앗처럼 담겨 있어요. 아직 완전히 피어나지 않은 매력이에요. 시간이 지날수록 더 깊고 독특한 아름다움이 드러나는 후기 개화형이에요.",
+  "도화성_양(養)":"도화성의 흡인력이 양(養)의 포근함과 만나 자연스럽고 따뜻한 매력이 돼요. 억지로 꾸미지 않아도 사람을 편안하게 만드는 구조예요. 돌봐주고 싶어지는 매력이 있어요.",
+  // ── 귀문성 ──
+  "귀문성_장생(長生)":"귀문성의 인연 에너지가 장생(長生)과 만나 새로운 시작마다 귀인이 등장하는 구조예요. 좋은 만남이 새 출발을 이끄는 패턴이에요.",
+  "귀문성_목욕(沐浴)":"귀문성의 사교성이 목욕(沐浴)의 감각적 에너지와 결합해요. 자연스러운 매력으로 다양한 인연을 끌어당기지만, 관계가 깊어지기 전에 충동적으로 움직이지 않는 게 중요해요.",
+  "귀문성_관대(冠帶)":"귀문성과 관대(冠帶)가 만나 사회에 나설수록 좋은 인연이 늘어나는 구조예요. 첫인상이 좋아 어디서나 귀인을 만나기 쉬운 타입이에요.",
+  "귀문성_건록(建祿)":"귀문성의 인연 기운과 건록(建祿)의 안정감이 결합해 전성기에 든든한 귀인이 함께하는 구조예요. 능력과 인복이 함께 빛나는 시기예요.",
+  "귀문성_제왕(帝旺)":"귀문성이 제왕(帝旺)과 만나 주변에 좋은 사람들이 자연스럽게 모이는 구조예요. 리더십과 인복이 함께 강한 시기예요.",
+  "귀문성_쇠(衰)":"귀문성의 인연 에너지가 쇠(衰)와 만나 새로운 인연보다 오래된 인연의 소중함이 드러나는 시기예요. 깊고 오랜 관계에서 귀인이 나타나는 구조예요.",
+  "귀문성_병(病)":"귀문성의 에너지가 병(病)과 겹쳐 힘든 시기에 뜻밖의 도움이 찾아오는 구조예요. 약한 순간에 귀인이 등장하는 패턴이에요.",
+  "귀문성_사(死)":"귀문성과 사(死)가 만나 인연이 잠시 멈추는 시기예요. 새 인연보다 내면을 채우는 시간이 필요해요. 충분히 회복된 후 더 좋은 인연이 열려요.",
+  "귀문성_묘(墓)":"귀문성의 인연 에너지가 묘(墓) 안에 축적돼요. 인연이 숨어 있다가 때가 되면 한꺼번에 터지는 구조예요. 기다림 끝에 좋은 만남이 쏟아지는 패턴이에요.",
+  "귀문성_절(絶)":"귀문성과 절(絶)이 만나 인연의 시작과 끊김이 선명해요. 오래된 인연이 정리되고 새로운 귀인이 등장하는 전환기 구조예요.",
+  "귀문성_태(胎)":"귀문성의 인연 에너지가 태(胎) 안에서 준비 중이에요. 아직 큰 인연이 드러나지 않았지만 좋은 만남을 위한 씨앗이 자라고 있어요.",
+  "귀문성_양(養)":"귀문성과 양(養)이 만나 인연이 천천히 포근하게 자라나는 구조예요. 오래 알수록 더 깊어지는 관계와 귀인이 찾아와요.",
+  // ── 충명성 ──
+  "충명성_장생(長生)":"충명성의 총명함이 장생(長生)의 생명력과 만나 배우고 성장할수록 지혜가 빛나는 구조예요. 새로운 분야에 뛰어들 때마다 빠른 습득력이 강점이 돼요.",
+  "충명성_목욕(沐浴)":"충명성과 목욕(沐浴)이 만나 영리하고 감각적인 에너지가 넘쳐요. 직관이 날카롭고 아이디어가 풍부하지만, 깊이 파고들기 전에 산만해지는 경향을 주의해요.",
+  "충명성_관대(冠帶)":"충명성의 총명함이 관대(冠帶)의 등장 에너지와 만나 두각을 나타내기 좋은 구조예요. 실력을 드러낼수록 주변의 인정이 따라오는 시기예요.",
+  "충명성_건록(建祿)":"충명성과 건록(建祿)이 만나 탁월한 두뇌가 안정된 전성기에 마음껏 발휘되는 구조예요. 전문성으로 승부하기 가장 좋은 조합이에요.",
+  "충명성_제왕(帝旺)":"충명성이 제왕(帝旺)과 만나 강한 카리스마와 날카로운 두뇌가 결합해요. 지적 능력이 존재감과 함께 압도적으로 빛나는 구조예요.",
+  "충명성_쇠(衰)":"충명성의 예리함이 쇠(衰)의 원숙함과 만나 경험에서 우러난 깊은 지혜가 돼요. 젊을 때보다 나이 들수록 진가가 드러나는 타입이에요.",
+  "충명성_병(病)":"충명성의 두뇌가 병(病)의 섬세한 감수성과 결합해 예민하고 직관적인 통찰력이 강해져요. 몸보다 머리가 더 활발한 시기예요.",
+  "충명성_사(死)":"충명성과 사(死)가 만나 외부 활동보다 내면의 사색과 탐구 에너지가 강해요. 조용히 깊이 파고들 때 가장 빛나는 구조예요.",
+  "충명성_묘(墓)":"충명성의 지혜가 묘(墓) 안에 축적돼요. 겉으로는 잘 드러내지 않지만 내면에 방대한 지식과 통찰이 쌓이는 구조예요. 적재적소에 꺼낼 때 가장 빛나요.",
+  "충명성_절(絶)":"충명성의 총명함이 절(絶)을 만나 직관과 통찰이 더 날카로워져요. 기존 방식을 과감히 버리고 새로운 관점을 받아들일 때 가장 빛나요.",
+  "충명성_태(胎)":"충명성의 총명함이 아직 표면으로 나오지 않은 시기예요. 겉으론 눈에 띄지 않지만 내면에서 엄청난 것을 준비하고 있어요. 때가 되면 단번에 드러나는 잠재형이에요.",
+  "충명성_양(養)":"충명성과 양(養)이 만나 총명함이 안전한 환경에서 천천히 자라나는 구조예요. 급하게 드러내기보다 충분히 쌓은 후 빛나는 타입이에요.",
+  // ── 역마성 ──
+  "역마성_장생(長生)":"역마성의 이동 에너지가 장생(長生)과 만나 새로운 환경으로 나아갈 때마다 생명력이 충전되는 구조예요. 변화와 도전이 에너지원이에요.",
+  "역마성_목욕(沐浴)":"역마성과 목욕(沐浴)이 겹쳐 충동적으로 이동하거나 새로운 자극을 찾아다니는 에너지가 강해요. 한 곳에 오래 있으면 답답함을 크게 느끼는 구조예요.",
+  "역마성_관대(冠帶)":"역마성의 이동 기운이 관대(冠帶)와 만나 사회적 활동 반경이 넓어지는 구조예요. 외부 활동과 네트워크 확장이 자연스럽게 이뤄지는 시기예요.",
+  "역마성_건록(建祿)":"역마성과 건록(建祿)이 만나 활발한 이동과 활동이 안정적인 성과로 이어지는 구조예요. 움직일수록 결과가 나오는 패턴이에요.",
+  "역마성_제왕(帝旺)":"역마성이 제왕(帝旺)과 만나 넓은 무대에서 활발하게 활동하는 에너지가 압도적이에요. 국내보다 넓은 무대에서 더 빛나는 구조예요.",
+  "역마성_쇠(衰)":"역마성의 이동 에너지가 쇠(衰)와 만나 활동 반경이 서서히 줄어드는 시기예요. 멀리 가는 것보다 가까운 곳을 깊이 탐색하는 것이 더 맞는 흐름이에요.",
+  "역마성_병(病)":"역마성과 병(病)이 겹쳐 이동이나 변화 중에 몸이 힘들어질 수 있는 구조예요. 무리한 이동보다 충분한 회복이 먼저예요.",
+  "역마성_사(死)":"역마성의 이동 에너지가 사(死)와 만나 이동이 일시적으로 멈추거나 마무리되는 시기예요. 지금은 외부보다 내면의 정착이 필요한 구조예요.",
+  "역마성_묘(墓)":"역마성의 에너지가 묘(墓) 안에 쌓여 있어요. 당장은 움직이기 어려운 구조지만, 때가 되면 한꺼번에 크게 이동하는 패턴이에요.",
+  "역마성_절(絶)":"역마성과 절(絶)이 만나 완전한 이동과 단절의 에너지가 결합해요. 거주지·직장·관계까지 한꺼번에 바뀌는 큰 전환이 찾아오는 구조예요.",
+  "역마성_태(胎)":"역마성의 에너지가 태(胎) 안에서 준비 중이에요. 지금은 이동보다 준비하는 시기예요. 충분히 채워지면 역마 기운이 크게 발동해요.",
+  "역마성_양(養)":"역마성과 양(養)이 만나 이동 에너지가 안전하게 자라나는 구조예요. 주변의 지지 속에 새로운 환경으로 나아가는 패턴이에요.",
+  // ── 화개성 ──
+  "화개성_장생(長生)":"화개성의 예술·신비 기운이 장생(長生)과 만나 창의적 재능이 싱그럽게 피어나는 구조예요. 새로운 분야에서 독창성이 빛나는 시기예요.",
+  "화개성_목욕(沐浴)":"화개성과 목욕(沐浴)이 만나 감각적인 예술성이 강해지는 구조예요. 표현이 자유롭고 창의적이지만, 산만해지지 않도록 방향을 잡는 것이 중요해요.",
+  "화개성_건록(建祿)":"화개성의 예술·학문 에너지가 건록(建祿)의 전성기와 만나 창의적 역량이 안정적으로 발휘되는 구조예요. 재능으로 결과를 만들어내기 가장 좋은 조합이에요.",
+  "화개성_제왕(帝旺)":"화개성이 제왕(帝旺)과 만나 예술적·영적 에너지가 최고조에 달하는 구조예요. 독보적인 개성과 창의성이 가장 강하게 빛나는 시기예요.",
+  "화개성_쇠(衰)":"화개성의 예술 에너지가 쇠(衰)와 만나 깊이와 원숙함이 더해지는 시기예요. 화려함보다 내면에서 우러나오는 진중한 창의성이 빛나요.",
+  "화개성_사(死)":"화개성과 사(死)가 만나 외부보다 내면 탐구와 예술적 사색이 깊어지는 구조예요. 은둔 속에서 가장 깊은 창작물이 탄생하는 패턴이에요.",
+  "화개성_절(絶)":"화개성과 절(絶)이 만나 기존 창작 방식을 완전히 비우고 새로운 세계를 여는 에너지예요. 과감한 전환이 더 독창적인 길을 열어요.",
+  "화개성_태(胎)":"화개성의 예술·신비 에너지가 태(胎) 안에서 조용히 자라나고 있어요. 아직 드러나지 않은 독특한 재능이 때를 기다리는 구조예요.",
+  "화개성_양(養)":"화개성과 양(養)이 만나 예술적 감성이 보호받으며 천천히 성장하는 구조예요. 서두르지 않고 자신만의 세계를 깊이 키워나가는 타입이에요.",
+};
+// 별성 이름 → COMBO_DESC 키 접두사 매핑
+function getComboDesc(byeolseongName, stage){
+  // byeolseongName: "도화성(桃花星)" 형태에서 앞부분만 추출
+  const bKey=(byeolseongName||"").replace(/\(.*\)/,"").trim();
+  return COMBO_DESC[`${bKey}_${stage}`]||"";
+}
 function calcSinsal(ilgan,yearJi,monthJi,dayJi,timeJi){
   const result=[];
   const taeul={갑:["축","미"],무:["축","미"],경:["축","미"],을:["자","신"],기:["자","신"],병:["해","유"],정:["해","유"],임:["묘","사"],계:["묘","사"],신:["오","인"]};
@@ -1578,106 +1663,144 @@ function TabDayNight({d}){
         ))}
       </div>
     </section>
+    <div style={{padding:"12px 14px",background:"#f3f0ff",borderRadius:12,border:"1px solid #ddd6fe",fontSize:11,color:"#5b21b6",lineHeight:1.7,textAlign:"center"}}>
+      🔬 분노 패턴·회복 리듬·개운법은 <strong>내면 해부</strong> 탭에서 확인하세요
+    </div>
+  </>;
+}
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 8-B. 내면 해부 탭 (구 "나는 왜" + 낮과밤의 내면의 리듬 통합)
+// parentInnerAI/setParentInnerAI: 부모 상태로 탭 전환·새로고침 유지
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function TabInner({d,parentInnerAI,setParentInnerAI}){
+  // 부모 상태 우선 → d._innerAI → sessionStorage → null
+  const [innerAI,setInnerAI]=React.useState(()=>{
+    if(parentInnerAI) return parentInnerAI;
+    if(d._innerAI) return d._innerAI;
+    try{
+      const key=`fy_inner_v2_${d.birth}`;
+      const s=sessionStorage.getItem(key);
+      return s?JSON.parse(s):null;
+    }catch{return null;}
+  });
+  const [loading,setLoading]=React.useState(!innerAI);
+  const [err,setErr]=React.useState(false);
+
+  // 부모 상태 동기화
+  React.useEffect(()=>{
+    if(innerAI&&setParentInnerAI) setParentInnerAI(innerAI);
+  },[innerAI]);
+
+  React.useEffect(()=>{
+    if(innerAI){setLoading(false);return;}
+    let cancelled=false;
+    async function fetchInner(){
+      setLoading(true);setErr(false);
+      try{
+        const prompt=buildInnerPrompt(d);
+        const text=await callNetlify({model:"claude-haiku-4-5-20251001",max_tokens:2000,messages:[{role:"user",content:prompt}]});
+        const parsed=JSON.parse(text);
+        if(!cancelled){
+          setInnerAI(parsed);
+          if(setParentInnerAI) setParentInnerAI(parsed);
+          try{sessionStorage.setItem(`fy_inner_v2_${d.birth}`,JSON.stringify(parsed));}catch{}
+        }
+      }catch(e){console.error("inner fetch:",e);if(!cancelled)setErr(true);}
+      if(!cancelled)setLoading(false);
+    }
+    fetchInner();
+    return()=>{cancelled=true;};
+  },[d.birth]);
+
+  const Skel=({w="100%"})=><div style={{height:11,background:"linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%)",backgroundSize:"200% 100%",borderRadius:99,width:w,marginBottom:5,animation:"shimmer 1.4s infinite"}}/>;
+  const shimmerStyle=`@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}`;
+  const LoadBlock=()=><div style={{padding:"16px 0",display:"flex",flexDirection:"column",gap:5}}>
+    {[100,90,95,80,85].map((w,i)=><Skel key={i} w={`${w}%`}/>)}
+    <p style={{fontSize:11,color:"#aaa",textAlign:"center",marginTop:8}}>{err?"잠시 후 다시 시도해주세요":"분석 중이에요..."}</p>
+  </div>;
+
+  return <>
+    <style>{shimmerStyle}</style>
+
+    {/* ① 내면의 리듬 (기존 낮과밤 탭에 있던 섹션 이동) */}
     <section style={S.card}>
       <ST icon="🌊" title="내면의 리듬"/>
       <GT>사주 일간·신강신약·MBTI를 교차 분석한 감정 패턴이에요.</GT>
-      {d._innerAI
+      {innerAI
         ? <>
-            {/* 분노 트리거 */}
             <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
-              {(d._innerAI.angerTriggers||[]).map((t,i)=>(
+              {(innerAI.angerTriggers||[]).map((t,i)=>(
                 <div key={i} style={{padding:"12px 14px",background:"#fff5f5",borderRadius:11,border:"1px solid #ffcdd2"}}>
                   <div style={{fontSize:13,fontWeight:900,color:"#b71c1c",marginBottom:6}}>"{cleanText(t.quote)}"</div>
                   <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.75}}>{cleanText(t.reason)}</p>
                 </div>
               ))}
             </div>
-            {/* 에세이 */}
             <div style={{marginTop:10,padding:"14px 16px",background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderRadius:12}}>
-              {cleanText(d._innerAI.innerRhythm||"").split("\n\n").map((para,i)=>(
+              {cleanText(innerAI.innerRhythm||"").split("\n\n").map((para,i)=>(
                 <p key={i} style={{fontSize:12,color:"#e0e7ff",lineHeight:1.9,margin:i>0?"12px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}>{para}</p>
               ))}
             </div>
           </>
-        : <div style={{marginTop:10,padding:"20px",background:"#f5f5f5",borderRadius:12,textAlign:"center"}}>
-            <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:10}}>
-              {[100,90,95,80].map((w,i)=><div key={i} style={{height:11,background:"#e0e0e0",borderRadius:99,width:`${w}%`}}/>)}
-            </div>
-            <p style={{fontSize:11,color:"#aaa",margin:0}}>분석 중이에요...</p>
-          </div>
-      }
+        : <LoadBlock/>}
     </section>
-  </>;
-}
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 나는 왜 이럴까 탭
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function TabWhy({d}){
-  const ai=d._innerAI;
-  const Skel2=({w="100%"})=><div style={{height:11,background:"#e8e8e8",borderRadius:99,width:w,marginBottom:5}}/>;
-  const Loading=()=><div style={{padding:"16px",display:"flex",flexDirection:"column",gap:5}}>
-    {[100,90,95,80,85].map((w,i)=><Skel2 key={i} w={`${w}%`}/>)}
-    <p style={{fontSize:11,color:"#aaa",textAlign:"center",marginTop:8}}>분석 중이에요...</p>
-  </div>;
 
-  return <>
-    {/* 운동 추천 */}
+    {/* ② 운동 추천 */}
     <section style={S.card}>
       <ST icon="🏃" title="운동 추천"/>
       <GT>용신 기운을 채우는 개운 운동이에요.</GT>
-      {ai
+      {innerAI
         ? <div style={{display:"flex",flexDirection:"column",gap:10,marginTop:10}}>
-            {(ai.exercise||[]).map((ex,i)=>(
+            {(innerAI.exercise||[]).map((ex,i)=>(
               <div key={i} style={{padding:"13px 14px",background:"#f0fdf4",borderRadius:11,border:"1px solid #bbf7d0"}}>
                 <div style={{fontSize:13,fontWeight:900,color:"#166534",marginBottom:6}}>{cleanText(ex.name)}</div>
                 <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.75}}>{cleanText(ex.reason)}</p>
               </div>
             ))}
           </div>
-        : <Loading/>}
+        : <LoadBlock/>}
     </section>
 
-    {/* 취미 추천 */}
+    {/* ③ 취미 추천 */}
     <section style={S.card}>
       <ST icon="🎨" title="취미 추천"/>
       <GT>에너지를 채우고 흘려보내는 활동이에요.</GT>
-      {ai
+      {innerAI
         ? <div style={{display:"flex",flexDirection:"column",gap:10,marginTop:10}}>
-            {(ai.hobby||[]).map((h,i)=>(
+            {(innerAI.hobby||[]).map((h,i)=>(
               <div key={i} style={{padding:"13px 14px",background:"#fdf4ff",borderRadius:11,border:"1px solid #e9d5ff"}}>
                 <div style={{fontSize:13,fontWeight:900,color:"#6b21a8",marginBottom:6}}>{cleanText(h.name)}</div>
                 <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.75}}>{cleanText(h.reason)}</p>
               </div>
             ))}
           </div>
-        : <Loading/>}
+        : <LoadBlock/>}
     </section>
 
-    {/* 돈이 없는 이유 */}
+    {/* ④ 돈이 없는 이유 */}
     <section style={S.card}>
       <ST icon="💸" title="돈이 없는 이유"/>
       <GT>사주·별자리·수비학으로 보는 재물 에너지예요.</GT>
-      {ai
+      {innerAI
         ? <div style={{marginTop:10,padding:"14px 18px",background:"#fffbeb",borderRadius:12,border:"1px solid #fde68a"}}>
-            {cleanText(ai.moneyReason||"").split("\n\n").map((para,i)=>(
+            {cleanText(innerAI.moneyReason||"").split("\n\n").map((para,i)=>(
               <p key={i} style={{fontSize:12,color:"#444",margin:i>0?"10px 0 0":"0",lineHeight:1.85,textAlign:"justify"}}>{para}</p>
             ))}
           </div>
-        : <Loading/>}
+        : <LoadBlock/>}
     </section>
 
-    {/* 내가 진상일 때 */}
+    {/* ⑤ 내가 진상일 때 */}
     <section style={S.card}>
       <ST icon="😤" title="내가 진상일 때는?"/>
       <GT>자기 객관화에 도움되는 패턴 분석이에요.</GT>
-      {ai
+      {innerAI
         ? <div style={{marginTop:10,padding:"14px 16px",background:"#fdf2f8",borderRadius:12,border:"1px solid #fbcfe8"}}>
-            {cleanText(ai.jinsang||"").split("\n\n").map((para,i)=>(
+            {cleanText(innerAI.jinsang||"").split("\n\n").map((para,i)=>(
               <p key={i} style={{fontSize:12,color:"#444",margin:i>0?"10px 0 0":"0",lineHeight:1.85,textAlign:"justify"}}>{para}</p>
             ))}
           </div>
-        : <Loading/>}
+        : <LoadBlock/>}
     </section>
   </>;
 }
@@ -1749,6 +1872,7 @@ function TabTojung({d}){
             </div>
             <p style={{fontSize:11,color:"#555",margin:0,lineHeight:1.75,textAlign:"justify"}}>{p.desc}</p>
             {p.stageDesc&&<p style={{fontSize:10,color:"#888",margin:"6px 0 0",lineHeight:1.7,textAlign:"justify",paddingTop:6,borderTop:"1px dashed #eee"}}><span style={{color:"#e65100",fontWeight:700}}>{p.stage} </span>{p.stageDesc}</p>}
+            {(()=>{const combo=getComboDesc(p.byeolseong,p.stage);return combo?<p style={{fontSize:10,color:"#5c6bc0",margin:"5px 0 0",lineHeight:1.75,textAlign:"justify",paddingTop:5,borderTop:"1px dashed #e8eaf6"}}><span style={{fontWeight:700,color:"#3949ab"}}>✦ 조합 </span>{combo}</p>:null;})()}
           </div>;
         })}
       </div>
@@ -2078,10 +2202,20 @@ export default function SajuReport(){
   const [opacity,setOpacity]=useState(1);
   const [reportData,setReportData]=useState(_saved?.data||null);
   const [showAdmin,setShowAdmin]=useState(()=>window.location.search.includes("admin"));
-  // 별자리·타로 AI 상태를 부모에서 관리 (탭 전환해도 재로딩 안 됨)
-  const [parentAstroAI,setParentAstroAI]=useState(_saved?.data?._astroAI||null);
-  const [parentTarotAI,setParentTarotAI]=useState(_saved?.data?._tarotAI||null);
-  const TABS=["요약","사주","낮과 밤","토정·주역","별자리·타로수비학","MBTI","나는 왜"];
+  // AI 상태를 부모에서 관리 (탭 전환·새로고침해도 재로딩 안 됨)
+  const [parentAstroAI,setParentAstroAI]=useState(()=>{
+    if(_saved?.data?._astroAI) return _saved.data._astroAI;
+    try{const k=_saved?.data?.birth?`fy_astro_v5_${_saved.data.birth}`:null;return k?JSON.parse(sessionStorage.getItem(k)||"null"):null;}catch{return null;}
+  });
+  const [parentTarotAI,setParentTarotAI]=useState(()=>{
+    if(_saved?.data?._tarotAI) return _saved.data._tarotAI;
+    try{const k=_saved?.data?.birth?`fy_tarot_v5_${_saved.data.birth}`:null;return k?JSON.parse(sessionStorage.getItem(k)||"null"):null;}catch{return null;}
+  });
+  const [parentInnerAI,setParentInnerAI]=useState(()=>{
+    if(_saved?.data?._innerAI) return _saved.data._innerAI;
+    try{const k=_saved?.data?.birth?`fy_inner_v2_${_saved.data.birth}`:null;return k?JSON.parse(sessionStorage.getItem(k)||"null"):null;}catch{return null;}
+  });
+  const TABS=["요약","사주","낮과 밤","내면 해부","토정·주역","별자리·타로수비학","MBTI"];
 
   function changeTab(t){
     setTab(t);
@@ -2100,6 +2234,7 @@ export default function SajuReport(){
           setReportData(cachedWithName);
           if(cached._astroAI) setParentAstroAI(cached._astroAI);
           if(cached._tarotAI) setParentTarotAI(cached._tarotAI);
+          if(cached._innerAI) setParentInnerAI(cached._innerAI);
           try{
             sessionStorage.setItem("fy_report_v2", JSON.stringify(cachedWithName));
             sessionStorage.setItem("fy_tab", "요약");
@@ -2219,35 +2354,7 @@ JSON만 응답: {"sevenInsight":"..."}`;
       const fetchInner=async()=>{
         if(innerResult) return;
         try{
-          const dn=data.daynight;
-          const mb=data.mbti;
-          const ilgan=data.pillars?.[2]?.gan?.ko||"";
-          const ilju=data.pillars?.[2]?.gan?.ko+(data.pillars?.[2]?.ji?.ko||"");
-          const sinsal=(data.sinsal||[]).map(s=>s.name).join(", ")||"없음";
-          const yongsin=data.yongsinA||"";
-          const gisin=data.gisinA||"";
-          const lp=data.tarot?.lifePath||"";
-          const triggers=(dn?.night?.triggers||[]).join(" / ");
-          const prompt=`다음은 ${data.name}님의 사주·심리 데이터야.
-일주: ${ilju} / 일간: ${ilgan} / 신강신약: ${data.singang||""} / MBTI: ${mb?.estimated||""} (${mb?.userType||""})
-용신(도움되는 기운): ${yongsin} / 기신(피할 기운): ${gisin}
-감정 폭발 상황: ${triggers}
-낮의 자아: ${dn?.day?.impression||""} / 밤의 욕구: ${dn?.night?.desire||""}
-신살: ${sinsal} / 생명경로수: ${lp}
-
-위 데이터로 아래 6가지를 각각 분석해줘.
-한자 절대 사용 금지. 전문 용어 쓰면 반드시 쉽게 풀어서 설명해줘.
-반드시 ~이에요, ~해요 체(언니체). "${data.name}님"으로 지칭. 이모지·마크다운 금지.
-
-1. angerTriggers (array, 3개): 자존심/화를 건드리는 말 top3. 각각 {"quote":"말 자체","reason":"왜 이 말이 특히 찌르는지 2~3문장으로"}
-2. innerRhythm (string): 분노 패턴과 회복 리듬을 에세이로. 첫 문단(150자): 어떤 상황에서 감정이 올라오는지 내면 패턴으로 서술. 빈 줄. 둘째 문단(200자): 회복 방식. DB 문장 그대로 쓰지 말고 새로운 언어로 재해석해줘.
-3. exercise (array, 3개): 개운 운동 추천. 각각 {"name":"운동명","reason":"왜 이 사람한테 맞는지 2~3문장. 사주·별자리 근거 포함. 쉽게 설명"}
-4. hobby (array, 3개): 개운 취미 추천. 각각 {"name":"취미명","reason":"왜 이 사람한테 맞는지 2~3문장. 사주·별자리 근거 포함. 쉽게 설명"}
-5. moneyReason (string): 지금 돈이 없다면 왜인지. 재성·기신·별자리·생명경로수로 쉽게 풀어서. 300자 내외. 위로가 되는 톤으로.
-6. jinsang (string): 이 사람이 진상일 때 어떤 패턴인지. 300자 내외. 자기 객관화 도움되게, 가볍고 공감되는 톤으로.
-
-JSON만 응답:
-{"angerTriggers":[{"quote":"...","reason":"..."}],"innerRhythm":"...","exercise":[{"name":"...","reason":"..."}],"hobby":[{"name":"...","reason":"..."}],"moneyReason":"...","jinsang":"..."}`;
+          const prompt=buildInnerPrompt(data);
           const text=await callNetlify({model:"claude-haiku-4-5-20251001",max_tokens:2000,messages:[{role:"user",content:prompt}]});
           innerResult=JSON.parse(text);
           try{sessionStorage.setItem(cacheInnerKey,JSON.stringify(innerResult));}catch{}
@@ -2283,9 +2390,10 @@ JSON만 응답:
         },
       };
       setReportData(enrichedData);
-      // 부모 astro/tarot 상태 업데이트 → TabAstro 재로딩 방지
+      // 부모 AI 상태 업데이트 → 탭 전환·새로고침 시 재로딩 방지
       if(astroResult) setParentAstroAI(astroResult);
       if(tarotResult) setParentTarotAI(tarotResult);
+      if(innerResult) setParentInnerAI(innerResult);
       try{
         sessionStorage.setItem("fy_report_v2",JSON.stringify(enrichedData));
         sessionStorage.setItem("fy_tab","요약");
@@ -2344,10 +2452,10 @@ JSON만 응답:
       {tab==="요약"        && <TabSummary d={d} changeTab={changeTab}/>}
       {tab==="사주"        && <TabSaju d={d} reportData={reportData}/>}
       {tab==="낮과 밤"     && <TabDayNight d={d}/>}
+      {tab==="내면 해부"   && <TabInner d={d} parentInnerAI={parentInnerAI} setParentInnerAI={setParentInnerAI}/>}
       {tab==="토정·주역"   && <TabTojung d={d}/>}
       {tab==="별자리·타로수비학" && <TabAstro d={d} parentAstroAI={parentAstroAI} setParentAstroAI={setParentAstroAI} parentTarotAI={parentTarotAI} setParentTarotAI={setParentTarotAI}/>}
       {tab==="MBTI"        && <TabMBTI d={d}/>}
-      {tab==="나는 왜"      && <TabWhy d={d}/>}
     </div>
     <div style={{textAlign:"center",fontSize:10,color:"#ccc",padding:"20px 0 8px"}}>
       ✦ Fortuneyam · Today {CY}.{String(CM).padStart(2,"0")}.{String(CD).padStart(2,"0")}
@@ -2484,6 +2592,38 @@ function buildTarotPrompt(tarot, ilganKo, ilganHanja){
 JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
 }
 
+function buildInnerPrompt(data){
+  const dn=data.daynight;
+  const mb=data.mbti;
+  const ilgan=data.pillars?.[2]?.gan?.ko||"";
+  const ilju=data.pillars?.[2]?.gan?.ko+(data.pillars?.[2]?.ji?.ko||"");
+  const sinsal=(data.sinsal||[]).map(s=>s.name).join(", ")||"없음";
+  const yongsin=data.yongsinA||"";
+  const gisin=data.gisinA||"";
+  const lp=data.tarot?.lifePath||"";
+  const triggers=(dn?.night?.triggers||[]).join(" / ");
+  return `다음은 ${data.name}님의 사주·심리 데이터야.
+일주: ${ilju} / 일간: ${ilgan} / 신강신약: ${data.singang||""} / MBTI: ${mb?.estimated||""} (${mb?.userType||""})
+용신(도움되는 기운): ${yongsin} / 기신(피할 기운): ${gisin}
+감정 폭발 상황: ${triggers}
+낮의 자아: ${dn?.day?.impression||""} / 밤의 욕구: ${dn?.night?.desire||""}
+신살: ${sinsal} / 생명경로수: ${lp}
+
+위 데이터로 아래 6가지를 각각 분석해줘.
+한자 절대 사용 금지. 전문 용어 쓰면 반드시 쉽게 풀어서 설명해줘.
+반드시 ~이에요, ~해요 체(언니체). "${data.name}님"으로 지칭. 이모지·마크다운 금지.
+
+1. angerTriggers (array, 3개): 자존심/화를 건드리는 말 top3. 각각 {"quote":"말 자체","reason":"왜 이 말이 특히 찌르는지 2~3문장으로"}
+2. innerRhythm (string): 분노 패턴과 회복 리듬을 에세이로. 첫 문단(150자): 어떤 상황에서 감정이 올라오는지 내면 패턴으로 서술. 빈 줄. 둘째 문단(200자): 회복 방식. DB 문장 그대로 쓰지 말고 새로운 언어로 재해석해줘.
+3. exercise (array, 3개): 개운 운동 추천. 각각 {"name":"운동명","reason":"왜 이 사람한테 맞는지 2~3문장. 사주·별자리 근거 포함. 쉽게 설명"}
+4. hobby (array, 3개): 개운 취미 추천. 각각 {"name":"취미명","reason":"왜 이 사람한테 맞는지 2~3문장. 사주·별자리 근거 포함. 쉽게 설명"}
+5. moneyReason (string): 지금 돈이 없다면 왜인지. 재성·기신·별자리·생명경로수로 쉽게 풀어서. 300자 내외. 위로가 되는 톤으로.
+6. jinsang (string): 이 사람이 진상일 때 어떤 패턴인지. 300자 내외. 자기 객관화 도움되게, 가볍고 공감되는 톤으로.
+
+JSON만 응답:
+{"angerTriggers":[{"quote":"...","reason":"..."}],"innerRhythm":"...","exercise":[{"name":"...","reason":"..."}],"hobby":[{"name":"...","reason":"..."}],"moneyReason":"...","jinsang":"..."}`;
+}
+
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function AdminPage({onClose}){
@@ -2602,7 +2742,8 @@ function SajuReport_Preview({data}){
   // Preview 전용 local state — 부모 SajuReport의 state와 무관
   const [previewAstroAI,setPreviewAstroAI]=useState(data?._astroAI||null);
   const [previewTarotAI,setPreviewTarotAI]=useState(data?._tarotAI||null);
-  const TABS=["요약","사주","낮과 밤","토정·주역","별자리·타로수비학","MBTI","나는 왜"];
+  const [previewInnerAI,setPreviewInnerAI]=useState(data?._innerAI||null);
+  const TABS=["요약","사주","낮과 밤","내면 해부","토정·주역","별자리·타로수비학","MBTI"];
   if(!data) return <div style={{padding:20,color:"#aaa"}}>데이터 없음</div>;
   return(
     <div style={{maxWidth:480,margin:"0 auto"}}>
@@ -2616,10 +2757,10 @@ function SajuReport_Preview({data}){
         {tab==="요약"        && <TabSummary d={data} changeTab={setTab}/>}
         {tab==="사주"        && <TabSaju d={data} reportData={data}/>}
         {tab==="낮과 밤"     && <TabDayNight d={data}/>}
+        {tab==="내면 해부"   && <TabInner d={data} parentInnerAI={previewInnerAI} setParentInnerAI={setPreviewInnerAI}/>}
         {tab==="토정·주역"   && <TabTojung d={data}/>}
         {tab==="별자리·타로수비학" && <TabAstro d={data} parentAstroAI={previewAstroAI} setParentAstroAI={setPreviewAstroAI} parentTarotAI={previewTarotAI} setParentTarotAI={setPreviewTarotAI}/>}
         {tab==="MBTI"        && <TabMBTI d={data}/>}
-        {tab==="나는 왜"      && <TabWhy d={data}/>}
       </div>
     </div>
   );
