@@ -132,6 +132,15 @@ function calcSeunScore(yr,month,meta){
     else if((SAMHAP[meta.dayJi]||[]).includes(ji))s+=SS.SAMHAP;
     else if(YUKHAP[meta.dayJi]===ji)s+=SS.YUKHAP;
   }
+  // ━━ 방법A: 다체계 보정 ━━
+  // 토정비결 총운 길흉 ±5
+  if(meta.tojungBonus) s+=meta.tojungBonus;
+  // 주역 본명괘 길흉 ±3
+  if(meta.ichingBonus) s+=meta.ichingBonus;
+  // 당사주 일주 십이운성 ±3
+  if(meta.dansajuBonus) s+=meta.dansajuBonus;
+  // 타로 개인연도수 ±4
+  if(meta.tarotBonus) s+=meta.tarotBonus*(month?0.7:1); // 월별은 70%만 반영
   if(month)s=SS.BASE+Math.round((s-SS.BASE)*SS.MONTH_DAMP);
   return Math.max(SS.SCORE_MIN,Math.min(SS.SCORE_MAX,Math.round(s)));
 }
@@ -824,38 +833,42 @@ function buildSajuData(input){
   const _sBonus=_isSingang?0.07:-0.07;
   // E↔I: 목화 일간=E, 금수토 일간=I 기반 + 오행비율 보정
   const _eBase=["갑","을","병","정"].includes(ilgan)?0.65:["무","기"].includes(ilgan)?0.55:0.45;
-  const _eScore=Math.round(Math.min(92,Math.max(52,(_eBase+(_mokHwa-0.4)*0.3)*100)));
-  const _eWins=_eScore>=50;
+  const _eRaw=(_eBase+(_mokHwa-0.4)*0.3)*100; // 클램핑 전 원시값
+  const _eWins=_eRaw>=50; // 원시값으로 승패 판정
+  const _eScore=Math.round(Math.min(92,Math.max(52,_eRaw)));
   // N↔S: 목화 많으면 N, 금수 많으면 S + 신강신약 보정
   const _nBase=_mokHwa-_geumSu+_sBonus*-1;
-  const _nScore=Math.round(Math.min(92,Math.max(52,(0.55+_nBase*0.6)*100)));
-  const _nWins=_nScore>=50;
+  const _nRaw=(0.55+_nBase*0.6)*100;
+  const _nWins=_nRaw>=50;
+  const _nScore=Math.round(Math.min(92,Math.max(52,_nRaw)));
   // F↔T: 음간 많으면 F, 양간 많으면 T + 신강신약 보정
   const _fBase=(_eumCnt-_yangCnt)/(_allGan.length||4);
-  const _fScore=Math.round(Math.min(92,Math.max(52,(0.5+_fBase*0.5+_sBonus*-1)*100)));
+  const _fRaw=(0.5+_fBase*0.5+_sBonus*-1)*100;
+  const _fWins=_fRaw>=50;
+  const _fScore=Math.round(Math.min(92,Math.max(52,_fRaw)));
   // J↔P: 토·금 많으면 J, 목·수 많으면 P
   const _jBase=((_od["土"]||0)+(_od["金"]||0)-(_od["木"]||0)-(_od["水"]||0))/_total;
-  const _jScore=Math.round(Math.min(92,Math.max(52,(0.55+_jBase*0.5)*100)));
-  const _jWins=_jScore>=50;
+  const _jRaw=(0.55+_jBase*0.5)*100;
+  const _jWins=_jRaw>=50;
+  const _jScore=Math.round(Math.min(92,Math.max(52,_jRaw)));
   // 사주 추정 MBTI
-  const _sajuType=`${_eWins?"E":"I"}${_nWins?"N":"S"}${_fScore>=50?"F":"T"}${_jWins?"J":"P"}`;
-  // 자가보고 MBTI (입력값)
+  const _sajuType=`${_eWins?"E":"I"}${_nWins?"N":"S"}${_fWins?"F":"T"}${_jWins?"J":"P"}`;
+  // 자가보고 MBTI (입력값) — 사주 90 : 자가보고 10
   const _userMbti=(input?.mbti||"").toUpperCase().trim();
   const _validMbti=/^[EI][NS][FT][JP]$/.test(_userMbti);
-  // 제안3: 사주 60 : 자가보고 40 가중 평균 → 각 축 점수 블렌딩
   const _blend=(sajuScore,axis,userType)=>{
     if(!_validMbti) return sajuScore;
     const userWins=(userType==="E"&&_userMbti[0]==="E")||(userType==="N"&&_userMbti[1]==="N")||
       (userType==="F"&&_userMbti[2]==="F")||(userType==="J"&&_userMbti[3]==="J");
-    const userScore=userWins?75:25; // 자가보고 방향의 기본 점수
-    return Math.round(sajuScore*0.6+userScore*0.4);
+    const userScore=userWins?75:25;
+    return Math.round(sajuScore*0.9+userScore*0.1);
   };
   const _eBlend=_blend(_eScore,"E","E");
   const _nBlend=_blend(_nScore,"N","N");
   const _fBlend=_blend(_fScore,"F","F");
   const _jBlend=_blend(_jScore,"J","J");
-  // 최종 MBTI 타입 (블렌딩 후)
-  const mbtiType=`${_eBlend>=50?"E":"I"}${_nBlend>=50?"N":"S"}${_fBlend>=50?"F":"T"}${_jBlend>=50?"J":"P"}`;
+  // 최종 MBTI 타입 (블렌딩 후 — 승패는 원시값 기준 유지)
+  const mbtiType=`${_eWins?"E":"I"}${_nWins?"N":"S"}${_fWins?"F":"T"}${_jWins?"J":"P"}`;
   const mbtiDesc=MBTI_DESC_MAP[ilgan]||"사주 교차 분석 중이에요.";
   const mbtiAxes=[
     {axis:`${_eBlend>=50?"E (외향)":"I (내향)"}`,score:_eBlend>=50?_eBlend:100-_eBlend,
@@ -889,10 +902,37 @@ function buildSajuData(input){
 
   // ━━ 세운 점수 메타 (전 탭 공유: 용신/희신/기신 + 현재 대운 + 일지) ━━
   const curDaeun=daeun.find(dv=>dv.cur);
+  // 방법A: 다체계 보정값 계산
+  // 토정비결: 사자성어 총운 길흉 ±5
+  const TOJUNG_BONUS={
+    "일출동방(日出東方)":5,"만화방창(萬化方暢)":5,"입신양명(立身揚名)":5,"순풍거범(順風擧帆)":5,
+    "고목봉춘(枯木逢春)":4,"전정만리(前程萬里)":4,"용약재연(龍躍在淵)":3,
+    "수뢰둔(水雷屯)":-3,"풍파(風波)":-4,"암야행인(暗夜行人)":-5,
+  };
+  const tojungBonus=TOJUNG_BONUS[sajaDB?.saja]||0;
+  // 주역: 본명괘 nature 길흉 ±3
+  const ICHING_BONUS_MAP={
+    "완성·성취·균형의 유지":3,"형통·소통·막힘이 뚫림":3,"포용·수용·대지의 힘":3,
+    "기쁨·열정·준비된 행동":3,"연대·협력·친밀한 관계":2,"해방·풀림·막혔던 것이 해소":2,
+    "회복·새 출발·본래로 돌아감":2,"기다림·준비·때를 기다리는 지혜":1,
+    "조직·리더십·군중을 이끄는 힘":1,"어려운 탄생·씨앗·고통 뒤의 성장":-2,
+    "위험·도전·거듭되는 시련":-3,"빛이 가려짐·인내·내면의 빛을 지킴":-2,
+  };
+  const ichingBonus=ICHING_BONUS_MAP[ichingData?.nature]||0;
+  // 당사주: 일주(2번째 당사주 pillars) 십이운성 길흉 ±3
+  const STAGE_BONUS={"장생(長生)":3,"관대(冠帶)":2,"건록(建祿)":3,"제왕(帝旺)":3,"목욕(沐浴)":1,
+    "쇠(衰)":-1,"병(病)":-2,"사(死)":-2,"묘(墓)":-1,"절(絶)":-3,"태(胎)":1,"양(養)":2};
+  const dansajuIlju=dansajuPillars?.[2];
+  const dansajuBonus=STAGE_BONUS[dansajuIlju?.stage]||0;
+  // 타로: 현재 개인연도수와 생명경로수 관계 ±4
+  const personalYearNow=lp; // 이미 계산됨 — lp를 currentYear 기준으로 재계산
+  const pyNow=(()=>{const digits=[...String(CY),...String(m).padStart(2,"0"),...String(d).padStart(2,"0")].map(Number);let sv=digits.reduce((a,b)=>a+b,0);while(sv>9&&![11,22,33].includes(sv))sv=String(sv).split("").reduce((a,b)=>a+parseInt(b),0);return sv;})();
+  const tarotBonus=pyNow===lp?4:pyNow===22||pyNow===11?3:[1,lp+1,lp-1].includes(pyNow)?2:0;
   const scoreMeta={
     yongsinO:_yongO, huisinO:_huiO, gisinO:_giO,
     daeunO: curDaeun?_GANO[curDaeun.label[0]]:"",
     dayJi: ilju.ji.ko,
+    tojungBonus, ichingBonus, dansajuBonus, tarotBonus,
   };
   const YEAR_SUMMARIES={
     high:"용신 기운이 살아나는 해예요. 준비한 것이 결실을 맺기 좋은 시기예요.",
@@ -905,7 +945,7 @@ function buildSajuData(input){
     const areas=calcSeunAreas(yr,0,scoreMeta);
     return{year:yr,score:sc,summary:bandSummary(sc),areas};
   });
-  // 이번 달부터 12개월 월별 세운
+  // 향후 1년 흐름 월별 세운
   const monthForecast=Array.from({length:12},(_,i)=>{
     const r=CM+i,mo=(r-1)%12+1,yr=CY+Math.floor((CM-1+i)/12);
     const sc=calcSeunScore(yr,mo,scoreMeta);
@@ -958,7 +998,11 @@ function buildSajuData(input){
   });
 
   // 주역 본명괘 (사주 최다오행→상괘, 일간을 극하는 관성오행→하괘)
-  const relO = GWAN_O[ilO] || "木"; // 관성 오행 (나를 극하는 것)
+  const relO_kor = GWAN_O[OHK[ilO]] || "목"; // ilO는 한자(木), OHK로 한글 변환 후 GWAN_O 조회
+  const relO_hanja = Object.keys(OHK).find(k=>OHK[k]===relO_kor) || relO_kor; // 한자로 다시 변환
+  const relO = relO_hanja; // iching key는 한자 기반이므로 한자로 유지
+  // TRIGRAM은 한글 키라 OHK[domOForIching], OHK[relO_hanja] 필요 없음 — 직접 한글로
+  const domO_kor = OHK[domOForIching] || "목";
   const ichingData = getIching(domOForIching, relO);
 
   // 낮과 밤 텍스트
@@ -1057,7 +1101,7 @@ function buildSajuData(input){
     sinsal,hap:[],hyeong:[],chung:[],
     daeun,daeunStart:startAge,daeunDir:forward?"순행(順行)":"역행(逆行)",
     dansaju:{pillars:dansajuPillars,overall:dansajuOverall,yearFlow:dansajuYearFlow},
-    iching:{bonmyeonggae:ichingData.name,gaeSymbol:ichingData.symbol||"☯",gaeNum:ichingData.num||0,gaeUpper:`${TRIGRAM[domOForIching]||""}·${OHK[domOForIching]||""}`,gaeLower:`${TRIGRAM[relO]||""}·${OHK[relO]||""}(관성)`,gaeUpperO:domOForIching,gaeLowerO:relO,gaeDesc:ichingData.desc,gaeNature:ichingData.nature,currentGae:ichingData.currentGae||"분석 중",currentYear:`${CY}년`,currentDesc:ichingData.currentDesc||"",strategy:ichingData.strategy||[],yearFlow:ichingYearFlow},
+    iching:{bonmyeonggae:ichingData.name,gaeSymbol:ichingData.symbol||"☯",gaeNum:ichingData.num||0,gaeUpper:`${TRIGRAM[domO_kor]||""}·${domO_kor}`,gaeLower:`${TRIGRAM[relO_kor]||""}·${relO_kor}(관성)`,gaeUpperO:domOForIching,gaeLowerO:relO,gaeDesc:ichingData.desc,gaeNature:ichingData.nature,currentGae:ichingData.currentGae||"분석 중",currentYear:`${CY}년`,currentDesc:ichingData.currentDesc||"",strategy:ichingData.strategy||[],yearFlow:ichingYearFlow},
     tojung:{sang,jung,ha,saja:sajaDB.saja,sajaDesc:sajaDB.desc,bonun:sajaDB.saja,bonunDesc:sajaDB.desc,yearFlow:tojungYearFlow,month2026:tojungMonth2026},
     astro:{sun:"분석 중",moon:"분석 중",asc:"분석 중",mercury:"분석 중",venus:"분석 중",mars:"분석 중",sunMeaning:"태양(☉)은 의식적 자아",moonMeaning:"달(☽)은 감정·본능",ascMeaning:"ASC는 첫인상",sunDesc:"점성술 분석 중이에요.",moonDesc:"점성술 분석 중이에요.",ascDesc:"점성술 분석 중이에요.",mercuryDesc:"분석 중",venusDesc:"분석 중",marsDesc:"분석 중",triangle:"",stellium:"",yearTransit:[]},
     tarot:{lifePath:lp,isMaster:[11,22,33].includes(lp),lifePathCard,lifePathCardNum:String(lp),lifePathDesc,soulCard:LP_CARDS[lp]||"분석 중",achieveCard:LP_CARDS[(lp+1)>9?1:lp+1]||"분석 중",soulDesc:soulDesc_val,achieveDesc:"성취 에너지 분석 중이에요.",calc,yearCards},
@@ -1132,12 +1176,6 @@ function Acc({items}){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function TabSummary({d,changeTab}){return <>
   <section style={S.card}>
-    <ST icon="🔮" title="사주 성격 요약"/>
-    <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
-      {(d.summary?.persona||[]).map((p,i)=><div key={i} style={{display:"flex",gap:10,padding:"11px 13px",background:"#fafafa",borderRadius:11,border:"1px solid #f0f0f0"}}><span style={{fontSize:20,flexShrink:0}}>{p.icon}</span><div><div style={{fontSize:13,fontWeight:800,color:"#111",marginBottom:2}}>{p.title}</div><div style={{fontSize:12,color:"#555",lineHeight:1.75,textAlign:"justify"}}>{p.desc}</div></div></div>)}
-    </div>
-  </section>
-  <section style={S.card}>
     <ST icon="🌐" title="7체계 종합 분석" sub="사주·토정비결·주역·당사주·점성술·타로수비학·MBTI"/>
     <GT>일곱 가지 운명 분석 체계가 공통으로 가리키는 핵심 주제입니다.</GT>
     <div style={{marginTop:10,padding:"14px 16px",background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderRadius:12,marginBottom:10}}>
@@ -1167,8 +1205,8 @@ function TabSummary({d,changeTab}){return <>
     </div>
   </section>
   <section style={S.card}>
-    <ST icon="🗓" title="이번 달부터 12개월"/>
-    <GT>이번 달 기준 12개월 월별 운기 점수입니다.</GT>
+    <ST icon="🗓" title="향후 1년 흐름"/>
+    <GT>이번 달부터 12개월 월별 운기 점수예요.</GT>
     <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
       {(d.summary?.monthForecast||[]).map((mf,i)=>(
         <div key={i} style={{display:"flex",flexDirection:"column",gap:4,padding:"10px 12px",background:scBg(mf.score),borderRadius:11}}>
@@ -1604,25 +1642,26 @@ function TabTojung({d}){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 9. 별자리·타로수비학 탭
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function TabAstro({d}){
+function TabAstro({d,parentAstroAI,setParentAstroAI,parentTarotAI,setParentTarotAI}){
   const a=d.astro,t=d.tarot;
-  // 로딩 중 미리 받아온 데이터 우선 사용
-  const preAstro=d._astroAI||null;
-  const preTarot=d._tarotAI||null;
-
-  const [astroAI,setAstroAI]=React.useState(preAstro);
-  const [tarotAI,setTarotAI]=React.useState(preTarot);
-  const [loadingAstro,setLoadingAstro]=React.useState(false);
-  const [loadingTarot,setLoadingTarot]=React.useState(false);
+  // 부모 상태 우선 → d._astroAI → null 순서
+  const astroAI=parentAstroAI||d._astroAI||null;
+  const tarotAI=parentTarotAI||d._tarotAI||null;
+  const setAstroAI=(v)=>{if(setParentAstroAI)setParentAstroAI(v);};
+  const setTarotAI=(v)=>{if(setParentTarotAI)setParentTarotAI(v);};
+  const [loadingAstro,setLoadingAstro]=React.useState(!astroAI);
+  const [loadingTarot,setLoadingTarot]=React.useState(!tarotAI);
   const [errAstro,setErrAstro]=React.useState(false);
   const [errTarot,setErrTarot]=React.useState(false);
   const fetchNatalRef=React.useRef(null);
   const fetchTarotRef=React.useRef(null);
 
   React.useEffect(()=>{
-    // 이미 데이터 있으면 API 재호출 불필요
-    if(preAstro && preTarot) return;    let cancelled=false;
+    // 부모에 이미 데이터 있으면 API 재호출 불필요
+    if(astroAI && tarotAI){setLoadingAstro(false);setLoadingTarot(false);return;}
+    let cancelled=false;
     async function fetchNatal(){
+      if(astroAI){setLoadingAstro(false);return;}
       setLoadingAstro(true);
       setErrAstro(false);
       try{
@@ -1653,6 +1692,7 @@ JSON만 응답 (다른 텍스트 없음):
       if(!cancelled) setLoadingAstro(false);
     }
     async function fetchTarot(){
+      if(tarotAI){setLoadingTarot(false);return;}
       setLoadingTarot(true);
       setErrTarot(false);
       try{
@@ -1893,7 +1933,7 @@ function LoadingScreen({name}){
   return(
     <div style={{position:"fixed",inset:0,background:"#fafafa",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:50}}>
       <div style={{
-        width:160,height:160,borderRadius:40,
+        width:100,height:100,borderRadius:30,
         display:"flex",alignItems:"center",justifyContent:"center",
         marginBottom:20,
         transition:"opacity 0.35s, transform 0.35s",
@@ -1903,7 +1943,7 @@ function LoadingScreen({name}){
         <img
           src={cur.img}
           alt={cur.name}
-          style={{width:150,height:150,objectFit:"contain"}}
+          style={{width:100,height:100,objectFit:"contain"}}
         />
       </div>
       <div style={{
@@ -1943,6 +1983,9 @@ export default function SajuReport(){
   const [reportData,setReportData]=useState(_saved?.data||null);
   const [saveStatus,setSaveStatus]=useState(null);
   const [showAdmin,setShowAdmin]=useState(()=>window.location.search.includes("admin"));
+  // 별자리·타로 AI 상태를 부모에서 관리 (탭 전환해도 재로딩 안 됨)
+  const [parentAstroAI,setParentAstroAI]=useState(_saved?.data?._astroAI||null);
+  const [parentTarotAI,setParentTarotAI]=useState(_saved?.data?._tarotAI||null);
   const TABS=["요약","사주","낮과 밤","토정·주역","별자리·타로수비학","MBTI"];
 
   function changeTab(t){
@@ -1997,8 +2040,8 @@ export default function SajuReport(){
       })();
 
       // 3. 네이탈차트 + 성취카드 API 병렬 호출 (로딩 중)
-      const cacheKey=`fy_astro_v3_${data.birth}`;
-      const cacheTarotKey=`fy_tarot_v3_${data.birth}`;
+      const cacheKey=`fy_astro_v4_${data.birth}`;
+      const cacheTarotKey=`fy_tarot_v4_${data.birth}`;
       let astroResult=null, tarotResult=null;
 
       // sessionStorage 캐시 확인
@@ -2055,7 +2098,7 @@ JSON만 응답: {"achieveDesc":"..."}`;
         }catch(e){console.warn("tarot API:", e);}
       };
 
-      const cacheSevenKey=`fy_seven_v3_${data.birth}`;
+      const cacheSevenKey=`fy_seven_v4_${data.birth}`;
       let sevenResult=null;
       try{const cs=sessionStorage.getItem(cacheSevenKey);if(cs)sevenResult=JSON.parse(cs);}catch{}
 
@@ -2067,11 +2110,13 @@ JSON만 응답: {"achieveDesc":"..."}`;
           const yf=sj?.yearForecast||[];
           const today=yf[0]||{};
           const best=[...yf].sort((a,b)=>b.score-a.score)[0]||{};
+          const astroDesc=astroResult?`태양 ${stripDegree(astroResult.sun||"")} — ${(astroResult.sunDesc||"").slice(0,60)}`:"(분석 중)";
           const prompt=`다음은 한 사람의 7가지 운명 분석 결과야.
 사주 일주: ${sys[0]?.key||""} / ${sys[0]?.desc||""}
 토정비결 총운: ${sys[1]?.key||""} — ${sys[1]?.desc||""}
 주역 본명괘: ${sys[2]?.key||""} — ${sys[2]?.desc||""}
 당사주: ${sys[3]?.key||""} / ${sys[3]?.desc||""}
+점성술: ${astroDesc}
 타로수비학: ${sys[5]?.key||""} / ${sys[5]?.desc||""}
 MBTI: ${sys[6]?.key||""} / ${sys[6]?.desc||""}
 올해(${today.year||CY}년) 운세: ${today.score||""}점
@@ -2092,8 +2137,9 @@ JSON만 응답: {"sevenInsight":"..."}`;
         }catch(e){console.warn("seven API:", e);}
       };
 
-      // API 병렬 실행 (로딩 화면 유지 중)
-      await Promise.all([fetchAstro(), fetchTarot(), fetchSeven()]);
+      // API 실행: astro/tarot 먼저, 완료 후 seven (별자리 포함하기 위해 직렬화)
+      await Promise.all([fetchAstro(), fetchTarot()]);
+      await fetchSeven(); // astroResult 완성 후 실행해야 별자리 반영됨
 
       // 4. API 결과를 reportData에 합쳐서 저장
       // 앞 2문장만 추출
@@ -2175,7 +2221,7 @@ JSON만 응답: {"sevenInsight":"..."}`;
       {tab==="사주"        && <TabSaju d={d} reportData={reportData}/>}
       {tab==="낮과 밤"     && <TabDayNight d={d}/>}
       {tab==="토정·주역"   && <TabTojung d={d}/>}
-      {tab==="별자리·타로수비학" && <TabAstro d={d}/>}
+      {tab==="별자리·타로수비학" && <TabAstro d={d} parentAstroAI={parentAstroAI} setParentAstroAI={setParentAstroAI} parentTarotAI={parentTarotAI} setParentTarotAI={setParentTarotAI}/>}
       {tab==="MBTI"        && <TabMBTI d={d}/>}
     </div>
     <div style={{textAlign:"center",fontSize:10,color:"#ccc",padding:"20px 0 8px"}}>
@@ -2413,7 +2459,7 @@ function SajuReport_Preview({data}){
         {tab==="사주"        && <TabSaju d={data} reportData={data}/>}
         {tab==="낮과 밤"     && <TabDayNight d={data}/>}
         {tab==="토정·주역"   && <TabTojung d={data}/>}
-        {tab==="별자리·타로수비학" && <TabAstro d={data}/>}
+        {tab==="별자리·타로수비학" && <TabAstro d={data} parentAstroAI={parentAstroAI} setParentAstroAI={setParentAstroAI} parentTarotAI={parentTarotAI} setParentTarotAI={setParentTarotAI}/>}
         {tab==="MBTI"        && <TabMBTI d={data}/>}
       </div>
     </div>
