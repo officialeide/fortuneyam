@@ -891,13 +891,13 @@ function buildSajuData(input){
   const mbtiDesc=MBTI_DESC_MAP[ilgan]||"사주 교차 분석 중이에요.";
   const mbtiAxes=[
     {axis:`${_eWins?"E (외향)":"I (내향)"}`,score:_eBlend>=50?_eBlend:100-_eBlend,
-      basis:`천간 양간 ${_eYangScore}점/5점 (일간 ${ilgan}·2배 가중)${_validMbti?" + 자가보고 20%":""}이에요.`},
+      basis:`사주 4기둥 천간 중 양간 ${_eYangScore}개/5점 (나를 나타내는 일간 ${ilgan} 2배 반영)${_validMbti?", 입력한 MBTI 20% 반영":""}이에요.`},
     {axis:`${_nWins?"N (직관)":"S (감각)"}`,score:_nBlend>=50?_nBlend:100-_nBlend,
-      basis:`목화(${Math.round(_mokHwa*100)}%) vs 금수(${Math.round(_geumSu*100)}%) 오행 비율이에요.`},
+      basis:`사주 전체 목·화 오행(${Math.round(_mokHwa*100)}%) vs 금·수 오행(${Math.round(_geumSu*100)}%) 비율이에요.`},
     {axis:`${_fWins?"F (감정)":"T (사고)"}`,score:_fBlend>=50?_fBlend:100-_fBlend,
-      basis:`음간 ${_eumCnt}개 vs 양간 ${_yangCnt}개 + ${_isSingang?"신강":"신약"} 보정이에요.`},
+      basis:`천간 음간 ${_eumCnt}개 vs 양간 ${_yangCnt}개, ${_isSingang?"에너지가 강한 신강":"에너지가 약한 신약"} 구조 반영이에요.`},
     {axis:`${_jWins?"J (판단)":"P (인식)"}`,score:_jBlend>=50?_jBlend:100-_jBlend,
-      basis:`일지 ${_iljiStage} (60%) + 월간 ${wolju.gan.ko}(${_monthGanYang?"양":"음"}간) (40%)이에요.`},
+      basis:`태어난 날의 지지 십이운성 ${_iljiStage} (60%), 태어난 달 천간 ${wolju.gan.ko}(${_monthGanYang?"양간·주도적":"음간·수용적"}) (40%) 반영이에요.`},
   ];
   // 타로 연도별 개인연도수
   function getPersonalYear(yr){
@@ -1004,6 +1004,13 @@ function buildSajuData(input){
     dansajuBonus: STAGE_BONUS[dansajuPillars[2]?.stage]||0,
     tarotBonus: pyNow===lp?4:pyNow===22||pyNow===11?3:[1,lp+1,lp-1].includes(pyNow)?2:0,
   };
+  // 사주탭 전용: 다체계 보정 없이 사주 기반만 (탭별 점수 분리)
+  const scoreMetaSaju={
+    yongsinO:_yongO, huisinO:_huiO, gisinO:_giO,
+    daeunO: curDaeun?_GANO[curDaeun.label[0]]:"",
+    dayJi: ilju.ji.ko,
+    tojungBonus:0, ichingBonus:0, dansajuBonus:0, tarotBonus:0,
+  };
   const YEAR_SUMMARIES={high:"용신 기운이 살아나는 해예요. 준비한 것이 결실을 맺기 좋은 시기예요.",mid:"흐름이 무난한 해예요. 큰 욕심 없이 꾸준히 나아가면 좋아요.",low:"기신 기운이 강한 해예요. 무리한 확장보다 내실을 다지는 시기예요."};
   const bandSummary=sc=>sc>=82?YEAR_SUMMARIES.high:sc>=66?YEAR_SUMMARIES.mid:YEAR_SUMMARIES.low;
   const yearForecast=[CY,CY+1,CY+2,CY+3,CY+4].map(yr=>{
@@ -1017,31 +1024,31 @@ function buildSajuData(input){
     return{year:yr,month:mo,label:`${yr}.${mo}`,ganji:gj.ko,score:sc,summary:bandSummary(sc),areas:calcSeunAreas(yr,mo,scoreMeta),isThis:i===0};
   });
 
-  // ━━ 연도별 흐름/월별 길흉 (전 탭 공유 점수 기반) ━━
+  // ━━ 연도별 흐름/월별 길흉 (사주탭 전용 — 사주 기반만) ━━
   const yrs5=[CY,CY+1,CY+2,CY+3,CY+4];
   const tojungYearFlow=yrs5.map(yr=>{
-    const sc=calcSeunScore(yr,0,scoreMeta);
-    return{year:yr,score:sc,month:sc>=82?"대길":sc>=66?"평운":"주의",desc:bandSummary(sc),areas:calcSeunAreas(yr,0,scoreMeta)};
+    const sc=calcSeunScore(yr,0,scoreMetaSaju);
+    return{year:yr,score:sc,month:sc>=82?"대길":sc>=66?"평운":"주의",desc:bandSummary(sc),areas:calcSeunAreas(yr,0,scoreMetaSaju)};
   });
   const tojungMonth2026=Array.from({length:12},(_,i)=>{
-    const mo=i+1,sc=calcSeunScore(2026,mo,scoreMeta);
+    const mo=i+1,sc=calcSeunScore(CY,mo,scoreMetaSaju);
     return{m:mo,score:sc,desc:sc>=80?"길":sc>=64?"평":"주의"};
   });
   const ichingYearFlow=yrs5.map(yr=>{
-    const sc=calcSeunScore(yr,0,scoreMeta);
+    const sc=calcSeunScore(yr,0,scoreMetaSaju);
     const yg=yearToGJ(yr),yO=normO(GAN_OE[yg.gan.ko]);
     const yi=getIching(yO,relO);
     return{year:yr,score:sc,gae:yi.name,desc:`${yi.nature}의 기운이 흐르는 해예요.`};
   });
   const dansajuYearFlow=yrs5.map(yr=>{
-    const sc=calcSeunScore(yr,0,scoreMeta);
+    const sc=calcSeunScore(yr,0,scoreMetaSaju);
     const yji=yearToGJ(yr).ji.ko,bs=BYEOLSEONG[yji];
     return{year:yr,score:sc,desc:`${_dsName(bs?.name||"")} 기운이 들어오는 해예요. ${bandSummary(sc)}`};
   });
 
   return{
     name,birth:`양력 ${y}년 ${m}월 ${d}일 ${rawH}시 ${String(rawM).padStart(2,"0")}분 ${city}`,gender,
-    personaTitle,scoreMeta,
+    personaTitle,scoreMeta:scoreMetaSaju,
     boundary:{...bnd,isBoundary:bnd.inBoundary,
       standardDesc:`${stripLead(ILJU_CHAR[iljuKey])||OHK[ilO]+" 기운의 일주예요."} ${stripLead(ilganDB.core)}`,
       midnightDesc:`${stripLead(ILJU_CHAR[iljuB.ko])||OHK[normO(GAN_OE[ilganB])]+" 기운의 일주예요."} ${stripLead((ILGAN_DESC[ilganB]||ILGAN_DESC["기"]).core)}`,
@@ -1179,16 +1186,16 @@ function TabSummary({d,changeTab}){return <>
         <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}>
           <div style={{width:60,fontSize:10,fontWeight:700,color:"#e65100",background:"#fff3e0",padding:"3px 5px",borderRadius:6,textAlign:"center",flexShrink:0,lineHeight:1.5}}>{s.system}</div>
           <div style={{flex:1}}>
-            <div style={{fontSize:12,fontWeight:800,color:"#111",marginBottom:2}}>{s.key}</div>
-            <div style={{fontSize:11,color:"#666",lineHeight:1.5,whiteSpace:"pre-line"}}>{s.desc}</div>
+            <div style={{fontSize:13,fontWeight:800,color:"#111",marginBottom:2}}>{s.key}</div>
+            <div style={{fontSize:12,color:"#666",lineHeight:1.5,whiteSpace:"pre-line"}}>{s.desc}</div>
           </div>
         </div>
       ))}
     </div>
   </section>
   <section style={S.card}>
-    <ST icon="📆" title={`향후 5년 흐름 (${CY}~${CY+4})`}/>
-    <GT>6체계 교차 분석 종합 운기 점수입니다.</GT>
+    <ST icon="📆" title="향후 5년 흐름"/>
+    <GT>사주·토정비결·주역·당사주·타로수비학 통합 운기 점수예요.</GT>
     <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
       {(d.summary?.yearForecast||[]).map((yf,i)=><div key={i} style={{display:"flex",flexDirection:"column",gap:6,padding:"10px 12px",background:scBg(yf.score),borderRadius:11}}><div style={{display:"flex",alignItems:"center",gap:10}}><Ring score={yf.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}><span style={{fontSize:13,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>{yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}</div><div style={{fontSize:11,color:"#444",lineHeight:1.6,textAlign:"justify"}}>{yf.summary}</div></div></div>{yf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.1)"}}>
         {Object.entries(yf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.6)",color:sc(v),fontWeight:700}}>{k.slice(0,3)} {v}</div>)}
@@ -1197,7 +1204,7 @@ function TabSummary({d,changeTab}){return <>
   </section>
   <section style={S.card}>
     <ST icon="📆" title="향후 1년 흐름"/>
-    <GT>이번 달부터 12개월 월별 운기 점수예요.</GT>
+    <GT>사주·토정비결·주역·당사주·타로수비학 통합 월별 운기 점수예요.</GT>
     <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
       {(d.summary?.monthForecast||[]).map((mf,i)=>(
         <div key={i} style={{display:"flex",flexDirection:"column",gap:4,padding:"10px 12px",background:scBg(mf.score),borderRadius:11}}>
@@ -1213,7 +1220,7 @@ function TabSummary({d,changeTab}){return <>
             </div>
           </div>
           {mf.areas&&<div style={{display:"flex",gap:3,flexWrap:"nowrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.08)"}}>
-            {Object.entries(mf.areas).map(([k,v])=><div key={k} style={{flex:1,fontSize:9,padding:"2px 2px",borderRadius:7,background:scBg(v),color:sc(v),fontWeight:700,textAlign:"center"}}>{k} {v}</div>)}
+            {Object.entries(mf.areas).map(([k,v])=><div key={k} style={{flex:1,fontSize:9,padding:"2px 2px",borderRadius:7,background:"rgba(255,255,255,0.7)",color:sc(v),fontWeight:800,textAlign:"center",border:`1px solid ${sc(v)}33`}}>{k} {v}</div>)}
           </div>}
         </div>
       ))}
@@ -1515,7 +1522,7 @@ function TabDayNight({d}){
         ].map(({t,c,tc,v})=>(
           <div key={t} style={{minHeight:72,padding:"10px 14px",background:c,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
             <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:v?4:0}}>{t}</div>
-            {v&&<p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.75,textAlign:"justify"}}>{v}</p>}
+            {v&&<p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{v}</p>}
           </div>
         ))}
       </div>
@@ -1532,10 +1539,10 @@ function TabDayNight({d}){
         ].map(({key,bg,tc,label,v,v2,triggers})=>(
           <div key={key} style={{minHeight:72,padding:"10px 14px",background:bg,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
             <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:(v||v2||triggers?.length)?5:0}}>{label}</div>
-            {v&&<p style={{fontSize:12,color:"#ddd",margin:0,lineHeight:1.75}}>{v}</p>}
-            {v2&&<p style={{fontSize:12,color:"#c4b5fd",margin:"8px 0 0",lineHeight:1.75,borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:8}}>{v2}</p>}
+            {v&&<p style={{fontSize:12,color:"#e8e8f0",margin:0,lineHeight:1.75}}>{v}</p>}
+            {v2&&<p style={{fontSize:12,color:"#d8b4fe",margin:"8px 0 0",lineHeight:1.75,borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:8}}>{v2}</p>}
             {triggers&&(triggers||[]).map((t,i)=>(
-              <div key={i} style={{fontSize:12,color:"#e0e7ff",padding:"4px 0",borderBottom:i<triggers.length-1?"1px dashed #ffffff22":"none",lineHeight:1.6}}>
+              <div key={i} style={{fontSize:12,color:"#e8e8f0",padding:"4px 0",borderBottom:i<triggers.length-1?"1px dashed #ffffff22":"none",lineHeight:1.6}}>
                 <span style={{color:tc,fontWeight:700,marginRight:6}}>{i+1}.</span>{t}
               </div>
             ))}
@@ -2156,6 +2163,9 @@ JSON만 응답: {"sevenInsight":"..."}`;
         },
       };
       setReportData(enrichedData);
+      // 부모 astro/tarot 상태 업데이트 → TabAstro 재로딩 방지
+      if(astroResult) setParentAstroAI(astroResult);
+      if(tarotResult) setParentTarotAI(tarotResult);
       try{
         sessionStorage.setItem("fy_report",JSON.stringify(enrichedData));
         sessionStorage.setItem("fy_tab","요약");
@@ -2205,7 +2215,7 @@ JSON만 응답: {"sevenInsight":"..."}`;
       <div style={{padding:"4px 12px",borderRadius:99,fontSize:12,fontWeight:700,background:gBg,color:gC}}>{d.gender}성</div>
     </div>
     <div style={{...S.tabBar,overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}}>
-      {TABS.map(t=><button key={t} onClick={()=>changeTab(t)} style={{...S.tab,minWidth:60,whiteSpace:"nowrap",...(tab===t?S.tabA:{})}}>{t}</button>)}
+      {TABS.map(t=><button key={t} onClick={()=>changeTab(t)} style={{...S.tab,whiteSpace:"nowrap",...(tab===t?S.tabA:{})}}>{t}</button>)}
     </div>
     <div style={S.content}>
       {tab==="요약"        && <TabSummary d={d} changeTab={changeTab}/>}
@@ -2232,7 +2242,7 @@ const S={
   pName:{fontSize:22,fontWeight:900,color:"#111",letterSpacing:-.5},
   pBirth:{fontSize:11,color:"#999",marginTop:2},
   tabBar:{display:"flex",background:"#fff",borderBottom:"2px solid #f0f0f0",position:"sticky",top:49,zIndex:19},
-  tab:{flex:1,padding:"11px 0",fontSize:10,fontWeight:600,background:"none",border:"none",color:"#bbb",cursor:"pointer",borderBottom:"2.5px solid transparent",marginBottom:-2,transition:"color .2s,border-color .2s"},
+  tab:{flex:1,padding:"11px 4px",fontSize:10,fontWeight:600,background:"none",border:"none",color:"#bbb",cursor:"pointer",borderBottom:"2.5px solid transparent",marginBottom:-2,transition:"color .2s,border-color .2s",textAlign:"center",letterSpacing:"-0.3px"},
   tabA:{color:"#e65100",borderBottomColor:"#e65100"},
   content:{padding:"12px 14px",display:"flex",flexDirection:"column",gap:11},
   card:{background:"#fff",borderRadius:16,padding:"16px",border:"1px solid #ebebeb",boxShadow:"0 1px 5px rgba(0,0,0,0.04)"},
@@ -2443,7 +2453,7 @@ function SajuReport_Preview({data}){
         관리자 미리보기: {data.name} ({data.birth})
       </div>
       <div style={{...S.tabBar,overflowX:"auto"}}>
-        {TABS.map(t=><button key={t} onClick={()=>setTab(t)} style={{...S.tab,minWidth:60,whiteSpace:"nowrap",...(tab===t?S.tabA:{})}}>{t}</button>)}
+        {TABS.map(t=><button key={t} onClick={()=>setTab(t)} style={{...S.tab,whiteSpace:"nowrap",...(tab===t?S.tabA:{})}}>{t}</button>)}
       </div>
       <div style={S.content}>
         {tab==="요약"        && <TabSummary d={data} changeTab={setTab}/>}
