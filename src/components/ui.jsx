@@ -1,6 +1,6 @@
 // components/ui.jsx
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { OC, GD, JD, JL, JH, gc, jc, yyE, cleanText, HJ, _GANO } from '../data/constants.js';
+import { OC, GD, JD, JL, JH, gc, jc, yyE, cleanText, _GANO } from '../data/constants.js';
 
 const GT=({children})=><p style={{fontSize:12,color:"#666",lineHeight:1.78,margin:"8px 0 0",borderLeft:"3px solid #e8e8e8",paddingLeft:10,textAlign:"justify"}}>{children}</p>;
 const ST=({icon,title,sub})=><div style={{marginBottom:6}}><div style={{fontSize:15,fontWeight:800,color:"#1a1a1a",display:"flex",alignItems:"center",gap:6}}><span>{icon}</span><span>{title}</span></div>{sub&&<div style={{fontSize:10,color:"#aaa",marginTop:1}}>{sub}</div>}</div>;
@@ -229,5 +229,14 @@ const SF={
   btn:{width:"100%",padding:"14px 0",borderRadius:14,border:"none",fontSize:13,fontWeight:800,cursor:"pointer",background:"#e65100",color:"#fff",fontFamily:"inherit"},
 };
 
+
+const HJ=({children,color})=>{
+  if(!children) return null;
+  const parts=String(children).split(/(\([^)]+\))/g);
+  return <>{parts.map((p,i)=>i%2===1
+    ?<span key={i} style={{color:color||"inherit",opacity:0.42,fontSize:"0.92em"}}>{p}</span>
+    :p
+  )}</>;
+};
 
 export { GT, ST, Ring, sc, scBg, GCard, JCard, Acc, S, SF, HJ, BndBanner, Manseryeok, Ohaeng, LoadingScreen };
