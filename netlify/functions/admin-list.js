@@ -1,41 +1,66 @@
 const { createClient } = require("@supabase/supabase-js");
+const crypto = require("crypto");
+
+// ── HMAC 토큰 검증 ──
+// 서명 일치 + 만료 전이면 true
+function verifyToken(token) {
+  if (!token || typeof token !== "string" || !token.includes(".")) return false;
+  const secret = process.env.ADMIN_TOKEN_SECRET || process.env.ADMIN_PW;
+  const [payloadB64, sig] = token.split(".");
+  if (!payloadB64 || !sig) return false;
+
+  // 서명 재계산 후 타이밍 안전 비교
+  const expectedSig = crypto
+    .createHmac("sha256", secret)
+    .update(payloadB64)
+    .digest("base64url");
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expectedSig);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return false;
+
+  // 만료 확인
+  try {
+    const payload = JSON.parse(Buffer.from(payloadB64, "base64url").toString());
+    if (!payload.exp || Date.now() > payload.exp) return false;
+  } catch {
+    return false;
+  }
+  return true;
+}
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
-
+  let body;
   try {
-    const { pw, page = 0 } = JSON.parse(event.body);
-
-    // 비밀번호 검증 (ADMIN_PW 환경변수 — VITE_ 없이 서버에서만 읽힘)
-    if (!pw || pw !== process.env.ADMIN_PW) {
-      return { statusCode: 401, body: JSON.stringify({ error: "unauthorized" }) };
-    }
-
-    // service_role 키로 Supabase 연결 (RLS 우회 가능)
-    const supabase = createClient(
-      process.env.VITE_SUPABASE_URL,       // Netlify에 있는 기존 변수 그대로 사용
-      process.env.SUPABASE_SERVICE_KEY      // 새로 추가한 service_role 키
-    );
-
-    const PAGE_SIZE = 50;
-    const { data, error } = await supabase
-      .from("reports")
-      .select("id,created_at,full_data_json,users(name,gender,birth_date,birth_time,city)")
-      .order("created_at", { ascending: false })
-      .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
-
-    if (error) {
-      return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
-    }
-
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data || []),
-    };
-  } catch (e) {
-    return { statusCode: 400, body: JSON.stringify({ error: e.message }) };
+    body = JSON.parse(event.body);
+  } catch {
+    return { statusCode: 400, body: "Bad Request" };
   }
+
+  const { token, page = 0 } = body;
+  // 토큰 검증 (평문 비밀번호 더 이상 받지 않음)
+  if (!verifyToken(token)) {
+    return { statusCode: 401, body: JSON.stringify({ error: "unauthorized" }) };
+  }
+
+  // service key로 Supabase 직접 조회 (RLS 우회)
+  const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_KEY
+  );
+  const PAGE_SIZE = 50;
+  const { data, error } = await supabase
+    .from("reports")
+    .select(
+      "id,created_at,full_data_json,users(name,gender,birth_date,birth_time,city)"
+    )
+    .order("created_at", { ascending: false })
+    .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+
+  if (error) {
+    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+  }
+  return { statusCode: 200, body: JSON.stringify(data) };
 };
