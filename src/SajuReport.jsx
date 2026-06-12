@@ -22,7 +22,7 @@ const stripLead=(s)=>(s||"").replace(/^\s*[^:：]{1,40}[:：]\s*/,"").trim();
 // AI 응답에서 깨진 문자(replacement char), 마름모(◇/�), 이모지·잡기호 제거
 const cleanText=(s)=>(s||"")
   .replace(/[\uFFFD\u25C6\u25C7\u2753\u2754\uFE0F]/g,"")
-  .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,"")
+  .replace(/[\u{1F000}-\u{1FAFF}]/gu,"")
   .replace(/ {2,}/g," ")
   .trim();
 // 별자리 표기에서 도수(숫자) 제거: "궁수자리 4도" / "전갈자리 8°" → 별자리 이름만
@@ -1417,35 +1417,59 @@ function TabSummary({d,changeTab}){return <>
   <section style={S.card}>
     <ST icon="📆" title="향후 5년 흐름"/>
     <GT>사주·토정비결·주역·당사주·타로수비학 통합 운기 점수예요.</GT>
-    <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
-      {(d.summary?.yearForecast||[]).map((yf,i)=><div key={i} style={{display:"flex",flexDirection:"column",gap:6,padding:"10px 12px",background:scBg(yf.score),borderRadius:11}}><div style={{display:"flex",alignItems:"center",gap:10}}><Ring score={yf.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}><span style={{fontSize:13,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>{yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}</div><div style={{fontSize:11,color:"#444",lineHeight:1.6,textAlign:"justify"}}>{yf.summary}</div></div></div>{yf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.1)"}}>
-        {Object.entries(yf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.85)",color:sc(v),fontWeight:800,border:`1px solid ${sc(v)}44`}}>{k.slice(0,3)} {v}</div>)}
-      </div>}</div>)}
-    </div>
+    {(d.summary?.yearForecast||[]).map((yf,i)=>{
+      const [open,setOpen]=React.useState(i===0);
+      return(
+        <div key={i} style={{marginTop:i===0?12:6}}>
+          <div onClick={()=>setOpen(o=>!o)} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:scBg(yf.score),borderRadius:open?"10px 10px 0 0":"10px",cursor:"pointer",border:`1px solid ${yf.score>=75?"#a5d6a7":yf.score>=60?"#ffe082":"#ef9a9a"}`}}>
+            <Ring score={yf.score} size={42}/>
+            <div style={{flex:1}}>
+              <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2}}>
+                <span style={{fontSize:13,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>
+                {yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}
+              </div>
+              {!open&&<div style={{fontSize:11,color:"#666"}}>{yf.summary?.slice(0,28)}…</div>}
+            </div>
+            <span style={{fontSize:11,color:"#aaa",transform:open?"rotate(180deg)":"none",transition:"transform 0.2s"}}>▼</span>
+          </div>
+          {open&&<div style={{padding:"10px 12px",background:scBg(yf.score),borderRadius:"0 0 10px 10px",borderTop:"1px dashed rgba(0,0,0,0.08)",border:`1px solid ${yf.score>=75?"#a5d6a7":yf.score>=60?"#ffe082":"#ef9a9a"}`,borderTopWidth:0}}>
+            <div style={{fontSize:11,color:"#444",lineHeight:1.6,textAlign:"justify",marginBottom:8}}>{yf.summary}</div>
+            {yf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+              {Object.entries(yf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.85)",color:sc(v),fontWeight:800,border:`1px solid ${sc(v)}44`}}>{k.slice(0,3)} {v}</div>)}
+            </div>}
+          </div>}
+        </div>
+      );
+    })}
   </section>
   <section style={S.card}>
     <ST icon="📆" title="향후 1년 흐름"/>
     <GT>사주·토정비결·주역·당사주·타로수비학 통합 월별 운기 점수예요.</GT>
-    <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
-      {(d.summary?.monthForecast||[]).map((mf,i)=>(
-        <div key={i} style={{display:"flex",flexDirection:"column",gap:4,padding:"10px 12px",background:scBg(mf.score),borderRadius:11}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <Ring score={mf.score} size={40}/>
+    {(d.summary?.monthForecast||[]).map((mf,i)=>{
+      const [open,setOpen]=React.useState(mf.isThis);
+      return(
+        <div key={i} style={{marginTop:i===0?12:6}}>
+          <div onClick={()=>setOpen(o=>!o)} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",background:scBg(mf.score),borderRadius:open?"10px 10px 0 0":"10px",cursor:"pointer",border:`1px solid ${mf.score>=75?"#a5d6a7":mf.score>=60?"#ffe082":"#ef9a9a"}`}}>
+            <Ring score={mf.score} size={38}/>
             <div style={{flex:1}}>
-              <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2}}>
+              <div style={{display:"flex",gap:6,alignItems:"center"}}>
                 <span style={{fontSize:12,fontWeight:900,color:mf.isThis?"#2e7d32":"#111"}}>{mf.year}년 {mf.month}월</span>
-                <span style={{fontSize:10,color:"#888",fontWeight:600}}>{mf.ganji}</span>
+                <span style={{fontSize:10,color:"#888"}}>{mf.ganji}</span>
                 {mf.isThis&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>이번 달</span>}
               </div>
-              <div style={{fontSize:10,color:"#555",lineHeight:1.5}}>{mf.summary}</div>
+              {!open&&<div style={{fontSize:10,color:"#666",marginTop:1}}>{mf.summary?.slice(0,24)}…</div>}
             </div>
+            <span style={{fontSize:11,color:"#aaa",transform:open?"rotate(180deg)":"none",transition:"transform 0.2s"}}>▼</span>
           </div>
-          {mf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.08)"}}>
-            {Object.entries(mf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.85)",color:sc(v),fontWeight:800,border:`1px solid ${sc(v)}44`}}>{k.slice(0,3)} {v}</div>)}
+          {open&&<div style={{padding:"9px 12px",background:scBg(mf.score),borderRadius:"0 0 10px 10px",border:`1px solid ${mf.score>=75?"#a5d6a7":mf.score>=60?"#ffe082":"#ef9a9a"}`,borderTopWidth:0,borderTop:"1px dashed rgba(0,0,0,0.08)"}}>
+            <div style={{fontSize:10,color:"#555",lineHeight:1.5,marginBottom:6}}>{mf.summary}</div>
+            {mf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+              {Object.entries(mf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.85)",color:sc(v),fontWeight:800,border:`1px solid ${sc(v)}44`}}>{k.slice(0,3)} {v}</div>)}
+            </div>}
           </div>}
         </div>
-      ))}
-    </div>
+      );
+    })}
   </section>
 
 </>;
@@ -1569,79 +1593,6 @@ function getMonthMemo_dynamic(ganKo, jiKo, reportData){
   }catch{return "이 달의 에너지를 타고 유연하게 움직이는 게 좋겠네요.";}
 }
 
-// 연도별 점수는 calcSeunScore/calcSeunAreas(사주 용신·희신·기신·대운·합충 기반)로 통일
-
-function Seun({reportData}){
-  const [st,setSt]=useState("year");
-  const ys=useMemo(()=>bYS(),[]),ms=useMemo(()=>bMS(),[]);
-  return <>
-    <section style={S.card}>
-      <ST icon="📅" title="세운(歲運)" sub={`Today ${CY}.${CM}.${CD} 기준 자동 계산`}/>
-      <GT>세운은 매년·매월 바뀌는 간지(干支) 에너지입니다. 오늘 날짜 기준으로 자동 계산됩니다.</GT>
-      <div style={{display:"flex",gap:6,marginTop:10}}>{[["year","연도별"],["month","월별"]].map(([k,l])=><button key={k} onClick={()=>setSt(k)} style={{flex:1,padding:"7px 0",borderRadius:9,border:"1.5px solid #e65100",fontSize:11,fontWeight:700,cursor:"pointer",background:st===k?"#e65100":"#fff",color:st===k?"#fff":"#e65100"}}>{l}</button>)}</div>
-      {st==="year"&&<div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
-        {ys.map((s,i)=>{
-          const score=calcSeunScore(s.year,0,reportData?.scoreMeta);
-          const detail=calcSeunAreas(s.year,0,reportData?.scoreMeta);
-          const cg=gc(s.gan.ko);
-          return <div key={i}
-            style={{...S.sRow,textAlign:"left",width:"100%",flexDirection:"column",gap:8,...(s.isThis?{border:"2px solid #4caf50",background:"#f9fff8"}:{})}}>
-            <div style={{display:"flex",alignItems:"center",gap:10}}>
-              <Ring score={score} size={48}/>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:2,flexWrap:"wrap"}}>
-                  <span style={{fontSize:13,fontWeight:900,color:"#111"}}>{s.year}년</span>
-                  <span style={{fontSize:10,fontWeight:700,padding:"2px 7px",borderRadius:7,background:cg.bg,color:cg.text}}>{s.hanja}({s.ko})</span>
-                  {s.isThis&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}
-                </div>
-                <div style={{fontSize:11,color:"#555",lineHeight:1.5}}>{getYMEMO(s.year, reportData)}</div>
-              </div>
-            </div>
-            <div style={{display:"flex",gap:4,flexWrap:"wrap",borderTop:"1px solid #e8e8e8",paddingTop:6}}>
-              {Object.entries(detail).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 7px",borderRadius:99,background:scBg(v),color:sc(v),fontWeight:700}}>{k.slice(0,3)} {v}</div>)}
-            </div>
-          </div>;
-        })}
-      </div>}
-      {st==="month"&&<div style={{display:"flex",flexDirection:"column",gap:7,marginTop:12}}>
-        {ms.map((s,i)=>{
-          const score=calcSeunScore(s.year,s.month,reportData?.scoreMeta);
-          const detail=calcSeunAreas(s.year,s.month,reportData?.scoreMeta);
-          const cg=gc(s.gan.ko),cj=jc(s.ji.ko);
-          const memo=getMonthMemo_dynamic(s.gan.ko,s.ji.ko,reportData);
-          return <div key={i}
-            style={{display:"flex",flexDirection:"column",gap:8,padding:"10px 12px",borderRadius:11,
-              border:s.isThis?"2px solid #4caf50":"1px solid #ebebeb",
-              background:s.isThis?"#f9fff8":"#fafafa"}}>
-            <div style={{display:"flex",alignItems:"center",gap:10}}>
-              <div style={{minWidth:44,textAlign:"center",flexShrink:0}}>
-                <div style={{fontSize:10,color:"#aaa",fontWeight:600}}>{s.year}</div>
-                <div style={{fontSize:12,fontWeight:900,color:s.isThis?"#2e7d32":"#111"}}>{MON[s.month-1]}</div>
-                {s.isThis&&<div style={{fontSize:9,background:"#4caf50",color:"#fff",borderRadius:99,padding:"1px 5px",marginTop:1,fontWeight:700}}>현재</div>}
-              </div>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{display:"flex",gap:4,marginBottom:4}}>
-                  {[{g:s.gan,isG:true,c:cg},{g:s.ji,isG:false,c:cj}].map(({g,isG,c},pi)=>(
-                    <div key={pi} style={{background:c.bg,color:c.text,border:`1px solid ${c.border}`,fontSize:10,padding:"4px 7px",borderRadius:7,fontWeight:700}}>
-                      {g.hanja}({g.ko})
-                    </div>
-                  ))}
-                </div>
-                <div style={{fontSize:10,color:"#555",lineHeight:1.5}}>{memo}</div>
-              </div>
-              <div style={{flexShrink:0}}>
-                <Ring score={score} size={42}/>
-              </div>
-            </div>
-            <div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid #e0e0e0"}}>
-              {Object.entries(detail).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:scBg(v),color:sc(v),fontWeight:700}}>{k.slice(0,3)} {v}</div>)}
-            </div>
-          </div>;
-        })}
-      </div>}
-    </section>
-  </>;
-}
 
 function TabSaju({d,reportData}){
   return <>
@@ -1695,7 +1646,6 @@ function TabSaju({d,reportData}){
         })}
       </div>
     </section>
-    <Seun reportData={reportData}/>
   </>;
 }
 
@@ -1720,7 +1670,7 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
   const [innerErr,setInnerErr]=React.useState(false);
 
   // 기본 4개 아코디언 열림 상태
-  const [basicOpen,setBasicOpen]=React.useState({exercise:false,hobby:false,money:false,jinsang:false});
+  const [basicOpen,setBasicOpen]=React.useState({vitality:false});
 
   // ── 딥카드 10개 상태 ──
   const [deepData,setDeepData]=React.useState(()=>{
@@ -1895,70 +1845,56 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
     {/* ─── 내면의 리듬 — 항상 열림, 자동 로딩 ─── */}
     <section style={S.card}>
       <ST icon="🌊" title="내면의 리듬"/>
-      <GT>사주 일간·신강신약·MBTI를 교차 분석한 감정 패턴이에요.</GT>
+      <GT>감정 패턴·분노 트리거·다크사이드·자기 객관화를 통합 분석해요.</GT>
       {innerLoading
         ?<SkelBlock err={false}/>
         :innerErr
           ?<SkelBlock err={true} onRetry={runInnerFetch}/>
           :innerAI
-            ?<>
-              <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
-                {(innerAI.angerTriggers||[]).map((t,i)=>(
-                  <div key={i} style={{padding:"12px 14px",background:"#fff5f5",borderRadius:11,border:"1px solid #ffcdd2"}}>
-                    <div style={{fontSize:13,fontWeight:900,color:"#b71c1c",marginBottom:6}}>"{cleanText(t.quote)}"</div>
-                    <p style={{fontSize:12,color:"#555",margin:0,lineHeight:1.75}}>{cleanText(t.reason)}</p>
-                  </div>
-                ))}
-              </div>
-              <div style={{marginTop:10,padding:"14px 16px",background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderRadius:12}}>
+            ?<div style={{marginTop:10,padding:"14px 16px",background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderRadius:12}}>
                 {cleanText(innerAI.innerRhythm||"").split("\n\n").map((para,i)=>(
                   <p key={i} style={{fontSize:12,color:"#e0e7ff",lineHeight:1.9,margin:i>0?"12px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}>{para}</p>
                 ))}
               </div>
-            </>
             :<SkelBlock err={false}/>
       }
     </section>
 
-    {/* ─── 기본 4개 아코디언 — 흰색 서식 통일 ─── */}
-    {[
-      {key:"exercise",icon:"🏃",title:"운동 추천",
-        render:()=>(innerAI?.exercise||[]).map((ex,i)=>(
-          <div key={i} style={{padding:"12px 14px",background:"#f0fdf4",borderRadius:11,border:"1px solid #bbf7d0",marginBottom:i<(innerAI.exercise.length-1)?8:0}}>
-            <div style={{fontSize:13,fontWeight:900,color:"#166534",marginBottom:5}}>{cleanText(ex.name)}</div>
-            <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.75}}>{cleanText(ex.reason)}</p>
-          </div>
-        ))},
-      {key:"hobby",icon:"🎨",title:"취미 추천",
-        render:()=>(innerAI?.hobby||[]).map((h,i)=>(
-          <div key={i} style={{padding:"12px 14px",background:"#fdf4ff",borderRadius:11,border:"1px solid #e9d5ff",marginBottom:i<(innerAI.hobby.length-1)?8:0}}>
-            <div style={{fontSize:13,fontWeight:900,color:"#6b21a8",marginBottom:5}}>{cleanText(h.name)}</div>
-            <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.75}}>{cleanText(h.reason)}</p>
-          </div>
-        ))},
-      {key:"money",icon:"💸",title:"돈이 없는 이유",
-        render:()=>cleanText(innerAI?.moneyReason||"").split("\n\n").map((p,i)=>(
-          <p key={i} style={{fontSize:13,color:"#444",margin:i>0?"10px 0 0":"0",lineHeight:1.85,textAlign:"justify"}}>{p}</p>
-        ))},
-      {key:"jinsang",icon:"😤",title:"내가 진상일 때는?",
-        render:()=>cleanText(innerAI?.jinsang||"").split("\n\n").map((p,i)=>(
-          <p key={i} style={{fontSize:13,color:"#444",margin:i>0?"10px 0 0":"0",lineHeight:1.85,textAlign:"justify"}}>{p}</p>
-        ))},
-    ].map(({key,icon,title,render})=>{
-      const open=basicOpen[key];
+    {/* ─── 활력 충전법 (운동+취미 통합) ─── */}
+    {(()=>{
+      const open=basicOpen.vitality;
       return(
-        <div key={key}>
-          <AccHead open={open} onToggle={()=>setBasicOpen(p=>({...p,[key]:!p[key]}))} icon={icon} title={title}/>
+        <div>
+          <AccHead open={open} onToggle={()=>setBasicOpen(p=>({...p,vitality:!p.vitality}))} icon="⚡" title="활력 충전법"/>
           {open&&(
             <div style={{padding:"14px 16px",background:"#fff",border:"1px solid #ebebeb",borderTop:"none",borderRadius:"0 0 12px 12px"}}>
-              {!innerAI?<SkelBlock err={innerErr} onRetry={innerErr?runInnerFetch:undefined}/>:render()}
+              {!innerAI?<SkelBlock err={innerErr} onRetry={innerErr?runInnerFetch:undefined}/>:<>
+                <div style={{fontSize:11,fontWeight:800,color:"#166534",marginBottom:8}}>🏃 운동</div>
+                <div style={{display:"flex",flexDirection:"column",gap:7,marginBottom:14}}>
+                  {(innerAI.exercise||[]).map((ex,i)=>(
+                    <div key={i} style={{padding:"10px 13px",background:"#f0fdf4",borderRadius:10,border:"1px solid #bbf7d0"}}>
+                      <div style={{fontSize:12,fontWeight:900,color:"#166534",marginBottom:4}}>{cleanText(ex.name)}</div>
+                      <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.7}}>{cleanText(ex.reason)}</p>
+                    </div>
+                  ))}
+                </div>
+                <div style={{fontSize:11,fontWeight:800,color:"#6b21a8",marginBottom:8}}>🎨 취미</div>
+                <div style={{display:"flex",flexDirection:"column",gap:7}}>
+                  {(innerAI.hobby||[]).map((h,i)=>(
+                    <div key={i} style={{padding:"10px 13px",background:"#fdf4ff",borderRadius:10,border:"1px solid #e9d5ff"}}>
+                      <div style={{fontSize:12,fontWeight:900,color:"#6b21a8",marginBottom:4}}>{cleanText(h.name)}</div>
+                      <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.7}}>{cleanText(h.reason)}</p>
+                    </div>
+                  ))}
+                </div>
+              </>}
             </div>
           )}
         </div>
       );
-    })}
+    })()}
 
-    {/* ─── 딥카드 10개 ─── */}
+    {/* ─── 딥카드 4개 ─── */}
     {DEEP_CARDS.map(card=>{
       const isNewGroup=!renderedGroups.current.has(card.group);
       if(isNewGroup) renderedGroups.current.add(card.group);
@@ -1993,17 +1929,6 @@ function TabTojung({d}){
         <div style={{fontSize:20,fontWeight:900,color:"#1b5e20",marginBottom:6}}>{tj.saja}</div>
         <p style={{fontSize:12,color:"#388e3c",margin:0,lineHeight:1.78,textAlign:"justify"}}>{tj.bonunDesc}</p>
       </div>
-      <div style={{marginTop:12}}><div style={{fontSize:11,fontWeight:800,color:"#333",marginBottom:8}}>연도별 운세 ({CY}~{CY+4})</div>
-        <div style={{display:"flex",flexDirection:"column",gap:7}}>
-          {tj.yearFlow.map((y,i)=><div key={i} style={{padding:"11px 13px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:7}}><Ring score={y.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",marginBottom:2}}><span style={{fontSize:13,fontWeight:900,color:y.year===CY?"#2e7d32":"#111"}}>{y.year}년</span>{y.year===CY&&<span style={{fontSize:9,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}<span style={{fontSize:10,background:"#fff8e1",color:"#7b5800",padding:"2px 7px",borderRadius:99,fontWeight:700}}>{y.month}</span></div><div style={{fontSize:11,color:"#555"}}>{y.desc}</div></div></div>
-            <div style={{display:"flex",gap:3,flexWrap:"nowrap"}}>{Object.entries(y.areas).map(([k,v])=><div key={k} style={{flex:1,fontSize:9,padding:"2px 2px",borderRadius:7,background:scBg(v),color:sc(v),fontWeight:700,textAlign:"center",whiteSpace:"nowrap"}}>{k} {v}</div>)}</div>
-          </div>)}
-        </div>
-      </div>
-      <div style={{marginTop:12}}><button onClick={()=>setShowM(!showM)} style={{width:"100%",padding:"10px 14px",background:"#f5f5f5",border:"1px solid #e0e0e0",borderRadius:10,fontSize:12,fontWeight:700,color:"#333",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",fontFamily:"inherit"}}><span>2026년 월별 길흉</span><span style={{fontSize:13,color:"#aaa"}}>{showM?"▲":"▼"}</span></button>
-        {showM&&<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginTop:8}}>{(tj.month2026||[]).map((m,i)=><div key={i} style={{padding:"8px",background:scBg(m.score),borderRadius:9,textAlign:"center"}}><div style={{fontSize:10,fontWeight:800,color:sc(m.score)}}>{m.m}월</div><div style={{fontSize:18,fontWeight:900,color:sc(m.score)}}>{m.score}</div><div style={{fontSize:10,color:"#666",marginTop:2,lineHeight:1.4}}>{m.desc}</div></div>)}</div>}
-      </div>
     </section>
     {/* 주역 */}
     <section style={S.card}>
@@ -2018,11 +1943,6 @@ function TabTojung({d}){
       <p style={{fontSize:12,color:"#444",lineHeight:1.85,textAlign:"justify",margin:"10px 0 0"}}>{ic.gaeDesc}</p>
       <div style={{marginTop:10,padding:"11px 13px",background:"#e3f2fd",borderRadius:10}}><div style={{fontSize:10,color:"#0d47a1",fontWeight:700,marginBottom:3}}>현재 변괘 ({ic.currentYear})</div><div style={{fontSize:14,fontWeight:900,color:"#1565c0"}}>{ic.currentGae}</div><p style={{fontSize:11,color:"#555",margin:"5px 0 0",lineHeight:1.7,textAlign:"justify"}}>{ic.currentDesc}</p></div>
       <div style={{marginTop:10,padding:"11px 13px",background:"#f9f9f9",borderRadius:10}}><div style={{fontSize:11,fontWeight:800,color:"#333",marginBottom:7}}>주역이 전하는 인생 전략 3가지</div>{ic.strategy.map((s,i)=><div key={i} style={{fontSize:12,color:"#555",padding:"5px 0",borderBottom:i<2?"1px dashed #eee":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{fontWeight:700,color:"#e65100",marginRight:6}}>{i+1}.</span>{s}</div>)}</div>
-      <div style={{marginTop:10}}><div style={{fontSize:11,fontWeight:800,color:"#333",marginBottom:8}}>연도별 괘 에너지</div>
-        <div style={{display:"flex",flexDirection:"column",gap:7}}>
-          {ic.yearFlow.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2,flexWrap:"wrap"}}><span style={{fontSize:12,fontWeight:900,color:"#111"}}>{y.year}년</span><span style={{fontSize:10,color:"#888"}}>{y.gae}</span></div><div style={{fontSize:11,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
-        </div>
-      </div>
     </section>
     {/* 당사주 */}
     <section style={S.card}>
@@ -2052,11 +1972,6 @@ function TabTojung({d}){
         })}
       </div>
       <div style={{marginTop:10,padding:"11px 13px",background:"#e8f5e0",borderRadius:10}}><div style={{fontSize:11,fontWeight:800,color:"#2d6a2d",marginBottom:5}}>당사주 종합 기질</div><p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.8,textAlign:"justify"}}>{ds.overall}</p></div>
-      <div style={{marginTop:10}}><div style={{fontSize:11,fontWeight:800,color:"#333",marginBottom:8}}>연도별 운세</div>
-        <div style={{display:"flex",flexDirection:"column",gap:7}}>
-          {ds.yearFlow.map((y,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}><Ring score={y.score} size={44}/><div style={{flex:1}}><div style={{fontSize:12,fontWeight:900,color:"#111",marginBottom:2}}>{y.year}년</div><div style={{fontSize:11,color:"#555",lineHeight:1.6,textAlign:"justify"}}>{y.desc}</div></div></div>)}
-        </div>
-      </div>
     </section>
   </>;
 }
@@ -2777,7 +2692,7 @@ function buildInnerPrompt(data){
   const dn=data.daynight;
   const mb=data.mbti;
   const ilgan=data.pillars?.[2]?.gan?.ko||"";
-  const ilju=data.pillars?.[2]?.gan?.ko+(data.pillars?.[2]?.ji?.ko||"");
+  const ilju=ilgan+(data.pillars?.[2]?.ji?.ko||"");
   const sinsal=(data.sinsal||[]).map(s=>s.name).join(", ")||"없음";
   const yongsin=data.yongsinA||"";
   const gisin=data.gisinA||"";
@@ -2790,19 +2705,21 @@ function buildInnerPrompt(data){
 낮의 자아: ${dn?.day?.impression||""} / 밤의 욕구: ${dn?.night?.desire||""}
 신살: ${sinsal} / 생명경로수: ${lp}
 
-위 데이터로 아래 6가지를 각각 분석해줘.
+위 데이터로 아래 3가지를 각각 분석해줘.
 한자 절대 사용 금지. 전문 용어 쓰면 반드시 쉽게 풀어서 설명해줘.
 반드시 ~이에요, ~해요 체(언니체). "${data.name}님"으로 지칭. 이모지·마크다운 금지.
 
-1. angerTriggers (array, 3개): 자존심/화를 건드리는 말 top3. 각각 {"quote":"말 자체","reason":"왜 이 말이 특히 찌르는지 2~3문장으로"}
-2. innerRhythm (string): 분노 패턴과 회복 리듬을 에세이로. 첫 문단(150자): 어떤 상황에서 감정이 올라오는지 내면 패턴으로 서술. 빈 줄. 둘째 문단(200자): 회복 방식. DB 문장 그대로 쓰지 말고 새로운 언어로 재해석해줘.
-3. exercise (array, 3개): 개운 운동 추천. 각각 {"name":"운동명","reason":"왜 이 사람한테 맞는지 2~3문장. 사주·별자리 근거 포함. 쉽게 설명"}
-4. hobby (array, 3개): 개운 취미 추천. 각각 {"name":"취미명","reason":"왜 이 사람한테 맞는지 2~3문장. 사주·별자리 근거 포함. 쉽게 설명"}
-5. moneyReason (string): 지금 돈이 없다면 왜인지. 재성·기신·별자리·생명경로수로 쉽게 풀어서. 300자 내외. 위로가 되는 톤으로.
-6. jinsang (string): 이 사람이 진상일 때 어떤 패턴인지. 300자 내외. 자기 객관화 도움되게, 가볍고 공감되는 톤으로.
+1. innerRhythm (string): 감정 트리거·분노 패턴·다크사이드·진상 패턴을 통합한 내면 분석 에세이.
+   문단1(200자): 어떤 상황에서 감정이 올라오는지, 어떤 말이 가장 찌르는지, 내면의 그림자 패턴을 하나의 흐름으로 서술.
+   빈 줄.
+   문단2(200자): 회복 방식과 자기 객관화 포인트. 가볍고 공감되는 톤으로.
+   결론(1문장): 핵심 통찰 + 위로 바로 이어서.
+
+2. exercise (array, 3개): 개운 운동 추천. 각각 {"name":"운동명","reason":"왜 이 사람한테 맞는지 2문장. 사주 근거 포함."}
+3. hobby (array, 3개): 개운 취미 추천. 각각 {"name":"취미명","reason":"왜 이 사람한테 맞는지 2문장. 사주 근거 포함."}
 
 JSON만 응답:
-{"angerTriggers":[{"quote":"...","reason":"..."}],"innerRhythm":"...","exercise":[{"name":"...","reason":"..."}],"hobby":[{"name":"...","reason":"..."}],"moneyReason":"...","jinsang":"..."}`;
+{"innerRhythm":"문단1\\n\\n문단2\\n\\n결론","exercise":[{"name":"...","reason":"..."}],"hobby":[{"name":"...","reason":"..."}]}`;
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -2820,16 +2737,10 @@ function buildDeepPrompt(key, data){
 토정비결: ${data.tojung?.saja||""}`;
 
   const TOPIC={
-    talent:    {title:"내 DNA에 새겨진 재능",    combo:"사주 용신 × 네이탈 MC × 수비학 표현수"},
-    emotionMap:{title:"나의 감정 트리거 지도",    combo:"사주 일간 × 네이탈 달 × MBTI 열등기능"},
-    darkSide:  {title:"내 안의 다크사이드",       combo:"사주 겁재·양인살 × 네이탈 명왕성 × 타로 그림자"},
-    lifeTide:  {title:"인생의 조수간만",           combo:"사주 대운 × 주역 64괘 × 수비학 개인연도"},
-    monthRelease:{title:"이번 달 놔야 할 것 vs 잡아야 할 것",combo:"주역 × 타로 월간 × 수비학 개인월"},
-    pastLife:  {title:"전생 리딩",                combo:"사주 일주 × 타로 메이저 × 당사주 전생궁"},
-    soulMission:{title:"이번 생 나의 영혼 미션",  combo:"사주 연주 × 네이탈 노스노드 × 수비학 생명수"},
-    guardianStar:{title:"내 운명을 밝히는 수호별",combo:"사주 용신 × 네이탈 수호성 × 당사주"},
-    guardianEnergy:{title:"나를 지키는 수호 에너지 총정리",combo:"사주 용신 × 네이탈 수호성 × 타로 수호"},
-    chemistryType:{title:"나랑 케미 폭발하는 사람의 조건",combo:"사주 일지 × 네이탈 7하우스 × MBTI"},
+    talent:      {title:"내 DNA에 새겨진 재능",         combo:"사주 용신 × 네이탈 MC × 수비학 표현수"},
+    monthRelease:{title:"이번 달 놔야 할 것 vs 잡아야 할 것", combo:"주역 × 타로 월간 × 수비학 개인월"},
+    soulMission: {title:"이번 생의 영혼 미션",           combo:"사주 일주 × 타로 메이저 × 당사주 전생궁 × 네이탈 노스노드 × 수비학 생명수. 전생에서 가져온 업과 이번 생에서 완성해야 할 미션을 연결해서 분석해줘."},
+    guardian:    {title:"나를 지키는 수호 에너지",       combo:"사주 용신 × 네이탈 수호성 × 타로 수호 × 당사주. 수호별과 수호 에너지를 함께 통합 분석해줘."},
   };
   const topic=TOPIC[key];
   return `당신은 사주, 주역, 토정비결, 당사주, 네이탈차트, 타로, 수비학, MBTI를 통합해서 운세를 분석하는 전문가예요.
@@ -2851,16 +2762,10 @@ JSON만 응답 (다른 텍스트 없이):
 // 딥카드 메타데이터
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const DEEP_CARDS=[
-  {group:"GROUP A — 나는 누구인가", icon:"🧬",title:"내 DNA에 새겨진 재능",      key:"talent",       bg:"#f0fdf4",border:"#bbf7d0",tc:"#166534"},
-  {group:"GROUP A — 나는 누구인가", icon:"🗺️",title:"나의 감정 트리거 지도",    key:"emotionMap",   bg:"#fff7ed",border:"#fed7aa",tc:"#9a3412"},
-  {group:"GROUP A — 나는 누구인가", icon:"🌑",title:"내 안의 다크사이드",        key:"darkSide",     bg:"#1a1a2e",border:"#312e81",tc:"#a78bfa",dark:true},
-  {group:"GROUP B — 내 인생의 흐름",icon:"🌊",title:"인생의 조수간만",           key:"lifeTide",     bg:"#eff6ff",border:"#bfdbfe",tc:"#1d4ed8"},
+  {group:"GROUP A — 나는 누구인가", icon:"🧬",title:"내 DNA에 새겨진 재능",      key:"talent",        bg:"#f0fdf4",border:"#bbf7d0",tc:"#166534"},
   {group:"GROUP B — 내 인생의 흐름",icon:"📅",title:"이번 달 놔야 할 것 vs 잡아야 할 것",key:"monthRelease",bg:"#fdf4ff",border:"#e9d5ff",tc:"#6b21a8"},
-  {group:"GROUP C — 우주적 나",     icon:"🔮",title:"전생 리딩",                 key:"pastLife",     bg:"#1e1b4b",border:"#4c1d95",tc:"#c4b5fd",dark:true},
-  {group:"GROUP C — 우주적 나",     icon:"✨",title:"이번 생 나의 영혼 미션",    key:"soulMission",  bg:"#fefce8",border:"#fde68a",tc:"#92400e"},
-  {group:"GROUP D — 나를 지키는 것들",icon:"⭐",title:"내 운명을 밝히는 수호별",key:"guardianStar",  bg:"#fff8e1",border:"#fde68a",tc:"#b45309"},
-  {group:"GROUP D — 나를 지키는 것들",icon:"🛡️",title:"나를 지키는 수호 에너지 총정리",key:"guardianEnergy",bg:"#f0fdf4",border:"#86efac",tc:"#14532d"},
-  {group:"GROUP E — 관계와 인연",   icon:"💝",title:"나랑 케미 폭발하는 사람의 조건",key:"chemistryType",bg:"#fdf2f8",border:"#fbcfe8",tc:"#831843"},
+  {group:"GROUP C — 우주적 나",     icon:"✨",title:"이번 생의 영혼 미션",         key:"soulMission",   bg:"#1e1b4b",border:"#4c1d95",tc:"#c4b5fd",dark:true},
+  {group:"GROUP D — 나를 지키는 것들",icon:"⭐",title:"나를 지키는 수호 에너지",  key:"guardian",      bg:"#fff8e1",border:"#fde68a",tc:"#b45309"},
 ];
 
 
