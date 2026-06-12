@@ -1,0 +1,144 @@
+// components/TabMBTI.jsx
+import React, {{ useState, useMemo, useRef, useEffect }} from 'react';
+import {{ GT, ST, Ring, sc, scBg, GCard, JCard, Acc, S, SF, HJ }} from './ui.jsx';
+import {{ OC, GD, JD, GL, JL, GH, JH, gc, jc, yyE, OHK, cleanText, stripDegree,
+  ILGAN_TITLE, ILGAN_PHILOSOPHY, GWAN_O, CY, CM, CD, TRIGRAM,
+  BYEOLSEONG, STAGES, STAGE_DESC, TOJUNG_SAJA }} from '../data/constants.js';
+import {{ getComboDesc }} from '../data/comboDB.js';
+import {{ callNetlify }} from '../utils/callNetlify.js';
+import {{ buildInnerPrompt, buildDeepPrompt, DEEP_CARDS }} from '../utils/prompts.js';
+
+function TabMBTI({d}){
+  const m=d.mbti;
+  return <>
+    <section style={{...S.card,background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderColor:"#4338ca"}}>
+      <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:12}}>
+        <div style={{width:64,height:64,borderRadius:16,background:"linear-gradient(135deg,#7c3aed,#4f46e5)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:900,color:"#fff",flexShrink:0,textAlign:"center",lineHeight:1.3}}>
+          {m.estimated}
+        </div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:10,color:"#a5b4fc",marginBottom:3}}>사주 기반 추정 MBTI</div>
+          <div style={{fontSize:20,fontWeight:900,color:"#e0e7ff"}}>{m.estimated}</div>
+        </div>
+      </div>
+      {/* 사주분석 MBTI | 자가보고 MBTI 나란히 */}
+      <div style={{display:"flex",gap:8,marginBottom:10}}>
+        <div style={{flex:1,padding:"12px 10px",background:"rgba(255,255,255,0.08)",borderRadius:10,border:"1px solid #7c3aed55",textAlign:"center"}}>
+          <div style={{fontSize:10,color:"#a5b4fc",marginBottom:4}}>사주분석 MBTI</div>
+          <div style={{fontSize:18,fontWeight:900,color:"#c4b5fd"}}>{m.estimated}</div>
+        </div>
+        <div style={{flex:1,padding:"12px 10px",background:"rgba(255,255,255,0.08)",borderRadius:10,border:"1px solid #2563eb55",textAlign:"center"}}>
+          <div style={{fontSize:10,color:"#93c5fd",marginBottom:4}}>자가보고 MBTI</div>
+          <div style={{fontSize:18,fontWeight:900,color:m.userType&&m.userType!=="모름"?(m.userType===m.estimated?"#86efac":"#fca5a5"):"#94a3b8"}}>{m.userType&&m.userType!=="모름"?m.userType:"미입력"}</div>
+        </div>
+      </div>
+      {m.userType&&m.userType!=="모름"&&(
+        <div style={{padding:"10px 12px",background:"rgba(255,255,255,0.07)",borderRadius:10,marginBottom:10,fontSize:11,color:"#c4b5fd",lineHeight:1.7}}>
+          {m.userType===m.estimated
+            ? `✓ 자가보고(${m.userType})와 사주 분석(${m.estimated})이 일치해요. 타고난 기질과 스스로 인식하는 모습이 잘 맞아떨어지는 경우예요.`
+            : `💡 자가보고(${m.userType})와 사주 분석(${m.estimated})이 달라요. 겉으로 드러내는 모습(${m.userType})과 타고난 기질(${m.estimated})이 다른 경우로, 두 유형의 특성을 모두 가지고 있을 가능성이 높아요.`}
+        </div>
+      )}
+      <p style={{fontSize:11,color:"#c4b5fd",lineHeight:1.75,margin:0}}>{m.basis}</p>
+    </section>
+    <section style={S.card}>
+      <ST icon="🧠" title="4축 분석"/>
+      <p style={{fontSize:11,color:"#888",margin:"6px 0 12px",lineHeight:1.6}}>{`사주 8글자 오행·음양 비율, 일간 기질, 일지 십이운성, 월간 음양${m.userType?", 입력한 MBTI":""}을 교차 분석했어요.`}</p>
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        {(m.axes||[]).map((ax,i)=>{
+          const pct=ax.score,c=pct>=70?"#5e35b1":"#0d47a1";
+          return <div key={i} style={{padding:"12px 14px",background:"#fafafa",borderRadius:11,border:"1px solid #eee"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div style={{width:44,height:44,borderRadius:10,background:"linear-gradient(135deg,#e8eaf6,#c5cae9)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:900,color:"#1a237e",flexShrink:0}}>
+                {ax.axis.split(" ")[0]}
+              </div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:12,fontWeight:800,color:"#111"}}>{ax.axis}</div>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginTop:4}}>
+                  <div style={{flex:1,height:6,background:"#e8eaf6",borderRadius:99,overflow:"hidden"}}>
+                    <div style={{width:`${pct}%`,height:"100%",background:c,borderRadius:99}}/>
+                  </div>
+                  <span style={{fontSize:11,fontWeight:800,color:c}}>{pct}%</span>
+                </div>
+              </div>
+            </div>
+          </div>;
+        })}
+      </div>
+    </section>
+    <section style={S.card}>
+      <ST icon="🌟" title="강점·과제·최적 환경"/>
+      <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:10}}>
+        <div style={{padding:"12px 14px",background:"#e8f5e0",borderRadius:11}}><div style={{fontSize:11,fontWeight:800,color:"#2d6a2d",marginBottom:7}}>강점(Strengths)</div>{(m.strengths||[]).map((s,i)=><div key={i} style={{fontSize:12,color:"#333",padding:"4px 0",borderBottom:i<m.strengths.length-1?"1px dashed #c8e6c9":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{color:"#4caf50",fontWeight:700,marginRight:6}}>✓</span>{s}</div>)}</div>
+        <div style={{padding:"12px 14px",background:"#fdecea",borderRadius:11}}><div style={{fontSize:11,fontWeight:800,color:"#b71c1c",marginBottom:7}}>성장 과제(Challenges)</div>{(m.challenges||[]).map((s,i)=><div key={i} style={{fontSize:12,color:"#333",padding:"4px 0",borderBottom:i<m.challenges.length-1?"1px dashed #ffcdd2":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{color:"#ef5350",fontWeight:700,marginRight:6}}>△</span>{s}</div>)}</div>
+        <div style={{padding:"12px 14px",background:"#e3f2fd",borderRadius:11}}><div style={{fontSize:11,fontWeight:800,color:"#0d47a1",marginBottom:5}}>최적 환경</div><p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{m.bestEnv}</p></div>
+        <div style={{padding:"12px 14px",background:"#f3e5f5",borderRadius:11}}><div style={{fontSize:11,fontWeight:800,color:"#4a148c",marginBottom:5}}>회복 방법</div><p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{m.recovery}</p></div>
+      </div>
+    </section>
+  </>;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 11. 메인
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 로딩 화면 컴포넌트
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const OHAENG_LOADING=[
+  {img:"/characters/wood.png",  color:"#4caf50", name:"목", label:"목 기운 분석 중"},
+  {img:"/characters/fire.png",  color:"#ef5350", name:"화", label:"화 기운 분석 중"},
+  {img:"/characters/earth.png", color:"#ffb300", name:"토", label:"토 기운 분석 중"},
+  {img:"/characters/metal.png", color:"#78909c", name:"금", label:"금 기운 분석 중"},
+  {img:"/characters/water.png", color:"#5c6bc0", name:"수", label:"수 기운 분석 중"},
+];
+
+function LoadingScreen({name}){
+  const [idx,setIdx]=useState(0);
+  const [visible,setVisible]=useState(true);
+  useEffect(()=>{
+    const iv=setInterval(()=>{
+      setVisible(false);
+      setTimeout(()=>{setIdx(i=>(i+1)%OHAENG_LOADING.length);setVisible(true);},300);
+    },1200);
+    return()=>clearInterval(iv);
+  },[]);
+  const cur=OHAENG_LOADING[idx];
+  return(
+    <div style={{position:"fixed",inset:0,background:"#fafafa",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:50}}>
+      <div style={{
+        width:100,height:100,borderRadius:30,
+        display:"flex",alignItems:"center",justifyContent:"center",
+        marginBottom:20,
+        transition:"opacity 0.35s, transform 0.35s",
+        opacity:visible?1:0,
+        transform:visible?"scale(1)":"scale(0.88)",
+      }}>
+        <img
+          src={cur.img}
+          alt={cur.name}
+          style={{width:100,height:100,objectFit:"contain"}}
+        />
+      </div>
+      <div style={{
+        fontSize:18,fontWeight:900,color:cur.color,
+        marginBottom:4,
+        transition:"opacity 0.35s",
+        opacity:visible?1:0,
+      }}>{cur.label}</div>
+      <div style={{fontSize:12,color:"#888",fontWeight:600,marginBottom:4}}>{name||""}님의 사주를 분석하고 있어요</div>
+      <div style={{fontSize:10,color:"#bbb",marginBottom:16}}>별자리·타로수비학까지 모두 준비할게요</div>
+      <div style={{display:"flex",gap:8,marginTop:4}}>
+        {OHAENG_LOADING.map((o,i)=>(
+          <div key={i} style={{
+            width:i===idx?20:6,height:6,borderRadius:99,
+            background:i===idx?OHAENG_LOADING[i].color:"#ddd",
+            transition:"all 0.3s"
+          }}/>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+export default TabMBTI;
