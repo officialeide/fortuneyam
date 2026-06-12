@@ -39,7 +39,7 @@ export async function saveUser(formInput) {
 // 분석 결과 저장
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export async function saveReport(userId, reportData) {
-  const { pillars, pillarsB, ohaengDist, sinsal, daeun, summary, _innerAI, _deepAI, ...rest } = reportData
+  const { pillars, pillarsB, ohaengDist, sinsal, daeun, summary, ...rest } = reportData
 
   const { data, error } = await supabase
     .from('reports')
@@ -50,8 +50,6 @@ export async function saveReport(userId, reportData) {
       sinsal_json: sinsal,
       daeun_json: daeun,
       summary_json: summary,
-      inner_ai_json: _innerAI || null,
-      deep_ai_json: _deepAI || null,
       full_data_json: reportData,
     })
     .select('id')
@@ -102,4 +100,38 @@ export async function getRecentReports(limit = 5) {
 
   if (error) return []
   return data
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// 동일 생년월일+시간+성별+도시 캐시 조회 (1년 이내)
+// formInput: { year, month, day, hour, minute, gender, city }
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+export async function findCachedReport(formInput) {
+  const { year, month, day, hour, minute, gender, city } = formInput
+  const birth_date = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`
+  const birth_time = `${String(hour).padStart(2,'0')}:${String(minute||'0').padStart(2,'0')}`
+  const oneYearAgo = new Date()
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
+
+  const { data, error } = await supabase
+    .from('users')
+    .select(`
+      id,
+      reports (id, full_data_json, created_at)
+    `)
+    .eq('birth_date', birth_date)
+    .eq('birth_time', birth_time)
+    .eq('gender', gender)
+    .eq('city', city)
+    .maybeSingle()
+
+  if (error || !data) return null
+  if (!data.reports || data.reports.length === 0) return null
+
+  // 1년 이내 리포트만, 가장 최근 것
+  const recent = data.reports
+    .filter(r => new Date(r.created_at) > oneYearAgo)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0]
+
+  return recent ? recent.full_data_json : null
 }
