@@ -1,7 +1,13 @@
 // components/SajuReportPreview.jsx
-import React, { useState } from 'react';
-import { S, ST } from './ui.jsx';
-import { CY, CM, CD } from '../data/constants.js';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { S } from './ui.jsx';
+import TabSummary from './TabSummary.jsx';
+import TabSaju from './TabSaju.jsx';
+import TabInner from './TabInner.jsx';
+import TabTojung from './TabTojung.jsx';
+import TabAstro from './TabAstro.jsx';
+import TabMBTI from './TabMBTI.jsx';
+
 
 function SajuReport_Preview({data}){
   const [tab,setTab]=useState("요약");

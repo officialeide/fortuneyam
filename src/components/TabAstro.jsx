@@ -1,8 +1,10 @@
 // components/TabAstro.jsx
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import {cleanText, stripDegree,  CY } from '../data/constants.js';
+import { CY, stripDegree, cleanText } from '../data/constants.js';
 import { callNetlify } from '../utils/callNetlify.js';
-import { GT, ST, Ring, sc, S, HJ } from './ui.jsx';
+import { buildTarotPrompt, buildAstroPrompt } from '../utils/prompts.js';
+import { S, ST, HJ, GT, sc, Ring } from './ui.jsx';
+
 
 function TabAstro({d,parentAstroAI,setParentAstroAI,parentTarotAI,setParentTarotAI}){
   const a=d.astro,t=d.tarot;

@@ -1,6 +1,6 @@
 // components/AdminPage.jsx
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-
+import { SajuReport_Preview } from './SajuReportPreview.jsx';
 
 function AdminPage({onClose}){
   const [pw,setPw]=useState("");

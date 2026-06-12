@@ -1,4 +1,24 @@
 // utils/prompts.js
+
+function buildAstroPrompt(pillarsStr, ilganKo, ilganHanja, birth){
+  return `사주 명식: ${pillarsStr}. 일간(천간, 나 자신): ${ilganKo}(${ilganHanja}) — 이것이 일간이에요. 생년월일: ${birth}.
+이 사람의 서양 점성술 네이탈 차트를 사주 오행 에너지와 교차 분석해줘.
+출생 데이터를 기반으로 가장 가능성 높은 행성 위치를 추정하고, 각 행성이 사주 일간의 기질과 어떻게 공명하는지 설명해줘.
+각 행성 설명은 2~3문장. 삼각 핵심 분석(태양·달·ASC 관계)은 3~4문장.
+반드시 ~이에요, ~해요 체로 작성해줘. 한자는 반드시 한글(한자) 형식으로 병기해줘. 일간 한자는 반드시 ${ilganHanja}로만 표기해줘.
+별자리 이름은 반드시 한국어 "○○자리" 형식으로만 표기해줘 (예: 궁수자리, 전갈자리, 천칭자리, 처녀자리, 게자리). 도수(숫자)는 절대 표기하지 말고 별자리 이름만 써줘. 영어나 한자, 궁(宮) 표기 금지.
+이모지나 특수문자 사용 금지.
+JSON만 응답 (다른 텍스트 없음):
+{"sun":"○○자리","sunDesc":"..","moon":"○○자리","moonDesc":"..","asc":"○○자리","ascDesc":"..","mercury":"○○자리","mercuryDesc":"..","venus":"○○자리","venusDesc":"..","mars":"○○자리","marsDesc":"..","triangle":".."}`;
+}
+
+function buildTarotPrompt(tarot, ilganKo, ilganHanja){
+  return `생명경로수: ${tarot?.lifePath}. 본명 타로 카드: ${tarot?.lifePathCard}. 영혼 카드(Soul Card): ${tarot?.soulCard}. 성취 카드(Achievement Card): ${tarot?.achieveCard}. 사주 일간: ${ilganKo}(${ilganHanja}).
+이 사람의 성취 에너지를 사주 일간과 타로 성취 카드를 연결해서 딱 2문장으로 설명해줘.
+반드시 ~이에요, ~해요 체(언니체)로 작성해줘. 한 문장은 어떤 방식으로 성취하는지, 한 문장은 어떤 환경에서 빛나는지.
+JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
+}
+
 function buildInnerPrompt(data){
   const dn=data.daynight;
   const mb=data.mbti;
@@ -54,6 +74,7 @@ function buildDeepPrompt(key, data){
     guardian:    {title:"수호 에너지",       combo:"사주 용신 × 네이탈 수호성 × 타로 수호 × 당사주. 아래 항성(Fixed Star) 중 이 사람의 네이탈 차트와 가장 가까운 항성의 에너지를 반드시 언급해줘: 알파 스피카(Spica·처녀자리·창의·행운), 레굴루스(Regulus·사자자리·왕의 기운·리더십), 알데바란(Aldebaran·황소자리·용기·강인함), 안타레스(Antares·전갈자리·집중·극단적 에너지), 시리우스(Sirius·큰개자리·충성·지혜), 베가(Vega·거문고자리·예술·감수성), 포말하우트(Fomalhaut·물고기자리·꿈·이상주의). 사주 용신과 수호 항성 에너지가 어떻게 연결되는지 통합 분석해줘. 수호별과 수호 에너지를 함께 통합 분석해줘."},
   };
   const topic=TOPIC[key];
+  if(!topic) throw new Error(`buildDeepPrompt: unknown key '${key}'`);
   return `당신은 사주, 주역, 토정비결, 당사주, 네이탈차트, 타로, 수비학, MBTI를 통합해서 운세를 분석하는 전문가예요.
 
 ${base}
@@ -79,4 +100,4 @@ const DEEP_CARDS=[
   {group:"GROUP D", icon:"⭐",title:"수호 에너지",        key:"guardian",      bg:"#fff8e1",border:"#fde68a",tc:"#b45309"},
 ];
 
-export { buildInnerPrompt, buildDeepPrompt, DEEP_CARDS };
+export { buildAstroPrompt, buildTarotPrompt, buildInnerPrompt, buildDeepPrompt, DEEP_CARDS };

@@ -4,7 +4,8 @@ import { OC, GD, JD, GL, JL, GH, JH, gc, jc, OHK, GWAN_O, ILGAN_TITLE, ILGAN_PHI
   BASE, JASI_START, JASI_END, toJDN, idxToGJ, calcIlju, calcBnd, yearToGJ, mToGJ,
   getToday, CY, CM, CD, bYS, bMS, calcSeunScore, calcSeunAreas,
   BYEOLSEONG, STAGES, getStage, getIching, GAN_OE, getSibsong, calcWolju, calcSiju,
-  calcYeonju, getMonthJi, getTimeJi, calcOhaengDist, STAGE_DESC } from '../data/constants.js';
+  calcYeonju, getMonthJi, getTimeJi, calcOhaengDist, STAGE_DESC,
+  _GANO, _JIO, normO, JI_OE, isYang, isYangJ, YONGSIN_TABLE } from '../data/constants.js';
 import { getComboDesc } from '../data/comboDB.js';
 
 function calcSinsal(ilgan,yearJi,monthJi,dayJi,timeJi){
@@ -473,6 +474,5 @@ function buildSajuData(input){
     mbti:{estimated:mbtiType,userType:input?.mbti||"",basis:mbtiDesc,axes:mbtiAxes,borderline:`${mbtiType[2]==='F'?'F':'T'}↔${mbtiType[2]==='F'?'T':'F'} 경계: 상황에 따라 유연하게 전환돼요.`,strengths:ilganDB.strengths||[`${OHK[ilO]} 일간의 강점이 발휘되는 환경에서 최고의 실력이 나와요.`],challenges:ilganDB.challenges||[`용신 ${yongsinA_val} 기운이 부족하면 균형이 깨질 수 있어요.`],bestEnv:ilganDB.bestEnv||`${OHK[ilO]} 에너지가 잘 발휘되는 환경이에요.`,recovery:ilganDB.recovery||`용신인 ${yongsinA_val}를 활용한 루틴이 도움이 돼요.`},
   };
 }
-
 
 export { calcSinsal, calcLifePath, buildSajuData };

@@ -1,7 +1,8 @@
 // components/TabSaju.jsx
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { OC, gc, jc } from '../data/constants.js';
-import { GT, ST, Acc, S } from './ui.jsx';
+import { jc, gc, OC } from '../data/constants.js';
+import { BndBanner, S, Acc, ST, GT, Manseryeok, Ohaeng } from './ui.jsx';
+
 
 function TabSaju({d,reportData}){
   return <>

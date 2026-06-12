@@ -361,24 +361,7 @@ const CITIES=[
 ];
 
 
-function buildAstroPrompt(pillarsStr, ilganKo, ilganHanja, birth){
-  return `사주 명식: ${pillarsStr}. 일간(천간, 나 자신): ${ilganKo}(${ilganHanja}) — 이것이 일간이에요. 생년월일: ${birth}.
-이 사람의 서양 점성술 네이탈 차트를 사주 오행 에너지와 교차 분석해줘.
-출생 데이터를 기반으로 가장 가능성 높은 행성 위치를 추정하고, 각 행성이 사주 일간의 기질과 어떻게 공명하는지 설명해줘.
-각 행성 설명은 2~3문장. 삼각 핵심 분석(태양·달·ASC 관계)은 3~4문장.
-반드시 ~이에요, ~해요 체로 작성해줘. 한자는 반드시 한글(한자) 형식으로 병기해줘. 일간 한자는 반드시 ${ilganHanja}로만 표기해줘.
-별자리 이름은 반드시 한국어 "○○자리" 형식으로만 표기해줘 (예: 궁수자리, 전갈자리, 천칭자리, 처녀자리, 게자리). 도수(숫자)는 절대 표기하지 말고 별자리 이름만 써줘. 영어나 한자, 궁(宮) 표기 금지.
-이모지나 특수문자 사용 금지.
-JSON만 응답 (다른 텍스트 없음):
-{"sun":"○○자리","sunDesc":"..","moon":"○○자리","moonDesc":"..","asc":"○○자리","ascDesc":"..","mercury":"○○자리","mercuryDesc":"..","venus":"○○자리","venusDesc":"..","mars":"○○자리","marsDesc":"..","triangle":".."}`;
-}
 
-function buildTarotPrompt(tarot, ilganKo, ilganHanja){
-  return `생명경로수: ${tarot?.lifePath}. 본명 타로 카드: ${tarot?.lifePathCard}. 영혼 카드(Soul Card): ${tarot?.soulCard}. 성취 카드(Achievement Card): ${tarot?.achieveCard}. 사주 일간: ${ilganKo}(${ilganHanja}).
-이 사람의 성취 에너지를 사주 일간과 타로 성취 카드를 연결해서 딱 2문장으로 설명해줘.
-반드시 ~이에요, ~해요 체(언니체)로 작성해줘. 한 문장은 어떤 방식으로 성취하는지, 한 문장은 어떤 환경에서 빛나는지.
-JSON만 응답 (다른 텍스트 없음): {"achieveDesc":"..."}`;
-}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 딥카드 프롬프트 헬퍼

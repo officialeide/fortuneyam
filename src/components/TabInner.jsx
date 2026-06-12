@@ -2,8 +2,9 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { cleanText } from '../data/constants.js';
 import { callNetlify } from '../utils/callNetlify.js';
-import { buildInnerPrompt, buildDeepPrompt, DEEP_CARDS } from '../utils/prompts.js';
-import { ST, S } from './ui.jsx';
+import { buildInnerPrompt, DEEP_CARDS, buildDeepPrompt } from '../utils/prompts.js';
+import { S, ST } from './ui.jsx';
+
 
 function TabInner({d,parentInnerAI,setParentInnerAI}){
   const cacheKey=k=>`fy_inner_${k}_${d.birth}`;
@@ -25,7 +26,7 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
   // 기본 4개 아코디언 열림 상태
   const [basicOpen,setBasicOpen]=React.useState({rhythm:true,vitality:false});
 
-  // ── 딥카드 10개 상태 ──
+  // ── 딥카드 4개 상태 ──
   const [deepData,setDeepData]=React.useState(()=>{
     const init={};
     DEEP_CARDS.forEach(c=>{

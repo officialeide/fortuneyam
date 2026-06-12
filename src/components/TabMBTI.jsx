@@ -1,6 +1,6 @@
 // components/TabMBTI.jsx
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { ST, S } from './ui.jsx';
+import { S, ST } from './ui.jsx';
 
 function TabMBTI({d}){
   const m=d.mbti;
@@ -85,54 +85,6 @@ const OHAENG_LOADING=[
   {img:"/characters/metal.png", color:"#78909c", name:"금", label:"금 기운 분석 중"},
   {img:"/characters/water.png", color:"#5c6bc0", name:"수", label:"수 기운 분석 중"},
 ];
-
-function LoadingScreen({name}){
-  const [idx,setIdx]=useState(0);
-  const [visible,setVisible]=useState(true);
-  useEffect(()=>{
-    const iv=setInterval(()=>{
-      setVisible(false);
-      setTimeout(()=>{setIdx(i=>(i+1)%OHAENG_LOADING.length);setVisible(true);},300);
-    },1200);
-    return()=>clearInterval(iv);
-  },[]);
-  const cur=OHAENG_LOADING[idx];
-  return(
-    <div style={{position:"fixed",inset:0,background:"#fafafa",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:50}}>
-      <div style={{
-        width:100,height:100,borderRadius:30,
-        display:"flex",alignItems:"center",justifyContent:"center",
-        marginBottom:20,
-        transition:"opacity 0.35s, transform 0.35s",
-        opacity:visible?1:0,
-        transform:visible?"scale(1)":"scale(0.88)",
-      }}>
-        <img
-          src={cur.img}
-          alt={cur.name}
-          style={{width:100,height:100,objectFit:"contain"}}
-        />
-      </div>
-      <div style={{
-        fontSize:18,fontWeight:900,color:cur.color,
-        marginBottom:4,
-        transition:"opacity 0.35s",
-        opacity:visible?1:0,
-      }}>{cur.label}</div>
-      <div style={{fontSize:12,color:"#888",fontWeight:600,marginBottom:4}}>{name||""}님의 사주를 분석하고 있어요</div>
-      <div style={{fontSize:10,color:"#bbb",marginBottom:16}}>별자리·타로수비학까지 모두 준비할게요</div>
-      <div style={{display:"flex",gap:8,marginTop:4}}>
-        {OHAENG_LOADING.map((o,i)=>(
-          <div key={i} style={{
-            width:i===idx?20:6,height:6,borderRadius:99,
-            background:i===idx?OHAENG_LOADING[i].color:"#ddd",
-            transition:"all 0.3s"
-          }}/>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 
 export default TabMBTI;

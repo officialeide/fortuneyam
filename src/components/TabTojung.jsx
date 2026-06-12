@@ -1,8 +1,9 @@
 // components/TabTojung.jsx
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { JL, JH, jc } from '../data/constants.js';
+import { JH, jc, JL } from '../data/constants.js';
 import { getComboDesc } from '../data/comboDB.js';
-import { GT, ST, S } from './ui.jsx';
+import { S, ST, GT } from './ui.jsx';
+
 
 function TabTojung({d}){
   const tj=d.tojung,ic=d.iching,ds=d.dansaju;
@@ -30,7 +31,7 @@ function TabTojung({d}){
       </div>
       <p style={{fontSize:12,color:"#444",lineHeight:1.85,textAlign:"justify",margin:"10px 0 0"}}>{ic.gaeDesc}</p>
       <div style={{marginTop:10,padding:"11px 13px",background:"#e3f2fd",borderRadius:10}}><div style={{fontSize:10,color:"#0d47a1",fontWeight:700,marginBottom:3}}>현재 변괘 ({ic.currentYear})</div><div style={{fontSize:14,fontWeight:900,color:"#1565c0"}}>{ic.currentGae}</div><p style={{fontSize:11,color:"#555",margin:"5px 0 0",lineHeight:1.7,textAlign:"justify"}}>{ic.currentDesc}</p></div>
-      <div style={{marginTop:10,padding:"11px 13px",background:"#f9f9f9",borderRadius:10}}><div style={{fontSize:11,fontWeight:800,color:"#333",marginBottom:7}}>주역이 전하는 인생 전략 3가지</div>{ic.strategy.map((s,i)=><div key={i} style={{fontSize:12,color:"#555",padding:"5px 0",borderBottom:i<2?"1px dashed #eee":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{fontWeight:700,color:"#e65100",marginRight:6}}>{i+1}.</span>{s}</div>)}</div>
+      <div style={{marginTop:10,padding:"11px 13px",background:"#f9f9f9",borderRadius:10}}><div style={{fontSize:11,fontWeight:800,color:"#333",marginBottom:7}}>주역이 전하는 인생 전략 3가지</div>{(ic.strategy||[]).map((s,i)=><div key={i} style={{fontSize:12,color:"#555",padding:"5px 0",borderBottom:i<2?"1px dashed #eee":"none",lineHeight:1.7,textAlign:"justify"}}><span style={{fontWeight:700,color:"#e65100",marginRight:6}}>{i+1}.</span>{s}</div>)}</div>
     </section>
     {/* 당사주 */}
     <section style={S.card}>
