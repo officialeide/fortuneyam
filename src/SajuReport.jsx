@@ -1546,38 +1546,35 @@ function Ohaeng({d}){
       <div style={{fontSize:10,color:"#555",lineHeight:1.7}}>{d.singang==="신강(身强)"?"일간을 돕는 기운이 넉넉한 구조예요.":"사주 8글자 중 나를 도와주는 기운보다 소모시키는 기운이 더 많은 구조예요. 에너지를 쓰는 만큼 채우는 것이 중요한 체질이에요."}</div>
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:7}}>
-      {/* 용신/희신/기신 안내 */}
-      <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:2}}>
-        {[
-          {name:"용신",desc:"지금 내게 가장 도움되는 오행",bg:"#e8f5e0",tc:"#2d6a2d"},
-          {name:"희신",desc:"간접적으로 힘을 주는 오행",bg:"#f1f8e9",tc:"#558b2f"},
-          {name:"기신",desc:"기운을 빼앗는 피해야 할 오행",bg:"#fdecea",tc:"#b71c1c"},
-        ].map(({name,desc,bg,tc})=>(
-          <div key={name} style={{display:"flex",alignItems:"center",gap:5,padding:"4px 9px",background:bg,borderRadius:99}}>
-            <span style={{fontSize:10,fontWeight:800,color:tc}}>{name}</span>
-            <span style={{fontSize:10,color:"#666"}}>{desc}</span>
-          </div>
-        ))}
-      </div>
       {[
         {label:"",bg:"#f1f8e9",border:"#c5e1a5",items:[
-          {name:"용신",val:d.yongsinA,pillBg:"#33691e",pillTc:"#fff",valC:"#333"},
-          {name:"희신",val:d.huisinA,pillBg:"#e8f5e0",pillTc:"#2d6a2d",valC:"#444"},
-          {name:"기신",val:d.gisinA,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
+          {name:"용신",val:d.yongsinA,pillBg:"#33691e",pillTc:"#fff",valC:"#333",desc:"도움되는 기운",descBg:"#e8f5e0",descTc:"#2d6a2d"},
+          {name:"희신",val:d.huisinA,pillBg:"#e8f5e0",pillTc:"#2d6a2d",valC:"#444",desc:"간접 도움",descBg:"#f1f8e9",descTc:"#558b2f"},
+          {name:"기신",val:d.gisinA,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444",desc:"피할 기운",descBg:"#fdecea",descTc:"#b71c1c"},
         ]},
         ...(d.yongsinB&&d.yongsinB!=="분석 중"?[{label:"야자시 기준",bg:"#fff8e1",border:"#ffe082",items:[
-          {name:"용신",val:d.yongsinB,pillBg:"#e65100",pillTc:"#fff",valC:"#333"},
-          {name:"희신",val:d.huisinB,pillBg:"#fff3e0",pillTc:"#7b5800",valC:"#444"},
-          {name:"기신",val:d.gisinB,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
+          {name:"용신",val:d.yongsinB,pillBg:"#e65100",pillTc:"#fff",valC:"#333",desc:"도움되는 기운",descBg:"#fff3e0",descTc:"#e65100"},
+          {name:"희신",val:d.huisinB,pillBg:"#fff3e0",pillTc:"#7b5800",valC:"#444",desc:"간접 도움",descBg:"#fff8e1",descTc:"#7b5800"},
+          {name:"기신",val:d.gisinB,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444",desc:"피할 기운",descBg:"#fdecea",descTc:"#b71c1c"},
         ]}]:[]),
       ].map(({label,bg,border,items})=>(
         <div key={label||"main"} style={{padding:"8px 12px",background:bg,borderRadius:10,border:`1px solid ${border}`}}>
           {label&&<div style={{fontSize:10,color:"#888",fontWeight:600,marginBottom:6}}>{label}</div>}
-          <div style={{display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
+          {/* 결과값 */}
+          <div style={{display:"flex",alignItems:"center",gap:14,flexWrap:"wrap",marginBottom:7}}>
             {items.map(({name,val,pillBg,pillTc,valC})=>(
               <div key={name} style={{display:"flex",alignItems:"center",gap:6}}>
                 <span style={{background:pillBg,color:pillTc,fontSize:10,fontWeight:800,padding:"3px 9px",borderRadius:7,whiteSpace:"nowrap"}}>{name}</span>
                 <span style={{fontSize:13,fontWeight:900,color:valC,whiteSpace:"nowrap"}}>{val}</span>
+              </div>
+            ))}
+          </div>
+          {/* 설명 뱃지 — 한 줄 나란히 */}
+          <div style={{display:"flex",gap:6,flexWrap:"nowrap"}}>
+            {items.map(({name,desc,descBg,descTc})=>(
+              <div key={name} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:4,padding:"3px 6px",background:descBg,borderRadius:6,minWidth:0}}>
+                <span style={{fontSize:9,fontWeight:800,color:descTc,whiteSpace:"nowrap"}}>{name}</span>
+                <span style={{fontSize:9,color:"#666",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{desc}</span>
               </div>
             ))}
           </div>
@@ -1691,7 +1688,7 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
   const [innerErr,setInnerErr]=React.useState(false);
 
   // 기본 4개 아코디언 열림 상태
-  const [basicOpen,setBasicOpen]=React.useState({vitality:false});
+  const [basicOpen,setBasicOpen]=React.useState({rhythm:true,vitality:false});
 
   // ── 딥카드 10개 상태 ──
   const [deepData,setDeepData]=React.useState(()=>{
@@ -1808,9 +1805,9 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
           ?<SkelBlock err={false}/>
           :err?<SkelBlock err={true}/>
           :<>
-            <p style={{fontSize:13,color:"#444",lineHeight:1.85,margin:"0 0 10px",textAlign:"justify"}}>{data.para1}</p>
-            <p style={{fontSize:13,color:"#444",lineHeight:1.85,margin:"0 0 10px",textAlign:"justify"}}>{data.para2}</p>
-            <p style={{fontSize:13,fontWeight:800,color:"#111",lineHeight:1.75,margin:0,textAlign:"justify"}}>{data.conclusion}</p>
+            <p style={{fontSize:12,color:"#444",lineHeight:1.85,margin:"0 0 10px",textAlign:"justify"}}>{data.para1}</p>
+            <p style={{fontSize:12,color:"#444",lineHeight:1.85,margin:"0 0 10px",textAlign:"justify"}}>{data.para2}</p>
+            <p style={{fontSize:12,fontWeight:800,color:"#111",lineHeight:1.75,margin:0,textAlign:"justify"}}>{data.conclusion}</p>
           </>
         }
       </div>
@@ -1867,23 +1864,29 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
       </div>
     </section>
 
-    {/* ─── 내면의 리듬 — 항상 열림, 자동 로딩 ─── */}
-    <section style={S.card}>
-      <ST icon="🌊" title="내면의 리듬"/>
-      <GT>감정 패턴·분노 트리거·다크사이드·자기 객관화를 통합 분석해요.</GT>
-      {innerLoading
-        ?<SkelBlock err={false}/>
-        :innerErr
-          ?<SkelBlock err={true} onRetry={runInnerFetch}/>
-          :innerAI
-            ?<div style={{marginTop:10}}>
-                {cleanText(innerAI.innerRhythm||"").split("\n\n").map((para,i)=>(
-                  <p key={i} style={{fontSize:13,color:"#444",lineHeight:1.85,margin:i>0?"10px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}>{para}</p>
-                ))}
-              </div>
-            :<SkelBlock err={false}/>
-      }
-    </section>
+    {/* ─── 내면의 리듬 — 아코디언, 디폴트 열림 ─── */}
+    {(()=>{
+      const open=basicOpen.rhythm;
+      return(
+        <div>
+          <AccHead open={open} onToggle={()=>setBasicOpen(p=>({...p,rhythm:!p.rhythm}))} icon="🌊" title="내면의 리듬"/>
+          {open&&(
+            <div style={{padding:"14px 16px",background:"#fff",border:"1px solid #ebebeb",borderTop:"none",borderRadius:"0 0 12px 12px"}}>
+              {innerLoading
+                ?<SkelBlock err={false}/>
+                :innerErr
+                  ?<SkelBlock err={true} onRetry={runInnerFetch}/>
+                  :innerAI
+                    ?<>{cleanText(innerAI.innerRhythm||"").split("\n\n").map((para,i)=>(
+                        <p key={i} style={{fontSize:12,color:"#444",lineHeight:1.85,margin:i>0?"10px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}>{para}</p>
+                      ))}</>
+                    :<SkelBlock err={false}/>
+              }
+            </div>
+          )}
+        </div>
+      );
+    })()}
 
     {/* ─── 활력 충전법 (운동+취미 통합) ─── */}
     {(()=>{
@@ -2756,10 +2759,10 @@ function buildDeepPrompt(key, data){
 토정비결: ${data.tojung?.saja||""}`;
 
   const TOPIC={
-    talent:      {title:"내 DNA에 새겨진 재능",         combo:"사주 용신 × 네이탈 MC × 수비학 표현수"},
-    monthRelease:{title:"이번 달 초점", combo:"주역 × 타로 월간 × 수비학 개인월. '과도한 욕심'이 있다면 어떤 종류의 욕심인지(예: 인정 욕구, 빠른 성과, 관계 집착 등) 구체적으로 서술해줘. 일반론 금지, 이 사람의 데이터에 맞는 구체적 사례로 써줘."},
-    soulMission: {title:"이번 생의 영혼 미션",           combo:"사주 일주 × 타로 메이저 × 당사주 전생궁 × 네이탈 노스노드 × 수비학 생명수. 전생에서 가져온 업과 이번 생에서 완성해야 할 미션을 연결해서 분석해줘."},
-    guardian:    {title:"나를 지키는 수호 에너지",       combo:`사주 용신 × 네이탈 수호성 × 타로 수호 × 당사주. 아래 항성(Fixed Star) 중 이 사람의 네이탈 차트와 가장 가까운 항성의 에너지를 반드시 언급해줘: 알파 스피카(Spica·처녀자리·창의·행운), 레굴루스(Regulus·사자자리·왕의 기운·리더십), 알데바란(Aldebaran·황소자리·용기·강인함), 안타레스(Antares·전갈자리·집중·극단적 에너지), 시리우스(Sirius·큰개자리·충성·지혜), 베가(Vega·거문고자리·예술·감수성), 포말하우트(Fomalhaut·물고기자리·꿈·이상주의). 사주 용신과 수호 항성 에너지가 어떻게 연결되는지 통합 분석해줘. 수호별과 수호 에너지를 함께 통합 분석해줘.`},
+    talent:      {title:"숨겨진 재능",         combo:"사주 용신 × 네이탈 MC × 수비학 표현수"},
+    monthRelease:{title:"이번달 에너지", combo:"주역 × 타로 월간 × 수비학 개인월. '과도한 욕심'이 있다면 어떤 종류의 욕심인지(예: 인정 욕구, 빠른 성과, 관계 집착 등) 구체적으로 서술해줘. 일반론 금지, 이 사람의 데이터에 맞는 구체적 사례로 써줘."},
+    soulMission: {title:"소울 미션",           combo:"사주 일주 × 타로 메이저 × 당사주 전생궁 × 네이탈 노스노드 × 수비학 생명수. 전생에서 가져온 업과 이번 생에서 완성해야 할 미션을 연결해서 분석해줘."},
+    guardian:    {title:"수호 에너지",       combo:`사주 용신 × 네이탈 수호성 × 타로 수호 × 당사주. 아래 항성(Fixed Star) 중 이 사람의 네이탈 차트와 가장 가까운 항성의 에너지를 반드시 언급해줘: 알파 스피카(Spica·처녀자리·창의·행운), 레굴루스(Regulus·사자자리·왕의 기운·리더십), 알데바란(Aldebaran·황소자리·용기·강인함), 안타레스(Antares·전갈자리·집중·극단적 에너지), 시리우스(Sirius·큰개자리·충성·지혜), 베가(Vega·거문고자리·예술·감수성), 포말하우트(Fomalhaut·물고기자리·꿈·이상주의). 사주 용신과 수호 항성 에너지가 어떻게 연결되는지 통합 분석해줘. 수호별과 수호 에너지를 함께 통합 분석해줘.`},
   };
   const topic=TOPIC[key];
   return `당신은 사주, 주역, 토정비결, 당사주, 네이탈차트, 타로, 수비학, MBTI를 통합해서 운세를 분석하는 전문가예요.
@@ -2781,10 +2784,10 @@ JSON만 응답 (다른 텍스트 없이):
 // 딥카드 메타데이터
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const DEEP_CARDS=[
-  {group:"GROUP A — 나는 누구인가", icon:"🧬",title:"내 DNA에 새겨진 재능",      key:"talent",        bg:"#f0fdf4",border:"#bbf7d0",tc:"#166534"},
-  {group:"GROUP B — 내 인생의 흐름",icon:"📅",title:"이번 달 초점",key:"monthRelease",bg:"#fdf4ff",border:"#e9d5ff",tc:"#6b21a8"},
-  {group:"GROUP C — 우주적 나",     icon:"✨",title:"이번 생의 영혼 미션",         key:"soulMission",   bg:"#1e1b4b",border:"#4c1d95",tc:"#c4b5fd",dark:true},
-  {group:"GROUP D — 나를 지키는 것들",icon:"⭐",title:"나를 지키는 수호 에너지",  key:"guardian",      bg:"#fff8e1",border:"#fde68a",tc:"#b45309"},
+  {group:"GROUP A", icon:"🧬",title:"숨겨진 재능",      key:"talent",        bg:"#f0fdf4",border:"#bbf7d0",tc:"#166534"},
+  {group:"GROUP B", icon:"📅",title:"이번달 에너지",     key:"monthRelease",  bg:"#fdf4ff",border:"#e9d5ff",tc:"#6b21a8"},
+  {group:"GROUP C", icon:"✨",title:"소울 미션",          key:"soulMission",   bg:"#1e1b4b",border:"#4c1d95",tc:"#c4b5fd",dark:true},
+  {group:"GROUP D", icon:"⭐",title:"수호 에너지",        key:"guardian",      bg:"#fff8e1",border:"#fde68a",tc:"#b45309"},
 ];
 
 
