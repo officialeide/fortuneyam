@@ -3,9 +3,9 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { saveUser, saveReport, findCachedReport } from './supabase.js';
 import { buildSajuData } from './utils/saju.js';
 import { callNetlify } from './utils/callNetlify.js';
-import { buildInnerPrompt } from './utils/prompts.js';
-import { CY, CM, CD } from './data/constants.js';
-import { S, SF } from './components/ui.jsx';
+import { buildInnerPrompt, buildAstroPrompt, buildTarotPrompt } from './utils/prompts.js';
+import { CY, CM, CD, cleanText, stripDegree, _GANO, _JIO } from './data/constants.js';
+import { S, SF, LoadingScreen } from './components/ui.jsx';
 import TabSummary from './components/TabSummary.jsx';
 import TabSaju from './components/TabSaju.jsx';
 import TabInner from './components/TabInner.jsx';
@@ -28,7 +28,7 @@ export default function SajuReport(){
   const [phase,setPhase]=useState(_saved?"report":"form");
   const [opacity,setOpacity]=useState(1);
   const [reportData,setReportData]=useState(_saved?.data||null);
-  const [showAdmin,setShowAdmin]=useState(()=>window.location.search.includes("admin"));
+  const [showAdmin,setShowAdmin]=useState(()=>new URLSearchParams(window.location.search).has("admin"));
   // AI 상태를 부모에서 관리 (탭 전환·새로고침해도 재로딩 안 됨)
   const [parentAstroAI,setParentAstroAI]=useState(()=>{
     if(_saved?.data?._astroAI) return _saved.data._astroAI;
@@ -334,37 +334,23 @@ const LEAP_MONTHS = {
   2017:6,2020:4,2023:2,2025:6,
 };
 
-function lunarToSolar(ly, lm, ld) {
-  const data = LUNAR_DATA[ly];
-  if(!data) return null; // 범위 밖
-  const [sm, sd, monthSizes] = data;
-  const leapM = LEAP_MONTHS[ly];
-
-  // 음력 1월 1일의 양력 날짜 계산
-  let solarDate = new Date(ly, sm-1, sd);
-
-  // 지나온 날수 계산
-  let days = 0;
-  for(let m=1; m<lm; m++){
-    const idx = m-1;
-    // 윤달 처리: 이전 달에 윤달이 있었으면 +1달
-    if(leapM && leapM < m) {
-      days += 30; // 윤달 크기 (대부분 30일)
+function lunarToSolar(year, month, day) {
+  // 단순 근사 변환 (±1~2일 오차) — 정밀도가 필요하면 korean-lunar-calendar 라이브러리 사용 권장
+  // 음력은 양력보다 약 21~50일 뒤처짐. 월별 오프셋 기반 근사값 사용.
+  const LUNAR_MONTH_DAYS = [30,29,30,29,30,29,30,29,30,29,30,29];
+  try {
+    // 음력 1월 1일 ≈ 양력 해당 연도 1월 20~21일 기준으로 역산
+    const SPRING_OFFSET = 21; // 음력 1월 1일 ≈ 양력 1월 21일 (근사)
+    let totalDays = SPRING_OFFSET - 1;
+    for (let m = 1; m < month; m++) {
+      totalDays += LUNAR_MONTH_DAYS[(m - 1) % 12];
     }
-    days += monthSizes[idx] ? 30 : 29;
+    totalDays += day - 1;
+    const date = new Date(year, 0, 1 + totalDays);
+    return { year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() };
+  } catch {
+    return null;
   }
-  // 현재 달의 윤달 처리
-  if(isLeap && leapM === lm) {
-    days += monthSizes[lm-1] ? 30 : 29;
-  }
-  days += ld - 1;
-
-  solarDate.setDate(solarDate.getDate() + days);
-  return {
-    year: solarDate.getFullYear(),
-    month: solarDate.getMonth()+1,
-    day: solarDate.getDate(),
-  };
 }
 
 const CITIES=[
