@@ -1,12 +1,6 @@
 // components/SajuReportPreview.jsx
-import React, {{ useState, useMemo, useRef, useEffect }} from 'react';
-import {{ GT, ST, Ring, sc, scBg, GCard, JCard, Acc, S, SF, HJ }} from './ui.jsx';
-import {{ OC, GD, JD, GL, JL, GH, JH, gc, jc, yyE, OHK, cleanText, stripDegree,
-  ILGAN_TITLE, ILGAN_PHILOSOPHY, GWAN_O, CY, CM, CD, TRIGRAM,
-  BYEOLSEONG, STAGES, STAGE_DESC, TOJUNG_SAJA }} from '../data/constants.js';
-import {{ getComboDesc }} from '../data/comboDB.js';
-import {{ callNetlify }} from '../utils/callNetlify.js';
-import {{ buildInnerPrompt, buildDeepPrompt, DEEP_CARDS }} from '../utils/prompts.js';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { S } from './ui.jsx';
 
 function SajuReport_Preview({data}){
   const [tab,setTab]=useState("요약");
@@ -50,5 +44,25 @@ function SajuInputForm({onSubmit}){
   const up=(k,v)=>setForm(f=>({...f,[k]:v}));
   const timeInputRef=useRef(null);
   const timeFieldRef=useRef(null);
+
+  function validate1(){
+    const e={};
+    if(!form.name.trim()) e.name="이름을 입력해주세요";
+    const y=parseInt(form.year),m=parseInt(form.month),d=parseInt(form.day);
+    if(!form.year||!form.birthRaw||y<1931||y>2030) e.year="생년월일 6자리를 입력해주세요";
+    if(!form.month||m<1||m>12) e.month="월을 확인해주세요";
+    if(!form.day||d<1||d>31) e.day="일을 확인해주세요";
+    if(!Object.keys(e).length && calType==="lunar"){
+      const converted=lunarToSolar(y,m,d);
+      if(!converted){ e.year="해당 음력 날짜를 변환할 수 없어요 (1990~2025 지원)"; }
+      else { up("year",String(converted.year)); up("month",String(converted.month)); up("day",String(converted.day)); }
+    }
+    setErr(e);
+    return Object.keys(e).length===0;
+  }
+  function next(){if(step===1&&validate1()) setStep(2); else if(step===2) setStep(3);}
+
+  const OC2={여:{bg:"#fce4ec",c:"#880e4f"},남:{bg:"#e3f2fd",c:"#0d47a1"}};
+
 
 export { SajuReport_Preview };

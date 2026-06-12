@@ -3,8 +3,8 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { saveUser, saveReport, findCachedReport } from './supabase.js';
 import { buildSajuData } from './utils/saju.js';
 import { callNetlify } from './utils/callNetlify.js';
-import { buildInnerPrompt, buildDeepPrompt } from './utils/prompts.js';
-import { CY, CM, CD, cleanText } from './data/constants.js';
+import { buildInnerPrompt } from './utils/prompts.js';
+import { CY, CM, CD } from './data/constants.js';
 import { S, SF } from './components/ui.jsx';
 import TabSummary from './components/TabSummary.jsx';
 import TabSaju from './components/TabSaju.jsx';
@@ -13,7 +13,6 @@ import TabTojung from './components/TabTojung.jsx';
 import TabAstro from './components/TabAstro.jsx';
 import TabMBTI from './components/TabMBTI.jsx';
 import { AdminPage } from './components/AdminPage.jsx';
-import { SajuReport_Preview } from './components/SajuReportPreview.jsx';
 
 export default function SajuReport(){
   // sessionStorage 복원
@@ -375,19 +374,6 @@ const CITIES=[
   "경남 창원","경남 진주","전남 순천","전북 전주",
 ];
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 공용 AI 호출 헬퍼
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-async function callNetlify(body){
-  const res=await fetch("/.netlify/functions/claude",{
-    method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(body)
-  });
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
-  const d=await res.json();
-  if(d.error) throw new Error(d.error.message||"API 오류");
-  return d.content?.map(c=>c.text||"").join("").replace(/```json|```/g,"").trim();
-}
 
 function buildAstroPrompt(pillarsStr, ilganKo, ilganHanja, birth){
   return `사주 명식: ${pillarsStr}. 일간(천간, 나 자신): ${ilganKo}(${ilganHanja}) — 이것이 일간이에요. 생년월일: ${birth}.

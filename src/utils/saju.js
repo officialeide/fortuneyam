@@ -7,7 +7,6 @@ import { OC, GD, JD, GL, JL, GH, JH, gc, jc, OHK, GWAN_O, ILGAN_TITLE, ILGAN_PHI
   calcYeonju, getMonthJi, getTimeJi, calcOhaengDist, STAGE_DESC } from '../data/constants.js';
 import { getComboDesc } from '../data/comboDB.js';
 
-}
 function calcSinsal(ilgan,yearJi,monthJi,dayJi,timeJi){
   const result=[];
   const taeul={갑:["축","미"],무:["축","미"],경:["축","미"],을:["자","신"],기:["자","신"],병:["해","유"],정:["해","유"],임:["묘","사"],계:["묘","사"],신:["오","인"]};

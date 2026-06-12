@@ -1,12 +1,9 @@
 // components/TabInner.jsx
-import React, {{ useState, useMemo, useRef, useEffect }} from 'react';
-import {{ GT, ST, Ring, sc, scBg, GCard, JCard, Acc, S, SF, HJ }} from './ui.jsx';
-import {{ OC, GD, JD, GL, JL, GH, JH, gc, jc, yyE, OHK, cleanText, stripDegree,
-  ILGAN_TITLE, ILGAN_PHILOSOPHY, GWAN_O, CY, CM, CD, TRIGRAM,
-  BYEOLSEONG, STAGES, STAGE_DESC, TOJUNG_SAJA }} from '../data/constants.js';
-import {{ getComboDesc }} from '../data/comboDB.js';
-import {{ callNetlify }} from '../utils/callNetlify.js';
-import {{ buildInnerPrompt, buildDeepPrompt, DEEP_CARDS }} from '../utils/prompts.js';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { cleanText } from '../data/constants.js';
+import { callNetlify } from '../utils/callNetlify.js';
+import { buildInnerPrompt, buildDeepPrompt, DEEP_CARDS } from '../utils/prompts.js';
+import { ST, S } from './ui.jsx';
 
 function TabInner({d,parentInnerAI,setParentInnerAI}){
   const cacheKey=k=>`fy_inner_${k}_${d.birth}`;
