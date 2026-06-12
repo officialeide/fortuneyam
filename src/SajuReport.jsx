@@ -1204,9 +1204,13 @@ function buildSajuData(input){
     {icon:"✨",title:"신살(神殺)",desc:sinsal.length>0?sinsal.map(s=>s.name).join("·")+" 발동":"특별한 신살이 없는 안정적인 구조예요."},
   ];
 
-  // 당사주 종합 기질 — 4별성 + 일간/신강신약을 엮은 요약 (이슈12)
+  // 종합 기질 — 토정비결+주역+당사주+일간 인사이트형 통합 (~300자)
   const _dsName=n=>n.split("(")[0];
-  const dansajuOverall=`당사주는 인생의 네 영역에 별이 하나씩 자리 잡고 있어요. 뿌리·집안을 뜻하는 년주에 ${_dsName(dansajuPillars[0].byeolseong)}, 부모·성장기를 뜻하는 월주에 ${_dsName(dansajuPillars[1].byeolseong)}, 나 자신·배우자를 뜻하는 일주에 ${_dsName(dansajuPillars[2].byeolseong)}, 자녀·말년을 뜻하는 시주에 ${_dsName(dansajuPillars[3].byeolseong)}이 들어와 있어요. 중심이 되는 일주의 ${_dsName(dansajuPillars[2].byeolseong)}이 삶의 핵심 색깔을 만들고, 나머지 세 별이 시기별로 그 기운을 거들어요. ${ILGAN_TITLE[ilgan]} 같은 ${OHK[ilO]} 일간의 ${singang.replace(/\(.*\)/,"")} 기질과 어우러져, ${ilganDB.core.replace(/^[^:]*:\s*/,"")}`;
+  const _ilganTitle=ILGAN_TITLE[ilgan]||"";
+  const _ichNature=ichingData?.nature||"";
+  const _sajaName=sajaDB?.saja||"";
+  const _iljiStar=_dsName(dansajuPillars[2].byeolseong);
+  const dansajuOverall=`${_ilganTitle} 같은 ${OHK[ilO]} 일간의 ${singang.replace(/\(.*\)/,"")} 기질과 어우러져, ${ilganDB.core.replace(/^[^:]*:\s*/,"")} 토정비결 ${_sajaName}의 흐름은 ${sajaDB?.desc?.slice(0,30)||""}…의 에너지를 담고 있어요. 주역 ${ichingData?.name||""}(${_ichNature})의 기운이 이 흐름을 뒷받침해요. 당사주 일주의 ${_iljiStar}이 삶의 중심축이 되고, 나머지 세 별이 시기별로 그 기운을 거들어요.`;
 
 
   // ━━ 세운 점수 메타 — sajaDB, ichingData, dansajuPillars 모두 정의된 후에 계산 ━━
@@ -1542,22 +1546,35 @@ function Ohaeng({d}){
       <div style={{fontSize:10,color:"#555",lineHeight:1.7}}>{d.singang==="신강(身强)"?"일간을 돕는 기운이 넉넉한 구조예요.":"사주 8글자 중 나를 도와주는 기운보다 소모시키는 기운이 더 많은 구조예요. 에너지를 쓰는 만큼 채우는 것이 중요한 체질이에요."}</div>
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:7}}>
+      {/* 용신/희신/기신 안내 */}
+      <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:2}}>
+        {[
+          {name:"용신",desc:"지금 내게 가장 도움되는 오행",bg:"#e8f5e0",tc:"#2d6a2d"},
+          {name:"희신",desc:"간접적으로 힘을 주는 오행",bg:"#f1f8e9",tc:"#558b2f"},
+          {name:"기신",desc:"기운을 빼앗는 피해야 할 오행",bg:"#fdecea",tc:"#b71c1c"},
+        ].map(({name,desc,bg,tc})=>(
+          <div key={name} style={{display:"flex",alignItems:"center",gap:5,padding:"4px 9px",background:bg,borderRadius:99}}>
+            <span style={{fontSize:10,fontWeight:800,color:tc}}>{name}</span>
+            <span style={{fontSize:10,color:"#666"}}>{desc}</span>
+          </div>
+        ))}
+      </div>
       {[
         {label:"",bg:"#f1f8e9",border:"#c5e1a5",items:[
-          {name:"용신",sub:"도움되는 기운",val:d.yongsinA,pillBg:"#33691e",pillTc:"#fff",valC:"#333"},
-          {name:"희신",sub:"간접 도움",val:d.huisinA,pillBg:"#e8f5e0",pillTc:"#2d6a2d",valC:"#444"},
-          {name:"기신",sub:"피할 기운",val:d.gisinA,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
+          {name:"용신",val:d.yongsinA,pillBg:"#33691e",pillTc:"#fff",valC:"#333"},
+          {name:"희신",val:d.huisinA,pillBg:"#e8f5e0",pillTc:"#2d6a2d",valC:"#444"},
+          {name:"기신",val:d.gisinA,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
         ]},
         ...(d.yongsinB&&d.yongsinB!=="분석 중"?[{label:"야자시 기준",bg:"#fff8e1",border:"#ffe082",items:[
-          {name:"용신",sub:"도움되는 기운",val:d.yongsinB,pillBg:"#e65100",pillTc:"#fff",valC:"#333"},
-          {name:"희신",sub:"간접 도움",val:d.huisinB,pillBg:"#fff3e0",pillTc:"#7b5800",valC:"#444"},
-          {name:"기신",sub:"피할 기운",val:d.gisinB,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
+          {name:"용신",val:d.yongsinB,pillBg:"#e65100",pillTc:"#fff",valC:"#333"},
+          {name:"희신",val:d.huisinB,pillBg:"#fff3e0",pillTc:"#7b5800",valC:"#444"},
+          {name:"기신",val:d.gisinB,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
         ]}]:[]),
       ].map(({label,bg,border,items})=>(
         <div key={label||"main"} style={{padding:"8px 12px",background:bg,borderRadius:10,border:`1px solid ${border}`}}>
           {label&&<div style={{fontSize:10,color:"#888",fontWeight:600,marginBottom:6}}>{label}</div>}
           <div style={{display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
-            {items.map(({name,sub,val,pillBg,pillTc,valC})=>(
+            {items.map(({name,val,pillBg,pillTc,valC})=>(
               <div key={name} style={{display:"flex",alignItems:"center",gap:6}}>
                 <span style={{background:pillBg,color:pillTc,fontSize:10,fontWeight:800,padding:"3px 9px",borderRadius:7,whiteSpace:"nowrap"}}>{name}</span>
                 <span style={{fontSize:13,fontWeight:900,color:valC,whiteSpace:"nowrap"}}>{val}</span>
@@ -1835,7 +1852,7 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
         <div style={{padding:"10px 14px",background:"#1e1b4b",borderRadius:11}}>
           <div style={{fontSize:11,fontWeight:800,color:"#818cf8",marginBottom:8}}>관계 에너지</div>
           {dn.night.attraction&&<div style={{marginBottom:8}}>
-            <div style={{fontSize:10,color:"#c4b5fd",fontWeight:700,marginBottom:3}}>이성에게 치명적인 매력</div>
+            <div style={{fontSize:10,color:"#c4b5fd",fontWeight:700,marginBottom:3}}>매력</div>
             <p style={{fontSize:12,color:"#e8e8f0",margin:0,lineHeight:1.75}}>{dn.night.attraction}</p>
           </div>}
           {dn.night.idealType&&<div style={{marginBottom:8,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.1)"}}>
@@ -1972,9 +1989,7 @@ function TabTojung({d}){
       </div>
       <div style={{marginTop:10,padding:"11px 13px",background:"#e8f5e0",borderRadius:10}}>
         <div style={{fontSize:11,fontWeight:800,color:"#2d6a2d",marginBottom:5}}>종합 기질</div>
-        <p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.8,textAlign:"justify"}}>
-          {`토정비결 ${tj.saja}(${tj.bonunDesc?.slice(0,30)}…), 주역 ${ic.bonmyeonggae}(${ic.gaeNature}). ${ds.overall}`}
-        </p>
+        <p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.8,textAlign:"justify"}}>{ds.overall}</p>
       </div>
     </section>
   </>;
@@ -2713,11 +2728,11 @@ function buildInnerPrompt(data){
 한자 절대 사용 금지. 전문 용어 쓰면 반드시 쉽게 풀어서 설명해줘.
 반드시 ~이에요, ~해요 체(언니체). "${data.name}님"으로 지칭. 이모지·마크다운 금지.
 
-1. innerRhythm (string): 감정 트리거·분노 패턴·다크사이드·진상 패턴을 통합한 내면 분석 에세이.
-   문단1(2문장): 어떤 상황에서 감정이 올라오는지, 내면의 그림자 패턴.
-   문단2(2문장): 회복 방식과 자기 객관화 포인트.
+1. innerRhythm (string): 감정 패턴·내면의 그림자·자기 객관화를 통합한 내면 분석 에세이.
+   문단1(2문장): 어떤 구체적인 상황(예: "인정받지 못할 때", "예상치 못한 변화가 생길 때")에서 감정이 크게 움직이는지 묘사. "감정이 폭발해요" 같은 부정적 표현 금지 — "감동을 받아요", "마음이 크게 흔들려요" 같은 중립·긍정 표현 사용.
+   문단2(2문장): 회복 방식과 자기 객관화 포인트. 가볍고 공감되는 톤으로. "억눌린 화" 같은 부정적 표현 대신 "에너지가 내면으로 향해요" 같은 표현 사용.
    결론(1문장): 핵심 통찰 + 위로.
-   전체 300자 이내.
+   전체 300자 이내. "폭발", "폭발하려", "억누르" 등 부정적 단어 절대 사용 금지.
 
 2. exercise (array, 3개): 개운 운동 추천. 각각 {"name":"운동명","reason":"왜 이 사람한테 맞는지 2문장. 사주 근거 포함."}
 3. hobby (array, 3개): 개운 취미 추천. 각각 {"name":"취미명","reason":"왜 이 사람한테 맞는지 2문장. 사주 근거 포함."}
@@ -2742,9 +2757,9 @@ function buildDeepPrompt(key, data){
 
   const TOPIC={
     talent:      {title:"내 DNA에 새겨진 재능",         combo:"사주 용신 × 네이탈 MC × 수비학 표현수"},
-    monthRelease:{title:"이번 달 놔야 할 것 vs 잡아야 할 것", combo:"주역 × 타로 월간 × 수비학 개인월"},
+    monthRelease:{title:"이번 달 초점", combo:"주역 × 타로 월간 × 수비학 개인월. '과도한 욕심'이 있다면 어떤 종류의 욕심인지(예: 인정 욕구, 빠른 성과, 관계 집착 등) 구체적으로 서술해줘. 일반론 금지, 이 사람의 데이터에 맞는 구체적 사례로 써줘."},
     soulMission: {title:"이번 생의 영혼 미션",           combo:"사주 일주 × 타로 메이저 × 당사주 전생궁 × 네이탈 노스노드 × 수비학 생명수. 전생에서 가져온 업과 이번 생에서 완성해야 할 미션을 연결해서 분석해줘."},
-    guardian:    {title:"나를 지키는 수호 에너지",       combo:"사주 용신 × 네이탈 수호성 × 타로 수호 × 당사주. 수호별과 수호 에너지를 함께 통합 분석해줘."},
+    guardian:    {title:"나를 지키는 수호 에너지",       combo:`사주 용신 × 네이탈 수호성 × 타로 수호 × 당사주. 아래 항성(Fixed Star) 중 이 사람의 네이탈 차트와 가장 가까운 항성의 에너지를 반드시 언급해줘: 알파 스피카(Spica·처녀자리·창의·행운), 레굴루스(Regulus·사자자리·왕의 기운·리더십), 알데바란(Aldebaran·황소자리·용기·강인함), 안타레스(Antares·전갈자리·집중·극단적 에너지), 시리우스(Sirius·큰개자리·충성·지혜), 베가(Vega·거문고자리·예술·감수성), 포말하우트(Fomalhaut·물고기자리·꿈·이상주의). 사주 용신과 수호 항성 에너지가 어떻게 연결되는지 통합 분석해줘. 수호별과 수호 에너지를 함께 통합 분석해줘.`},
   };
   const topic=TOPIC[key];
   return `당신은 사주, 주역, 토정비결, 당사주, 네이탈차트, 타로, 수비학, MBTI를 통합해서 운세를 분석하는 전문가예요.
@@ -2767,7 +2782,7 @@ JSON만 응답 (다른 텍스트 없이):
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const DEEP_CARDS=[
   {group:"GROUP A — 나는 누구인가", icon:"🧬",title:"내 DNA에 새겨진 재능",      key:"talent",        bg:"#f0fdf4",border:"#bbf7d0",tc:"#166534"},
-  {group:"GROUP B — 내 인생의 흐름",icon:"📅",title:"이번 달 놔야 할 것 vs 잡아야 할 것",key:"monthRelease",bg:"#fdf4ff",border:"#e9d5ff",tc:"#6b21a8"},
+  {group:"GROUP B — 내 인생의 흐름",icon:"📅",title:"이번 달 초점",key:"monthRelease",bg:"#fdf4ff",border:"#e9d5ff",tc:"#6b21a8"},
   {group:"GROUP C — 우주적 나",     icon:"✨",title:"이번 생의 영혼 미션",         key:"soulMission",   bg:"#1e1b4b",border:"#4c1d95",tc:"#c4b5fd",dark:true},
   {group:"GROUP D — 나를 지키는 것들",icon:"⭐",title:"나를 지키는 수호 에너지",  key:"guardian",      bg:"#fff8e1",border:"#fde68a",tc:"#b45309"},
 ];
