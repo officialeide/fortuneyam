@@ -21,9 +21,10 @@ const OHK={木:"목",火:"화",土:"토",金:"금",水:"수"};
 const stripLead=(s)=>(s||"").replace(/^\s*[^:：]{1,40}[:：]\s*/,"").trim();
 // AI 응답에서 깨진 문자(replacement char), 마름모(◇/�), 이모지·잡기호 제거
 const cleanText=(s)=>(s||"")
-  .replace(/[\uFFFD\u25C6\u25C7\u2753\u2754\uFE0F]/g,"")
+  .replace(/\uFFFD+/g,"")
+  .replace(/[\u25C6\u25C7\u2753\u2754\uFE0F]/g,"")
   .replace(/[\u{1F000}-\u{1FAFF}]/gu,"")
-  .replace(/ {2,}/g," ")
+  .replace(/\s{2,}/g," ")
   .trim();
 // 별자리 표기에서 도수(숫자) 제거: "궁수자리 4도" / "전갈자리 8°" → 별자리 이름만
 const stripDegree=(s)=>(s||"").replace(/\s*\d+\s*도\s*$/,"").replace(/\s*\d+\s*°.*$/,"").replace(/\s*\d+\s*$/,"").trim();
@@ -1322,7 +1323,7 @@ function buildSajuData(input){
     dansaju:{pillars:dansajuPillars,overall:dansajuOverall,yearFlow:dansajuYearFlow},
     iching:{bonmyeonggae:ichingData.name,gaeSymbol:ichingData.symbol||"☯",gaeNum:ichingData.num||0,gaeUpper:`${TRIGRAM[domO_kor]||""}·${domO_kor}`,gaeLower:`${TRIGRAM[relO_kor]||""}·${relO_kor}(관성)`,gaeUpperO:domOForIching,gaeLowerO:relO,gaeDesc:ichingData.desc,gaeNature:ichingData.nature,currentGae:ichingData.currentGae||"분석 중",currentYear:`${CY}년`,currentDesc:ichingData.currentDesc||"",strategy:ichingData.strategy||[],yearFlow:ichingYearFlow},
     tojung:{sang,jung,ha,saja:sajaDB.saja,sajaDesc:sajaDB.desc,bonun:sajaDB.saja,bonunDesc:sajaDB.desc,yearFlow:tojungYearFlow,month2026:tojungMonth2026},
-    astro:{sun:"분석 중",moon:"분석 중",asc:"분석 중",mercury:"분석 중",venus:"분석 중",mars:"분석 중",sunMeaning:"태양(☉)은 의식적 자아",moonMeaning:"달(☽)은 감정·본능",ascMeaning:"ASC는 첫인상",sunDesc:"점성술 분석 중이에요.",moonDesc:"점성술 분석 중이에요.",ascDesc:"점성술 분석 중이에요.",mercuryDesc:"분석 중",venusDesc:"분석 중",marsDesc:"분석 중",triangle:"",stellium:"",yearTransit:[]},
+    astro:{sun:"분석 중",moon:"분석 중",asc:"분석 중",mercury:"분석 중",venus:"분석 중",mars:"분석 중",sunMeaning:"의식적 자아",moonMeaning:"감정·본능",ascMeaning:"첫인상",sunDesc:"점성술 분석 중이에요.",moonDesc:"점성술 분석 중이에요.",ascDesc:"점성술 분석 중이에요.",mercuryDesc:"분석 중",venusDesc:"분석 중",marsDesc:"분석 중",triangle:"",stellium:"",yearTransit:[]},
     tarot:{lifePath:lp,isMaster:[11,22,33].includes(lp),lifePathCard,lifePathCardNum:String(lp),lifePathDesc,soulCard:LP_CARDS[lp]||"분석 중",achieveCard:LP_CARDS[(lp+1)>9?1:lp+1]||"분석 중",soulDesc:soulDesc_val,achieveDesc:"성취 에너지 분석 중이에요.",calc,yearCards},
     daynight:{overview:`${ilganDB.core} ${singang==="신강(身强)"?"강한 에너지를 가진 만큼, 그것을 흘려보내는 방법을 찾는 것이 중요해요.":"내면의 에너지를 충전하는 루틴이 필요해요."}`,
       day:{impression:dn_day.impression||"",mask:dn_day.mask||"",styling:{hair:"",fashion:"",color:"",makeup:"",perfume:""}},
@@ -1415,61 +1416,67 @@ function TabSummary({d,changeTab}){return <>
     </div>
   </section>
   <section style={S.card}>
-    <ST icon="📆" title="향후 5년 흐름"/>
-    <GT>사주·토정비결·주역·당사주·타로수비학 통합 운기 점수예요.</GT>
-    {(d.summary?.yearForecast||[]).map((yf,i)=>{
-      const [open,setOpen]=React.useState(i===0);
-      return(
-        <div key={i} style={{marginTop:i===0?12:6}}>
-          <div onClick={()=>setOpen(o=>!o)} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:scBg(yf.score),borderRadius:open?"10px 10px 0 0":"10px",cursor:"pointer",border:`1px solid ${yf.score>=75?"#a5d6a7":yf.score>=60?"#ffe082":"#ef9a9a"}`}}>
-            <Ring score={yf.score} size={42}/>
-            <div style={{flex:1}}>
-              <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2}}>
-                <span style={{fontSize:13,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>
-                {yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}
-              </div>
-              {!open&&<div style={{fontSize:11,color:"#666"}}>{yf.summary?.slice(0,28)}…</div>}
-            </div>
-            <span style={{fontSize:11,color:"#aaa",transform:open?"rotate(180deg)":"none",transition:"transform 0.2s"}}>▼</span>
-          </div>
-          {open&&<div style={{padding:"10px 12px",background:scBg(yf.score),borderRadius:"0 0 10px 10px",borderTop:"1px dashed rgba(0,0,0,0.08)",border:`1px solid ${yf.score>=75?"#a5d6a7":yf.score>=60?"#ffe082":"#ef9a9a"}`,borderTopWidth:0}}>
-            <div style={{fontSize:11,color:"#444",lineHeight:1.6,textAlign:"justify",marginBottom:8}}>{yf.summary}</div>
-            {yf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
-              {Object.entries(yf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.85)",color:sc(v),fontWeight:800,border:`1px solid ${sc(v)}44`}}>{k.slice(0,3)} {v}</div>)}
-            </div>}
-          </div>}
+    {(()=>{
+      const [open,setOpen]=React.useState(false);
+      return <>
+        <div onClick={()=>setOpen(o=>!o)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
+          <ST icon="📆" title="향후 5년 흐름"/>
+          <span style={{fontSize:11,color:"#bbb",transform:open?"rotate(180deg)":"none",transition:"transform 0.2s",marginLeft:8}}>▼</span>
         </div>
-      );
-    })}
+        <GT>사주·토정비결·주역·당사주·타로수비학 통합 운기 점수예요.</GT>
+        {open&&<div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
+          {(d.summary?.yearForecast||[]).map((yf,i)=>(
+            <div key={i} style={{display:"flex",flexDirection:"column",gap:6,padding:"10px 12px",background:scBg(yf.score),borderRadius:11,border:`1px solid ${yf.score>=75?"#a5d6a7":yf.score>=60?"#ffe082":"#ef9a9a"}`}}>
+              <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <Ring score={yf.score} size={44}/>
+                <div style={{flex:1}}>
+                  <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:3}}>
+                    <span style={{fontSize:13,fontWeight:900,color:yf.year===CY?"#2e7d32":"#111"}}>{yf.year}년</span>
+                    {yf.year===CY&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}
+                  </div>
+                  <div style={{fontSize:11,color:"#444",lineHeight:1.6,textAlign:"justify"}}>{yf.summary}</div>
+                </div>
+              </div>
+              {yf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.08)"}}>
+                {Object.entries(yf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.85)",color:sc(v),fontWeight:800,border:`1px solid ${sc(v)}44`}}>{k.slice(0,3)} {v}</div>)}
+              </div>}
+            </div>
+          ))}
+        </div>}
+      </>;
+    })()}
   </section>
   <section style={S.card}>
-    <ST icon="📆" title="향후 1년 흐름"/>
-    <GT>사주·토정비결·주역·당사주·타로수비학 통합 월별 운기 점수예요.</GT>
-    {(d.summary?.monthForecast||[]).map((mf,i)=>{
-      const [open,setOpen]=React.useState(mf.isThis);
-      return(
-        <div key={i} style={{marginTop:i===0?12:6}}>
-          <div onClick={()=>setOpen(o=>!o)} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 12px",background:scBg(mf.score),borderRadius:open?"10px 10px 0 0":"10px",cursor:"pointer",border:`1px solid ${mf.score>=75?"#a5d6a7":mf.score>=60?"#ffe082":"#ef9a9a"}`}}>
-            <Ring score={mf.score} size={38}/>
-            <div style={{flex:1}}>
-              <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                <span style={{fontSize:12,fontWeight:900,color:mf.isThis?"#2e7d32":"#111"}}>{mf.year}년 {mf.month}월</span>
-                <span style={{fontSize:10,color:"#888"}}>{mf.ganji}</span>
-                {mf.isThis&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>이번 달</span>}
-              </div>
-              {!open&&<div style={{fontSize:10,color:"#666",marginTop:1}}>{mf.summary?.slice(0,24)}…</div>}
-            </div>
-            <span style={{fontSize:11,color:"#aaa",transform:open?"rotate(180deg)":"none",transition:"transform 0.2s"}}>▼</span>
-          </div>
-          {open&&<div style={{padding:"9px 12px",background:scBg(mf.score),borderRadius:"0 0 10px 10px",border:`1px solid ${mf.score>=75?"#a5d6a7":mf.score>=60?"#ffe082":"#ef9a9a"}`,borderTopWidth:0,borderTop:"1px dashed rgba(0,0,0,0.08)"}}>
-            <div style={{fontSize:10,color:"#555",lineHeight:1.5,marginBottom:6}}>{mf.summary}</div>
-            {mf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
-              {Object.entries(mf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.85)",color:sc(v),fontWeight:800,border:`1px solid ${sc(v)}44`}}>{k.slice(0,3)} {v}</div>)}
-            </div>}
-          </div>}
+    {(()=>{
+      const [open,setOpen]=React.useState(false);
+      return <>
+        <div onClick={()=>setOpen(o=>!o)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer"}}>
+          <ST icon="📆" title="향후 1년 흐름"/>
+          <span style={{fontSize:11,color:"#bbb",transform:open?"rotate(180deg)":"none",transition:"transform 0.2s",marginLeft:8}}>▼</span>
         </div>
-      );
-    })}
+        <GT>사주·토정비결·주역·당사주·타로수비학 통합 월별 운기 점수예요.</GT>
+        {open&&<div style={{display:"flex",flexDirection:"column",gap:6,marginTop:12}}>
+          {(d.summary?.monthForecast||[]).map((mf,i)=>(
+            <div key={i} style={{display:"flex",flexDirection:"column",gap:4,padding:"10px 12px",background:scBg(mf.score),borderRadius:11,border:`1px solid ${mf.score>=75?"#a5d6a7":mf.score>=60?"#ffe082":"#ef9a9a"}`}}>
+              <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <Ring score={mf.score} size={40}/>
+                <div style={{flex:1}}>
+                  <div style={{display:"flex",gap:6,alignItems:"center",marginBottom:2}}>
+                    <span style={{fontSize:12,fontWeight:900,color:mf.isThis?"#2e7d32":"#111"}}>{mf.year}년 {mf.month}월</span>
+                    <span style={{fontSize:10,color:"#888"}}>{mf.ganji}</span>
+                    {mf.isThis&&<span style={{fontSize:10,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>이번 달</span>}
+                  </div>
+                  <div style={{fontSize:10,color:"#555",lineHeight:1.5}}>{mf.summary}</div>
+                </div>
+              </div>
+              {mf.areas&&<div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.08)"}}>
+                {Object.entries(mf.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:"rgba(255,255,255,0.85)",color:sc(v),fontWeight:800,border:`1px solid ${sc(v)}44`}}>{k.slice(0,3)} {v}</div>)}
+              </div>}
+            </div>
+          ))}
+        </div>}
+      </>;
+    })()}
   </section>
 
 </>;
@@ -1536,27 +1543,24 @@ function Ohaeng({d}){
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:7}}>
       {[
-        {label:"A명식 기준 (자정)",bg:"#f1f8e9",border:"#c5e1a5",items:[
+        {label:"",bg:"#f1f8e9",border:"#c5e1a5",items:[
           {name:"용신",sub:"도움되는 기운",val:d.yongsinA,pillBg:"#33691e",pillTc:"#fff",valC:"#333"},
           {name:"희신",sub:"간접 도움",val:d.huisinA,pillBg:"#e8f5e0",pillTc:"#2d6a2d",valC:"#444"},
           {name:"기신",sub:"피할 기운",val:d.gisinA,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
         ]},
-        ...(d.yongsinB&&d.yongsinB!=="분석 중"?[{label:"B명식 기준 (야자시)",bg:"#fff8e1",border:"#ffe082",items:[
+        ...(d.yongsinB&&d.yongsinB!=="분석 중"?[{label:"야자시 기준",bg:"#fff8e1",border:"#ffe082",items:[
           {name:"용신",sub:"도움되는 기운",val:d.yongsinB,pillBg:"#e65100",pillTc:"#fff",valC:"#333"},
           {name:"희신",sub:"간접 도움",val:d.huisinB,pillBg:"#fff3e0",pillTc:"#7b5800",valC:"#444"},
           {name:"기신",sub:"피할 기운",val:d.gisinB,pillBg:"#fdecea",pillTc:"#b71c1c",valC:"#444"},
         ]}]:[]),
       ].map(({label,bg,border,items})=>(
-        <div key={label} style={{padding:"10px 12px",background:bg,borderRadius:10,border:`1px solid ${border}`}}>
-          <div style={{fontSize:10,color:"#888",fontWeight:600,marginBottom:10}}>{label}</div>
-          <div style={{display:"flex",alignItems:"flex-start",gap:14,flexWrap:"wrap"}}>
+        <div key={label||"main"} style={{padding:"8px 12px",background:bg,borderRadius:10,border:`1px solid ${border}`}}>
+          {label&&<div style={{fontSize:10,color:"#888",fontWeight:600,marginBottom:6}}>{label}</div>}
+          <div style={{display:"flex",alignItems:"center",gap:14,flexWrap:"wrap"}}>
             {items.map(({name,sub,val,pillBg,pillTc,valC})=>(
-              <div key={name} style={{display:"flex",flexDirection:"column",alignItems:"flex-start",gap:4}}>
-                <div style={{display:"flex",alignItems:"center",gap:7}}>
-                  <span style={{background:pillBg,color:pillTc,fontSize:10,fontWeight:800,padding:"4px 10px",borderRadius:8,whiteSpace:"nowrap"}}>{name}</span>
-                  <span style={{fontSize:13,fontWeight:900,color:valC,whiteSpace:"nowrap"}}>{val}</span>
-                </div>
-                <span style={{fontSize:10,color:"#999",fontWeight:500}}>{sub}</span>
+              <div key={name} style={{display:"flex",alignItems:"center",gap:6}}>
+                <span style={{background:pillBg,color:pillTc,fontSize:10,fontWeight:800,padding:"3px 9px",borderRadius:7,whiteSpace:"nowrap"}}>{name}</span>
+                <span style={{fontSize:13,fontWeight:900,color:valC,whiteSpace:"nowrap"}}>{val}</span>
               </div>
             ))}
           </div>
@@ -1821,24 +1825,28 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
     <section style={S.card}>
       <ST icon="🌙" title="밤의 나: 숨겨진 본능과 욕망"/>
       <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:8}}>
-        {[
-          {key:"desire",bg:"#1a1a2e",tc:"#a78bfa",label:"내면의 결핍과 진짜 욕망",v:dn.night.desire,v2:dn.night.desire2},
-          {key:"trigger",bg:"#1e1b4b",tc:"#818cf8",label:"본능이 폭발하는 트리거 3가지",triggers:dn.night.triggers},
-          {key:"attract",bg:"#312e81",tc:"#c4b5fd",label:"이성에게 치명적인 은밀한 매력",v:dn.night.attraction},
-          {key:"ideal",bg:"#1e293b",tc:"#7dd3fc",label:"이상형",v:dn.night.idealType},
-          {key:"real",bg:"#0f172a",tc:"#86efac",label:"실제 궁합",v:dn.night.idealType2},
-        ].map(({key,bg,tc,label,v,v2,triggers})=>(
-          <div key={key} style={{minHeight:72,padding:"10px 14px",background:bg,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
-            <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:(v||v2||triggers?.length)?5:0}}>{label}</div>
-            {v&&<p style={{fontSize:12,color:"#e8e8f0",margin:0,lineHeight:1.75}}>{v}</p>}
-            {v2&&<p style={{fontSize:12,color:"#d8b4fe",margin:"8px 0 0",lineHeight:1.75,borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:8}}>{v2}</p>}
-            {triggers&&(triggers||[]).map((t,i)=>(
-              <div key={i} style={{fontSize:12,color:"#e8e8f0",padding:"4px 0",borderBottom:i<triggers.length-1?"1px dashed #ffffff22":"none",lineHeight:1.6}}>
-                <span style={{color:tc,fontWeight:700,marginRight:6}}>{i+1}.</span>{t}
-              </div>
-            ))}
-          </div>
-        ))}
+        {/* 내면 결핍·욕망 */}
+        <div style={{padding:"10px 14px",background:"#1a1a2e",borderRadius:11}}>
+          <div style={{fontSize:11,fontWeight:800,color:"#a78bfa",marginBottom:5}}>내면의 결핍과 진짜 욕망</div>
+          {dn.night.desire&&<p style={{fontSize:12,color:"#e8e8f0",margin:0,lineHeight:1.75}}>{dn.night.desire}</p>}
+          {dn.night.desire2&&<p style={{fontSize:12,color:"#d8b4fe",margin:"8px 0 0",lineHeight:1.75,borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:8}}>{dn.night.desire2}</p>}
+        </div>
+        {/* 매력·이상형·궁합 통합 */}
+        <div style={{padding:"10px 14px",background:"#1e1b4b",borderRadius:11}}>
+          <div style={{fontSize:11,fontWeight:800,color:"#818cf8",marginBottom:8}}>관계 에너지</div>
+          {dn.night.attraction&&<div style={{marginBottom:8}}>
+            <div style={{fontSize:10,color:"#c4b5fd",fontWeight:700,marginBottom:3}}>이성에게 치명적인 매력</div>
+            <p style={{fontSize:12,color:"#e8e8f0",margin:0,lineHeight:1.75}}>{dn.night.attraction}</p>
+          </div>}
+          {dn.night.idealType&&<div style={{marginBottom:8,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.1)"}}>
+            <div style={{fontSize:10,color:"#7dd3fc",fontWeight:700,marginBottom:3}}>이상형</div>
+            <p style={{fontSize:12,color:"#e8e8f0",margin:0,lineHeight:1.75}}>{dn.night.idealType}</p>
+          </div>}
+          {dn.night.idealType2&&<div style={{paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.1)"}}>
+            <div style={{fontSize:10,color:"#86efac",fontWeight:700,marginBottom:3}}>실제 궁합</div>
+            <p style={{fontSize:12,color:"#e8e8f0",margin:0,lineHeight:1.75}}>{dn.night.idealType2}</p>
+          </div>}
+        </div>
       </div>
     </section>
 
@@ -1851,9 +1859,9 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
         :innerErr
           ?<SkelBlock err={true} onRetry={runInnerFetch}/>
           :innerAI
-            ?<div style={{marginTop:10,padding:"14px 16px",background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderRadius:12}}>
+            ?<div style={{marginTop:10}}>
                 {cleanText(innerAI.innerRhythm||"").split("\n\n").map((para,i)=>(
-                  <p key={i} style={{fontSize:12,color:"#e0e7ff",lineHeight:1.9,margin:i>0?"12px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}>{para}</p>
+                  <p key={i} style={{fontSize:13,color:"#444",lineHeight:1.85,margin:i>0?"10px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}>{para}</p>
                 ))}
               </div>
             :<SkelBlock err={false}/>
@@ -1873,7 +1881,7 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
                 <div style={{display:"flex",flexDirection:"column",gap:7,marginBottom:14}}>
                   {(innerAI.exercise||[]).map((ex,i)=>(
                     <div key={i} style={{padding:"10px 13px",background:"#f0fdf4",borderRadius:10,border:"1px solid #bbf7d0"}}>
-                      <div style={{fontSize:12,fontWeight:900,color:"#166534",marginBottom:4}}>{cleanText(ex.name)}</div>
+                      <div style={{fontSize:12,fontWeight:900,color:"#166534",marginBottom:4,wordBreak:"keep-all"}}>{cleanText(ex.name)}</div>
                       <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.7}}>{cleanText(ex.reason)}</p>
                     </div>
                   ))}
@@ -1882,7 +1890,7 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
                 <div style={{display:"flex",flexDirection:"column",gap:7}}>
                   {(innerAI.hobby||[]).map((h,i)=>(
                     <div key={i} style={{padding:"10px 13px",background:"#fdf4ff",borderRadius:10,border:"1px solid #e9d5ff"}}>
-                      <div style={{fontSize:12,fontWeight:900,color:"#6b21a8",marginBottom:4}}>{cleanText(h.name)}</div>
+                      <div style={{fontSize:12,fontWeight:900,color:"#6b21a8",marginBottom:4,wordBreak:"keep-all"}}>{cleanText(h.name)}</div>
                       <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.7}}>{cleanText(h.reason)}</p>
                     </div>
                   ))}
@@ -1896,21 +1904,12 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
 
     {/* ─── 딥카드 4개 ─── */}
     {DEEP_CARDS.map(card=>{
-      const isNewGroup=!renderedGroups.current.has(card.group);
-      if(isNewGroup) renderedGroups.current.add(card.group);
       const open=deepOpen[card.key];
       return(
-        <React.Fragment key={card.key}>
-          {isNewGroup&&(
-            <div style={{padding:"8px 2px 2px",fontSize:10,fontWeight:800,color:"#bbb",letterSpacing:0.5}}>
-              {card.group}
-            </div>
-          )}
-          <div>
-            <AccHead open={open} onToggle={()=>toggleDeep(card.key)} icon={card.icon} title={card.title}/>
-            {open&&<DeepBody cardKey={card.key} bg={card.bg} border={card.border} dark={card.dark}/>}
-          </div>
-        </React.Fragment>
+        <div key={card.key}>
+          <AccHead open={open} onToggle={()=>toggleDeep(card.key)} icon={card.icon} title={card.title}/>
+          {open&&<DeepBody cardKey={card.key} bg={card.bg} border={card.border} dark={card.dark}/>}
+        </div>
       );
     })}
   </>;
@@ -1971,7 +1970,12 @@ function TabTojung({d}){
           </div>;
         })}
       </div>
-      <div style={{marginTop:10,padding:"11px 13px",background:"#e8f5e0",borderRadius:10}}><div style={{fontSize:11,fontWeight:800,color:"#2d6a2d",marginBottom:5}}>당사주 종합 기질</div><p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.8,textAlign:"justify"}}>{ds.overall}</p></div>
+      <div style={{marginTop:10,padding:"11px 13px",background:"#e8f5e0",borderRadius:10}}>
+        <div style={{fontSize:11,fontWeight:800,color:"#2d6a2d",marginBottom:5}}>종합 기질</div>
+        <p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.8,textAlign:"justify"}}>
+          {`토정비결 ${tj.saja}(${tj.bonunDesc?.slice(0,30)}…), 주역 ${ic.bonmyeonggae}(${ic.gaeNature}). ${ds.overall}`}
+        </p>
+      </div>
     </section>
   </>;
 }
@@ -2305,7 +2309,7 @@ export default function SajuReport(){
     if(_saved?.data?._innerAI) return _saved.data._innerAI;
     try{const k=_saved?.data?.birth?`fy_inner_v2_${_saved.data.birth}`:null;return k?JSON.parse(sessionStorage.getItem(k)||"null"):null;}catch{return null;}
   });
-  const TABS=["요약","사주","내면 해부","토정·주역","별자리·타로수비학","MBTI"];
+  const TABS=["요약","사주","토정·주역","별자리·타로수비학","MBTI","내면 해부"];
 
   function changeTab(t){
     setTab(t);
@@ -2710,10 +2714,10 @@ function buildInnerPrompt(data){
 반드시 ~이에요, ~해요 체(언니체). "${data.name}님"으로 지칭. 이모지·마크다운 금지.
 
 1. innerRhythm (string): 감정 트리거·분노 패턴·다크사이드·진상 패턴을 통합한 내면 분석 에세이.
-   문단1(200자): 어떤 상황에서 감정이 올라오는지, 어떤 말이 가장 찌르는지, 내면의 그림자 패턴을 하나의 흐름으로 서술.
-   빈 줄.
-   문단2(200자): 회복 방식과 자기 객관화 포인트. 가볍고 공감되는 톤으로.
-   결론(1문장): 핵심 통찰 + 위로 바로 이어서.
+   문단1(2문장): 어떤 상황에서 감정이 올라오는지, 내면의 그림자 패턴.
+   문단2(2문장): 회복 방식과 자기 객관화 포인트.
+   결론(1문장): 핵심 통찰 + 위로.
+   전체 300자 이내.
 
 2. exercise (array, 3개): 개운 운동 추천. 각각 {"name":"운동명","reason":"왜 이 사람한테 맞는지 2문장. 사주 근거 포함."}
 3. hobby (array, 3개): 개운 취미 추천. 각각 {"name":"취미명","reason":"왜 이 사람한테 맞는지 2문장. 사주 근거 포함."}
@@ -2751,11 +2755,11 @@ ${base}
 
 [출력 형식 — 반드시 준수]
 - 말투: ~해요/~이에요 친근한 존댓말. "${data.name}님"으로 지칭. 한자·이모지·마크다운 금지.
-- 구조: 문단1(3문장 이어쓰기) + 문단2(3문장 이어쓰기) + 결론(1문장, 핵심 통찰 + 위로 바로 이어서)
-- 계산 과정 없이 결론만. 쉬운 설명.
+- 구조: 문단1(2문장) + 문단2(2문장) + 결론(1문장, 핵심 통찰 + 위로)
+- 전체 300자 이내. 계산 과정 없이 결론만. 쉬운 설명.
 
 JSON만 응답 (다른 텍스트 없이):
-{"para1":"...","para2":"...","conclusion":"..."}`;
+{"para1":"...","para2":"...","conclusion":"..."}`;`
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -2887,7 +2891,7 @@ function SajuReport_Preview({data}){
   const [previewAstroAI,setPreviewAstroAI]=useState(data?._astroAI||null);
   const [previewTarotAI,setPreviewTarotAI]=useState(data?._tarotAI||null);
   const [previewInnerAI,setPreviewInnerAI]=useState(data?._innerAI||null);
-  const TABS=["요약","사주","내면 해부","토정·주역","별자리·타로수비학","MBTI"];
+  const TABS=["요약","사주","토정·주역","별자리·타로수비학","MBTI","내면 해부"];
   if(!data) return <div style={{padding:20,color:"#aaa"}}>데이터 없음</div>;
   return(
     <div style={{maxWidth:480,margin:"0 auto"}}>
