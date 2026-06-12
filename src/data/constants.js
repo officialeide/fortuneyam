@@ -23,8 +23,7 @@ const cleanText=(s)=>(s||"")
   .replace(/\uFFFD+/g,"")
   .replace(/[\u25C6\u25C7\u2753\u2754\uFE0F]/g,"")
   .replace(/[\u{1F000}-\u{1FAFF}]/gu,"")
-  .replace(/\s{2
-}/g," ")
+  .replace(/\s{2,}/g," ")
   .trim();
 // 별자리 표기에서 도수(숫자) 제거: "궁수자리 4도" / "전갈자리 8°" → 별자리 이름만
 const stripDegree=(s)=>(s||"").replace(/\s*\d+\s*도\s*$/,"").replace(/\s*\d+\s*°.*$/,"").replace(/\s*\d+\s*$/,"").trim();
