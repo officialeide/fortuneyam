@@ -747,18 +747,6 @@ const COMBO_DESC={
   "귀문성_태(胎)":"귀문성의 인연 에너지가 태(胎) 안에서 준비 중이에요. 아직 큰 인연이 드러나지 않았지만 좋은 만남을 위한 씨앗이 자라고 있어요.",
   "귀문성_양(養)":"귀문성과 양(養)이 만나 인연이 천천히 포근하게 자라나는 구조예요. 오래 알수록 더 깊어지는 관계와 귀인이 찾아와요.",
   // ── 충명성 ──
-  "충명성_장생(長生)":"충명성의 총명함이 장생(長生)의 생명력과 만나 배우고 성장할수록 지혜가 빛나는 구조예요. 새로운 분야에 뛰어들 때마다 빠른 습득력이 강점이 돼요.",
-  "충명성_목욕(沐浴)":"충명성과 목욕(沐浴)이 만나 영리하고 감각적인 에너지가 넘쳐요. 직관이 날카롭고 아이디어가 풍부하지만, 깊이 파고들기 전에 산만해지는 경향을 주의해요.",
-  "충명성_관대(冠帶)":"충명성의 총명함이 관대(冠帶)의 등장 에너지와 만나 두각을 나타내기 좋은 구조예요. 실력을 드러낼수록 주변의 인정이 따라오는 시기예요.",
-  "충명성_건록(建祿)":"충명성과 건록(建祿)이 만나 탁월한 두뇌가 안정된 전성기에 마음껏 발휘되는 구조예요. 전문성으로 승부하기 가장 좋은 조합이에요.",
-  "충명성_제왕(帝旺)":"충명성이 제왕(帝旺)과 만나 강한 카리스마와 날카로운 두뇌가 결합해요. 지적 능력이 존재감과 함께 압도적으로 빛나는 구조예요.",
-  "충명성_쇠(衰)":"충명성의 예리함이 쇠(衰)의 원숙함과 만나 경험에서 우러난 깊은 지혜가 돼요. 젊을 때보다 나이 들수록 진가가 드러나는 타입이에요.",
-  "충명성_병(病)":"충명성의 두뇌가 병(病)의 섬세한 감수성과 결합해 예민하고 직관적인 통찰력이 강해져요. 몸보다 머리가 더 활발한 시기예요.",
-  "충명성_사(死)":"충명성과 사(死)가 만나 외부 활동보다 내면의 사색과 탐구 에너지가 강해요. 조용히 깊이 파고들 때 가장 빛나는 구조예요.",
-  "충명성_묘(墓)":"충명성의 지혜가 묘(墓) 안에 축적돼요. 겉으로는 잘 드러내지 않지만 내면에 방대한 지식과 통찰이 쌓이는 구조예요. 적재적소에 꺼낼 때 가장 빛나요.",
-  "충명성_절(絶)":"충명성의 총명함이 절(絶)을 만나 직관과 통찰이 더 날카로워져요. 기존 방식을 과감히 버리고 새로운 관점을 받아들일 때 가장 빛나요.",
-  "충명성_태(胎)":"충명성의 총명함이 아직 표면으로 나오지 않은 시기예요. 겉으론 눈에 띄지 않지만 내면에서 엄청난 것을 준비하고 있어요. 때가 되면 단번에 드러나는 잠재형이에요.",
-  "충명성_양(養)":"충명성과 양(養)이 만나 총명함이 안전한 환경에서 천천히 자라나는 구조예요. 급하게 드러내기보다 충분히 쌓은 후 빛나는 타입이에요.",
   // ── 역마성 ──
   "역마성_장생(長生)":"역마성의 이동 에너지가 장생(長生)과 만나 새로운 환경으로 나아갈 때마다 생명력이 충전되는 구조예요. 변화와 도전이 에너지원이에요.",
   "역마성_목욕(沐浴)":"역마성과 목욕(沐浴)이 겹쳐 충동적으로 이동하거나 새로운 자극을 찾아다니는 에너지가 강해요. 한 곳에 오래 있으면 답답함을 크게 느끼는 구조예요.",
@@ -782,6 +770,97 @@ const COMBO_DESC={
   "화개성_절(絶)":"화개성과 절(絶)이 만나 기존 창작 방식을 완전히 비우고 새로운 세계를 여는 에너지예요. 과감한 전환이 더 독창적인 길을 열어요.",
   "화개성_태(胎)":"화개성의 예술·신비 에너지가 태(胎) 안에서 조용히 자라나고 있어요. 아직 드러나지 않은 독특한 재능이 때를 기다리는 구조예요.",
   "화개성_양(養)":"화개성과 양(養)이 만나 예술적 감성이 보호받으며 천천히 성장하는 구조예요. 서두르지 않고 자신만의 세계를 깊이 키워나가는 타입이에요.",
+  // ── 총명성 (BYEOLSEONG DB와 키 일치) ──
+  "총명성_장생(長生)":"총명성의 총명함이 장생(長生)의 생명력과 만나 배우고 성장할수록 지혜가 빛나는 구조예요. 새로운 분야에 뛰어들 때마다 빠른 습득력이 강점이 돼요.",
+  "총명성_목욕(沐浴)":"총명성과 목욕(沐浴)이 만나 영리하고 감각적인 에너지가 넘쳐요. 직관이 날카롭고 아이디어가 풍부하지만, 깊이 파고들기 전에 산만해지는 경향을 주의해요.",
+  "총명성_관대(冠帶)":"총명성의 총명함이 관대(冠帶)의 등장 에너지와 만나 두각을 나타내기 좋은 구조예요. 실력을 드러낼수록 주변의 인정이 따라오는 시기예요.",
+  "총명성_건록(建祿)":"총명성과 건록(建祿)이 만나 탁월한 두뇌가 안정된 전성기에 마음껏 발휘되는 구조예요. 전문성으로 승부하기 가장 좋은 조합이에요.",
+  "총명성_제왕(帝旺)":"총명성이 제왕(帝旺)과 만나 강한 카리스마와 날카로운 두뇌가 결합해요. 지적 능력이 존재감과 함께 압도적으로 빛나는 구조예요.",
+  "총명성_쇠(衰)":"총명성의 예리함이 쇠(衰)의 원숙함과 만나 경험에서 우러난 깊은 지혜가 돼요. 젊을 때보다 나이 들수록 진가가 드러나는 타입이에요.",
+  "총명성_병(病)":"총명성의 두뇌가 병(病)의 섬세한 감수성과 결합해 예민하고 직관적인 통찰력이 강해져요. 몸보다 머리가 더 활발한 시기예요.",
+  "총명성_사(死)":"총명성과 사(死)가 만나 외부 활동보다 내면의 사색과 탐구 에너지가 강해요. 조용히 깊이 파고들 때 가장 빛나는 구조예요.",
+  "총명성_묘(墓)":"총명성의 지혜가 묘(墓) 안에 축적돼요. 겉으로는 잘 드러내지 않지만 내면에 방대한 지식과 통찰이 쌓이는 구조예요.",
+  "총명성_절(絶)":"총명성의 총명함이 절(絶)을 만나 직관과 통찰이 더 날카로워져요. 기존 방식을 과감히 버리고 새로운 관점을 받아들일 때 가장 빛나요.",
+  "총명성_태(胎)":"총명성의 총명함이 아직 표면으로 나오지 않은 시기예요. 겉으론 눈에 띄지 않지만 내면에서 엄청난 것을 준비하고 있어요.",
+  "총명성_양(養)":"총명성과 양(養)이 만나 총명함이 안전한 환경에서 천천히 자라나는 구조예요. 충분히 쌓은 후 빛나는 타입이에요.",
+  // ── 안명성 ──
+  "안명성_장생(長生)":"안명성의 성실한 기운이 장생(長生)과 만나 새 출발마다 묵묵히 뿌리를 내리는 구조예요. 처음엔 느려 보여도 반드시 결과를 만들어내는 타입이에요.",
+  "안명성_목욕(沐浴)":"안명성과 목욕(沐浴)이 만나 꾸준한 노력 속에 감각적 매력이 더해지는 구조예요. 성실함이 자연스러운 인기로 이어지는 타입이에요.",
+  "안명성_관대(冠帶)":"안명성의 우직한 기운이 관대(冠帶)와 만나 사회에서 신뢰받는 존재로 자리잡는 구조예요. 꾸준함이 인정받는 시기예요.",
+  "안명성_건록(建祿)":"안명성과 건록(建祿)이 만나 묵묵한 성실함이 안정된 전성기로 이어지는 구조예요. 한 분야에서 깊이 쌓은 노력이 빛을 발하는 조합이에요.",
+  "안명성_제왕(帝旺)":"안명성이 제왕(帝旺)과 만나 우직한 에너지가 최고조에 달하는 구조예요. 묵묵히 걸어온 길이 정점에서 빛나는 시기예요.",
+  "안명성_쇠(衰)":"안명성과 쇠(衰)가 만나 경험에서 우러난 묵직한 신뢰감이 쌓이는 구조예요. 나이 들수록 진가가 드러나는 타입이에요.",
+  "안명성_병(病)":"안명성과 병(病)이 겹쳐 몸이 약해지는 시기에도 내면의 성실함은 흔들리지 않는 구조예요. 쉬면서도 꾸준히 준비하는 것이 지혜예요.",
+  "안명성_사(死)":"안명성과 사(死)가 만나 에너지가 내면으로 침잠하는 시기예요. 겉으로 보이는 것보다 훨씬 깊이 무언가를 준비하고 있는 구조예요.",
+  "안명성_묘(墓)":"안명성의 성실한 에너지가 묘(墓) 안에 차곡차곡 쌓이는 구조예요. 때가 되면 한꺼번에 크게 열리는 패턴이에요.",
+  "안명성_절(絶)":"안명성과 절(絶)이 만나 한 사이클이 완전히 끝나는 시기예요. 지금까지의 성실함을 바탕으로 완전히 새로운 시작을 준비하는 구조예요.",
+  "안명성_태(胎)":"안명성의 에너지가 태(胎) 안에서 씨앗처럼 자라고 있어요. 아직 드러나지 않은 성실함이 깊은 곳에서 준비되는 시기예요.",
+  "안명성_양(養)":"안명성과 양(養)이 만나 성실한 기운이 안전하게 보호받으며 자라는 구조예요. 든든한 환경 속에서 뿌리를 깊이 내리는 타입이에요.",
+  // ── 천인성 ──
+  "천인성_장생(長生)":"천인성의 권위·명예 기운이 장생(長生)과 만나 새 출발마다 인정받는 구조예요. 배움과 자격이 새로운 시작의 발판이 돼요.",
+  "천인성_목욕(沐浴)":"천인성과 목욕(沐浴)이 만나 권위가 감각적 매력과 결합하는 구조예요. 지식과 표현력이 함께 빛나는 타입이에요.",
+  "천인성_관대(冠帶)":"천인성의 학문·명예 기운이 관대(冠帶)와 만나 사회적으로 두각을 나타내기 좋은 구조예요. 실력이 인정받는 시기예요.",
+  "천인성_건록(建祿)":"천인성과 건록(建祿)이 만나 학문과 전문성이 안정된 전성기에 발휘되는 구조예요. 권위와 실력이 함께 인정받는 조합이에요.",
+  "천인성_제왕(帝旺)":"천인성이 제왕(帝旺)과 만나 권위와 명예가 최고조에 달하는 구조예요. 학문·자격·사회적 인정이 압도적으로 빛나는 시기예요.",
+  "천인성_쇠(衰)":"천인성의 권위 기운이 쇠(衰)와 만나 경험에서 우러난 깊은 지혜와 신뢰가 쌓이는 구조예요. 연륜이 권위가 되는 타입이에요.",
+  "천인성_병(病)":"천인성과 병(病)이 겹쳐 지식과 학문으로 내면을 채우는 시기예요. 공부와 탐구에서 에너지를 얻는 구조예요.",
+  "천인성_사(死)":"천인성과 사(死)가 만나 깊은 학문 탐구와 사색의 시간이 필요한 구조예요. 조용한 공부가 훗날 큰 권위의 기반이 돼요.",
+  "천인성_묘(墓)":"천인성의 명예·학문 에너지가 묘(墓) 안에 축적되는 구조예요. 드러나지 않아도 내면에 방대한 지식이 쌓이고 있는 타입이에요.",
+  "천인성_절(絶)":"천인성과 절(絶)이 만나 기존 권위를 내려놓고 새 분야에서 시작하는 에너지예요. 완전한 전환이 더 높은 권위로 이어져요.",
+  "천인성_태(胎)":"천인성의 권위·명예 에너지가 태(胎) 안에서 준비 중이에요. 아직 드러나지 않은 학문적 잠재력이 자라고 있는 구조예요.",
+  "천인성_양(養)":"천인성과 양(養)이 만나 권위와 명예의 기운이 보호받으며 차근차근 자라는 구조예요. 서두르지 않고 실력을 쌓을수록 빛나는 타입이에요.",
+  // ── 복성 ──
+  "복성_장생(長生)":"복성의 귀인·행운 기운이 장생(長生)과 만나 새로운 시작마다 뜻밖의 행운이 따르는 구조예요. 시작할 때 도움의 손길이 자연스럽게 찾아와요.",
+  "복성_목욕(沐浴)":"복성과 목욕(沐浴)이 만나 매력적인 행운이 찾아오는 구조예요. 자연스러운 끌림 속에서 좋은 인연과 기회가 연결되는 타입이에요.",
+  "복성_관대(冠帶)":"복성의 행운 기운이 관대(冠帶)와 만나 사회에 나설수록 귀인이 나타나는 구조예요. 좋은 기회가 자연스럽게 따르는 시기예요.",
+  "복성_건록(建祿)":"복성과 건록(建祿)이 만나 전성기에 행운과 귀인이 함께하는 구조예요. 노력과 운이 동시에 빛나는 조합이에요.",
+  "복성_제왕(帝旺)":"복성이 제왕(帝旺)과 만나 행운과 귀인의 에너지가 최고조에 달하는 구조예요. 가장 강한 복의 기운이 넘치는 시기예요.",
+  "복성_쇠(衰)":"복성의 행운 기운이 쇠(衰)와 만나 눈에 띄지 않는 작은 행운들이 차곡차곡 쌓이는 구조예요. 큰 행운보다 지속적인 복이 쌓이는 시기예요.",
+  "복성_병(病)":"복성과 병(病)이 겹쳐 힘든 시기에도 뜻밖의 귀인이 나타나 도와주는 구조예요. 약해질수록 더 강한 도움이 찾아오는 패턴이에요.",
+  "복성_사(死)":"복성과 사(死)가 만나 행운이 잠시 숨어드는 시기예요. 지금은 드러나지 않아도 내면에서 다음 큰 행운을 준비하는 구조예요.",
+  "복성_묘(墓)":"복성의 행운 에너지가 묘(墓) 안에 쌓여 있어요. 때가 되면 한꺼번에 쏟아지는 큰 행운이 기다리는 구조예요.",
+  "복성_절(絶)":"복성과 절(絶)이 만나 기존의 행운 패턴이 완전히 끊기고 새로운 복의 흐름이 시작되는 구조예요. 끊어짐이 더 큰 행운의 문을 여는 전환점이에요.",
+  "복성_태(胎)":"복성의 행운·귀인 에너지가 태(胎) 안에서 자라고 있어요. 아직 드러나지 않은 큰 복이 준비되는 시기예요.",
+  "복성_양(養)":"복성과 양(養)이 만나 행운이 보호받으며 천천히 커지는 구조예요. 주변의 따뜻한 도움 속에 복이 무르익는 타입이에요.",
+  // ── 문창성 ──
+  "문창성_장생(長生)":"문창성의 글·학문 기운이 장생(長生)과 만나 새로운 배움을 시작할 때 놀라운 흡수력을 발휘하는 구조예요. 공부할수록 빛나는 타입이에요.",
+  "문창성_목욕(沐浴)":"문창성과 목욕(沐浴)이 만나 언어 감각과 표현력이 감각적으로 빛나는 구조예요. 글쓰기와 말하기에서 자연스러운 매력이 나오는 타입이에요.",
+  "문창성_관대(冠帶)":"문창성의 학문·시험운이 관대(冠帶)와 만나 사회적으로 실력을 인정받기 좋은 구조예요. 시험·발표·자격증에서 두각을 나타내는 시기예요.",
+  "문창성_건록(建祿)":"문창성과 건록(建祿)이 만나 언어·글쓰기 능력이 안정된 전성기에 발휘되는 구조예요. 지식과 표현이 결실로 이어지는 시기예요.",
+  "문창성_제왕(帝旺)":"문창성이 제왕(帝旺)과 만나 글·학문·언어의 에너지가 압도적으로 빛나는 구조예요. 표현 능력으로 존재감을 드러내는 시기예요.",
+  "문창성_쇠(衰)":"문창성의 문필 기운이 쇠(衰)와 만나 깊이 있는 글과 지혜로운 언어가 빛나는 구조예요. 나이 들수록 글의 무게가 더해지는 타입이에요.",
+  "문창성_병(病)":"문창성과 병(病)이 겹쳐 독서·글쓰기·사색으로 내면을 채우는 구조예요. 조용한 탐구가 훗날 깊은 언어로 피어나요.",
+  "문창성_사(死)":"문창성과 사(死)가 만나 내면의 사색과 글쓰기 에너지가 깊어지는 구조예요. 조용한 침잠 속에서 가장 진한 글이 나오는 패턴이에요.",
+  "문창성_묘(墓)":"문창성의 학문·문필 에너지가 묘(墓) 안에 차곡차곡 축적돼요. 겉으로 드러내지 않지만 내면에 방대한 지식과 표현력이 쌓이는 구조예요.",
+  "문창성_절(絶)":"문창성과 절(絶)이 만나 기존 표현 방식을 완전히 비우고 새로운 글쓰기 세계를 여는 에너지예요. 과감한 전환이 더 독창적인 표현으로 이어져요.",
+  "문창성_태(胎)":"문창성의 글·학문 에너지가 태(胎) 안에서 씨앗처럼 자라고 있어요. 아직 드러나지 않은 문필 잠재력이 준비되는 시기예요.",
+  "문창성_양(養)":"문창성과 양(養)이 만나 글·학문의 기운이 보호받으며 천천히 성장하는 구조예요. 충분히 채운 후에야 빛나는 후기 개화형 문필가 기질이에요.",
+  // ── 고독성 ──
+  "고독성_장생(長生)":"고독성의 독립·자립 기운이 장생(長生)과 만나 홀로 새로운 길을 개척하는 에너지예요. 혼자 시작하는 것이 오히려 강점이 되는 구조예요.",
+  "고독성_목욕(沐浴)":"고독성과 목욕(沐浴)이 만나 독립적이면서도 감각적인 매력이 더해지는 구조예요. 혼자만의 시간에서 가장 창의적인 에너지가 나오는 타입이에요.",
+  "고독성_관대(冠帶)":"고독성의 자립 기운이 관대(冠帶)와 만나 독립적으로 자신의 전문성을 드러내는 구조예요. 혼자 빛나는 방식이 자연스러운 타입이에요.",
+  "고독성_건록(建祿)":"고독성과 건록(建祿)이 만나 독립적인 전문성이 전성기에 발휘되는 구조예요. 혼자 이루는 것이 함께보다 더 강한 시기예요.",
+  "고독성_제왕(帝旺)":"고독성이 제왕(帝旺)과 만나 독립·자립 에너지가 최고조에 달하는 구조예요. 누구의 도움 없이도 스스로 빛나는 압도적인 자립 에너지가 발휘돼요.",
+  "고독성_쇠(衰)":"고독성의 독립 기운이 쇠(衰)와 만나 혼자만의 깊은 세계가 더욱 원숙해지는 구조예요. 고독 속에서 전문성이 완성되는 타입이에요.",
+  "고독성_병(病)":"고독성과 병(病)이 겹쳐 혼자만의 시간이 더욱 깊어지는 구조예요. 내면을 채우고 전문성을 다지는 것이 좋은 시기예요.",
+  "고독성_사(死)":"고독성과 사(死)가 만나 깊은 고독과 침잠의 에너지가 결합해요. 외부 활동보다 혼자만의 탐구와 사색이 가장 강한 시기예요.",
+  "고독성_묘(墓)":"고독성의 독립·전문성 에너지가 묘(墓) 안에 쌓이는 구조예요. 겉으로는 드러나지 않아도 혼자만의 세계에서 엄청난 것을 쌓고 있어요.",
+  "고독성_절(絶)":"고독성과 절(絶)이 만나 완전한 홀로 서기의 에너지가 폭발하는 구조예요. 모든 것을 내려놓고 진정한 독립을 이루는 전환점이에요.",
+  "고독성_태(胎)":"고독성의 독립·자립 에너지가 태(胎) 안에서 준비 중이에요. 아직 드러나지 않은 독보적인 전문성이 자라고 있는 시기예요.",
+  "고독성_양(養)":"고독성과 양(養)이 만나 독립 에너지가 보호받으며 자라는 구조예요. 혼자이지만 든든한 울타리 안에서 자신만의 세계를 키워나가는 타입이에요.",
+  // ── 복덕성 ──
+  "복덕성_장생(長生)":"복덕성의 순수한 복·풍요 기운이 장생(長生)과 만나 새 출발마다 자연스러운 풍요가 따르는 구조예요. 시작 자체에 복이 깃드는 타입이에요.",
+  "복덕성_목욕(沐浴)":"복덕성과 목욕(沐浴)이 만나 순수한 매력과 풍요로운 에너지가 결합하는 구조예요. 있는 그대로의 모습이 주변을 이롭게 하는 타입이에요.",
+  "복덕성_관대(冠帶)":"복덕성의 풍요 기운이 관대(冠帶)와 만나 사회에 나설수록 주변을 이롭게 하는 존재가 되는 구조예요. 덕(德)으로 인정받는 시기예요.",
+  "복덕성_건록(建祿)":"복덕성과 건록(建祿)이 만나 풍요와 덕이 전성기에 함께 빛나는 구조예요. 주변 사람들을 이롭게 하면서 스스로도 풍요로워지는 시기예요.",
+  "복덕성_제왕(帝旺)":"복덕성이 제왕(帝旺)과 만나 풍요·덕·복의 에너지가 압도적으로 넘치는 구조예요. 나누면 나눌수록 더 커지는 가장 강한 복의 시기예요.",
+  "복덕성_쇠(衰)":"복덕성의 풍요 기운이 쇠(衰)와 만나 조용하지만 깊은 덕이 쌓이는 구조예요. 화려하진 않아도 진심으로 주변을 이롭게 하는 시기예요.",
+  "복덕성_병(病)":"복덕성과 병(病)이 겹쳐 스스로 약해질 때에도 주변을 걱정하는 따뜻한 마음이 있는 구조예요. 받는 것보다 주는 것이 자연스러운 타입이에요.",
+  "복덕성_사(死)":"복덕성과 사(死)가 만나 외부 활동보다 내면의 풍요와 덕이 깊어지는 시기예요. 조용히 충전하며 다음 큰 나눔을 준비하는 구조예요.",
+  "복덕성_묘(墓)":"복덕성의 풍요·덕 에너지가 묘(墓) 안에 쌓이는 구조예요. 겉으로 드러나지 않아도 내면에 방대한 복이 차곡차곡 축적되는 타입이에요.",
+  "복덕성_절(絶)":"복덕성과 절(絶)이 만나 기존의 풍요 패턴이 완전히 바뀌는 전환기예요. 내려놓음 속에서 더 순수하고 진한 복의 흐름이 새롭게 시작돼요.",
+  "복덕성_태(胎)":"복덕성의 순수한 복·풍요 에너지가 태(胎) 안에서 자라고 있어요. 아직 드러나지 않은 크고 따뜻한 복이 준비되는 시기예요.",
+  "복덕성_양(養)":"복덕성과 양(養)이 만나 풍요와 덕의 기운이 보호받으며 천천히 자라는 구조예요. 받은 사랑을 세상에 나누며 더 크게 꽃피우는 타입이에요.",
 };
 // 별성 이름 → COMBO_DESC 키 접두사 매핑
 function getComboDesc(byeolseongName, stage){
@@ -1499,7 +1578,7 @@ function Seun({reportData}){
     <section style={S.card}>
       <ST icon="📅" title="세운(歲運)" sub={`Today ${CY}.${CM}.${CD} 기준 자동 계산`}/>
       <GT>세운은 매년·매월 바뀌는 간지(干支) 에너지입니다. 오늘 날짜 기준으로 자동 계산됩니다.</GT>
-      <div style={{display:"flex",gap:6,marginTop:10}}>{[["year",`연도별 ${CY}~${CY+4}`],["month","월별 12개월"]].map(([k,l])=><button key={k} onClick={()=>setSt(k)} style={{flex:1,padding:"7px 0",borderRadius:9,border:"1.5px solid #e65100",fontSize:11,fontWeight:700,cursor:"pointer",background:st===k?"#e65100":"#fff",color:st===k?"#fff":"#e65100"}}>{l}</button>)}</div>
+      <div style={{display:"flex",gap:6,marginTop:10}}>{[["year","연도별"],["month","월별"]].map(([k,l])=><button key={k} onClick={()=>setSt(k)} style={{flex:1,padding:"7px 0",borderRadius:9,border:"1.5px solid #e65100",fontSize:11,fontWeight:700,cursor:"pointer",background:st===k?"#e65100":"#fff",color:st===k?"#fff":"#e65100"}}>{l}</button>)}</div>
       {st==="year"&&<div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
         {ys.map((s,i)=>{
           const score=calcSeunScore(s.year,0,reportData?.scoreMeta);
@@ -1621,58 +1700,11 @@ function TabSaju({d,reportData}){
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 7. 낮과 밤 탭
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function TabDayNight({d}){
-  const dn=d.daynight;
-  return <>
-    <section style={S.card}>
-      <ST icon="☀️" title="낮의 나: 사회적 페르소나"/>
-      <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:8}}>
-        {[
-          {t:"첫인상",c:"#e3f2fd",tc:"#0d47a1",v:dn.day.impression},
-          {t:"사회에서 쓰는 가면",c:"#f3e5f5",tc:"#4a148c",v:dn.day.mask},
-        ].map(({t,c,tc,v})=>(
-          <div key={t} style={{minHeight:72,padding:"10px 14px",background:c,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
-            <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:v?4:0}}>{t}</div>
-            {v&&<p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{v}</p>}
-          </div>
-        ))}
-      </div>
-    </section>
-    <section style={S.card}>
-      <ST icon="🌙" title="밤의 나: 숨겨진 본능과 욕망"/>
-      <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:8}}>
-        {[
-          {key:"desire",bg:"#1a1a2e",tc:"#a78bfa",label:"내면의 결핍과 진짜 욕망",v:dn.night.desire,v2:dn.night.desire2},
-          {key:"trigger",bg:"#1e1b4b",tc:"#818cf8",label:"본능이 폭발하는 트리거 3가지",triggers:dn.night.triggers},
-          {key:"attract",bg:"#312e81",tc:"#c4b5fd",label:"이성에게 치명적인 은밀한 매력",v:dn.night.attraction},
-          {key:"ideal",bg:"#1e293b",tc:"#7dd3fc",label:"이상형",v:dn.night.idealType},
-          {key:"real",bg:"#0f172a",tc:"#86efac",label:"실제 궁합",v:dn.night.idealType2},
-        ].map(({key,bg,tc,label,v,v2,triggers})=>(
-          <div key={key} style={{minHeight:72,padding:"10px 14px",background:bg,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
-            <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:(v||v2||triggers?.length)?5:0}}>{label}</div>
-            {v&&<p style={{fontSize:12,color:"#e8e8f0",margin:0,lineHeight:1.75}}>{v}</p>}
-            {v2&&<p style={{fontSize:12,color:"#d8b4fe",margin:"8px 0 0",lineHeight:1.75,borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:8}}>{v2}</p>}
-            {triggers&&(triggers||[]).map((t,i)=>(
-              <div key={i} style={{fontSize:12,color:"#e8e8f0",padding:"4px 0",borderBottom:i<triggers.length-1?"1px dashed #ffffff22":"none",lineHeight:1.6}}>
-                <span style={{color:tc,fontWeight:700,marginRight:6}}>{i+1}.</span>{t}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    </section>
-    <div style={{padding:"12px 14px",background:"#f3f0ff",borderRadius:12,border:"1px solid #ddd6fe",fontSize:11,color:"#5b21b6",lineHeight:1.7,textAlign:"center"}}>
-      🔬 분노 패턴·회복 리듬·개운법은 <strong>내면 해부</strong> 탭에서 확인하세요
-    </div>
-  </>;
-}
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 8-B. 내면 해부 탭
+// 7+8. 내면 해부 탭 (낮과 밤 + 내면 분석 통합)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function TabInner({d,parentInnerAI,setParentInnerAI}){
   const cacheKey=k=>`fy_inner_${k}_${d.birth}`;
+  const dn=d.daynight;
 
   // ── 기본 inner 상태 (부모→d._innerAI→sessionStorage 순) ──
   const [innerAI,setInnerAI]=React.useState(()=>{
@@ -1680,7 +1712,11 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
     if(d._innerAI) return d._innerAI;
     try{const s=sessionStorage.getItem(`fy_inner_v2_${d.birth}`);return s?JSON.parse(s):null;}catch{return null;}
   });
-  const [innerLoading,setInnerLoading]=React.useState(false);
+  // innerLoading: 데이터 없으면 true로 시작해서 즉시 스켈레톤 표시
+  const [innerLoading,setInnerLoading]=React.useState(()=>{
+    if(parentInnerAI||d._innerAI) return false;
+    try{return !sessionStorage.getItem(`fy_inner_v2_${d.birth}`);}catch{return true;}
+  });
   const [innerErr,setInnerErr]=React.useState(false);
 
   // 기본 4개 아코디언 열림 상태
@@ -1704,7 +1740,20 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
     if(innerAI&&setParentInnerAI) setParentInnerAI(innerAI);
   },[innerAI]);
 
-  // 탭 진입 시 자동 fetch (내면의 리듬)
+  // 재시도 가능한 fetch 함수
+  async function runInnerFetch(){
+    setInnerLoading(true);setInnerErr(false);
+    try{
+      const text=await callNetlify({model:"claude-haiku-4-5-20251001",max_tokens:2000,messages:[{role:"user",content:buildInnerPrompt(d)}]});
+      const parsed=JSON.parse(text);
+      setInnerAI(parsed);
+      if(setParentInnerAI) setParentInnerAI(parsed);
+      try{sessionStorage.setItem(`fy_inner_v2_${d.birth}`,JSON.stringify(parsed));}catch{}
+    }catch(e){console.error("inner:",e);setInnerErr(true);}
+    setInnerLoading(false);
+  }
+
+  // 탭 진입 시 자동 fetch
   React.useEffect(()=>{
     if(innerAI){setInnerLoading(false);return;}
     let cancelled=false;
@@ -1748,30 +1797,32 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
   // 공통 스켈레톤
   const shimmerStyle=`@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}`;
   const Skel=({w="100%",h=11})=><div style={{height:h,width:w,background:"linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%)",backgroundSize:"200% 100%",borderRadius:99,marginBottom:5,animation:"shimmer 1.4s infinite"}}/>;
-  const SkelBlock=({err,dark})=>(
+  const SkelBlock=({err,onRetry})=>(
     <div style={{padding:"4px 0 8px",display:"flex",flexDirection:"column",gap:4}}>
       {err
-        ?<p style={{fontSize:12,color:"#ef5350",margin:0}}>잠시 후 다시 시도해주세요.</p>
-        :[100,90,95,80,85,70].map((w,i)=><Skel key={i} w={`${w}%`} h={dark?undefined:11}/>)
+        ?<div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-start"}}>
+            <p style={{fontSize:12,color:"#ef5350",margin:0}}>분석 중 오류가 생겼어요.</p>
+            {onRetry&&<button onClick={onRetry} style={{fontSize:11,fontWeight:700,color:"#e65100",background:"#fff3e0",border:"1px solid #ffcc80",padding:"5px 12px",borderRadius:8,cursor:"pointer",fontFamily:"inherit"}}>다시 시도</button>}
+          </div>
+        :[100,90,95,80,85,70].map((w,i)=><Skel key={i} w={`${w}%`}/>)
       }
     </div>
   );
 
-  // 아코디언 헤더
-  const AccHead=({open,onToggle,icon,title,bg,border,tc,dark})=>(
+  // 아코디언 헤더 — 내면의 리듬과 동일한 흰색 서식 통일
+  const AccHead=({open,onToggle,icon,title})=>(
     <div onClick={onToggle} style={{
       display:"flex",alignItems:"center",justifyContent:"space-between",
-      padding:"14px 16px",
-      background:dark?"#0f0e17":bg,
-      border:`1px solid ${border}`,
+      padding:"14px 16px",background:"#fff",
+      border:"1px solid #ebebeb",
       borderRadius:open?"12px 12px 0 0":"12px",
       cursor:"pointer",transition:"border-radius 0.2s",
     }}>
       <div style={{display:"flex",alignItems:"center",gap:10}}>
         <span style={{fontSize:18}}>{icon}</span>
-        <span style={{fontSize:14,fontWeight:800,color:dark?"#e0e7ff":tc}}>{title}</span>
+        <span style={{fontSize:14,fontWeight:800,color:"#111"}}>{title}</span>
       </div>
-      <span style={{fontSize:11,color:dark?"#6366f1":"#ccc",transform:open?"rotate(180deg)":"none",transition:"transform 0.2s"}}>▼</span>
+      <span style={{fontSize:11,color:"#ccc",transform:open?"rotate(180deg)":"none",transition:"transform 0.2s"}}>▼</span>
     </div>
   );
 
@@ -1781,14 +1832,14 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
     const loading=deepLoading[cardKey];
     const err=deepErr[cardKey];
     return(
-      <div style={{padding:"14px 16px",background:dark?"#0a0918":bg,border:`1px solid ${border}`,borderTop:"none",borderRadius:"0 0 12px 12px"}}>
+      <div style={{padding:"14px 16px",background:"#fff",border:"1px solid #ebebeb",borderTop:"none",borderRadius:"0 0 12px 12px"}}>
         {(loading||(!data&&!err))
-          ?<SkelBlock err={false} dark={dark}/>
+          ?<SkelBlock err={false}/>
           :err?<SkelBlock err={true}/>
           :<>
-            <p style={{fontSize:13,color:dark?"#c4b5fd":"#444",lineHeight:1.85,margin:"0 0 10px",textAlign:"justify"}}>{data.para1}</p>
-            <p style={{fontSize:13,color:dark?"#c4b5fd":"#444",lineHeight:1.85,margin:"0 0 10px",textAlign:"justify"}}>{data.para2}</p>
-            <p style={{fontSize:13,fontWeight:800,color:dark?"#e0e7ff":"#111",lineHeight:1.75,margin:0,textAlign:"justify"}}>{data.conclusion}</p>
+            <p style={{fontSize:13,color:"#444",lineHeight:1.85,margin:"0 0 10px",textAlign:"justify"}}>{data.para1}</p>
+            <p style={{fontSize:13,color:"#444",lineHeight:1.85,margin:"0 0 10px",textAlign:"justify"}}>{data.para2}</p>
+            <p style={{fontSize:13,fontWeight:800,color:"#111",lineHeight:1.75,margin:0,textAlign:"justify"}}>{data.conclusion}</p>
           </>
         }
       </div>
@@ -1800,14 +1851,55 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
   return <>
     <style>{shimmerStyle}</style>
 
-    {/* ① 내면의 리듬 — 항상 열림, 자동 로딩 */}
+    {/* ─── 낮의 나 ─── */}
+    <section style={S.card}>
+      <ST icon="☀️" title="낮의 나: 사회적 페르소나"/>
+      <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:8}}>
+        {[
+          {t:"첫인상",c:"#e3f2fd",tc:"#0d47a1",v:dn.day.impression},
+          {t:"사회에서 쓰는 가면",c:"#f3e5f5",tc:"#4a148c",v:dn.day.mask},
+        ].map(({t,c,tc,v})=>(
+          <div key={t} style={{minHeight:72,padding:"10px 14px",background:c,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
+            <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:v?4:0}}>{t}</div>
+            {v&&<p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{v}</p>}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* ─── 밤의 나 ─── */}
+    <section style={S.card}>
+      <ST icon="🌙" title="밤의 나: 숨겨진 본능과 욕망"/>
+      <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:8}}>
+        {[
+          {key:"desire",bg:"#1a1a2e",tc:"#a78bfa",label:"내면의 결핍과 진짜 욕망",v:dn.night.desire,v2:dn.night.desire2},
+          {key:"trigger",bg:"#1e1b4b",tc:"#818cf8",label:"본능이 폭발하는 트리거 3가지",triggers:dn.night.triggers},
+          {key:"attract",bg:"#312e81",tc:"#c4b5fd",label:"이성에게 치명적인 은밀한 매력",v:dn.night.attraction},
+          {key:"ideal",bg:"#1e293b",tc:"#7dd3fc",label:"이상형",v:dn.night.idealType},
+          {key:"real",bg:"#0f172a",tc:"#86efac",label:"실제 궁합",v:dn.night.idealType2},
+        ].map(({key,bg,tc,label,v,v2,triggers})=>(
+          <div key={key} style={{minHeight:72,padding:"10px 14px",background:bg,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
+            <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:(v||v2||triggers?.length)?5:0}}>{label}</div>
+            {v&&<p style={{fontSize:12,color:"#e8e8f0",margin:0,lineHeight:1.75}}>{v}</p>}
+            {v2&&<p style={{fontSize:12,color:"#d8b4fe",margin:"8px 0 0",lineHeight:1.75,borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:8}}>{v2}</p>}
+            {triggers&&(triggers||[]).map((t,i)=>(
+              <div key={i} style={{fontSize:12,color:"#e8e8f0",padding:"4px 0",borderBottom:i<triggers.length-1?"1px dashed #ffffff22":"none",lineHeight:1.6}}>
+                <span style={{color:tc,fontWeight:700,marginRight:6}}>{i+1}.</span>{t}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* ─── 내면의 리듬 — 항상 열림, 자동 로딩 ─── */}
     <section style={S.card}>
       <ST icon="🌊" title="내면의 리듬"/>
       <GT>사주 일간·신강신약·MBTI를 교차 분석한 감정 패턴이에요.</GT>
       {innerLoading
         ?<SkelBlock err={false}/>
         :innerErr
-          ?<SkelBlock err={true}/>
+          ?<SkelBlock err={true} onRetry={runInnerFetch}/>
           :innerAI
             ?<>
               <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
@@ -1828,46 +1920,45 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
       }
     </section>
 
-    {/* ② 기본 4개 아코디언 */}
+    {/* ─── 기본 4개 아코디언 — 흰색 서식 통일 ─── */}
     {[
-      {key:"exercise",icon:"🏃",title:"운동 추천",bg:"#f0fdf4",border:"#bbf7d0",tc:"#166534",
+      {key:"exercise",icon:"🏃",title:"운동 추천",
         render:()=>(innerAI?.exercise||[]).map((ex,i)=>(
-          <div key={i} style={{padding:"12px 14px",background:"#fff",borderRadius:10,border:"1px solid #bbf7d0",marginBottom:i<(innerAI.exercise.length-1)?8:0}}>
+          <div key={i} style={{padding:"12px 14px",background:"#f0fdf4",borderRadius:11,border:"1px solid #bbf7d0",marginBottom:i<(innerAI.exercise.length-1)?8:0}}>
             <div style={{fontSize:13,fontWeight:900,color:"#166534",marginBottom:5}}>{cleanText(ex.name)}</div>
             <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.75}}>{cleanText(ex.reason)}</p>
           </div>
         ))},
-      {key:"hobby",icon:"🎨",title:"취미 추천",bg:"#fdf4ff",border:"#e9d5ff",tc:"#6b21a8",
+      {key:"hobby",icon:"🎨",title:"취미 추천",
         render:()=>(innerAI?.hobby||[]).map((h,i)=>(
-          <div key={i} style={{padding:"12px 14px",background:"#fff",borderRadius:10,border:"1px solid #e9d5ff",marginBottom:i<(innerAI.hobby.length-1)?8:0}}>
+          <div key={i} style={{padding:"12px 14px",background:"#fdf4ff",borderRadius:11,border:"1px solid #e9d5ff",marginBottom:i<(innerAI.hobby.length-1)?8:0}}>
             <div style={{fontSize:13,fontWeight:900,color:"#6b21a8",marginBottom:5}}>{cleanText(h.name)}</div>
             <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.75}}>{cleanText(h.reason)}</p>
           </div>
         ))},
-      {key:"money",icon:"💸",title:"돈이 없는 이유",bg:"#fffbeb",border:"#fde68a",tc:"#92400e",
+      {key:"money",icon:"💸",title:"돈이 없는 이유",
         render:()=>cleanText(innerAI?.moneyReason||"").split("\n\n").map((p,i)=>(
           <p key={i} style={{fontSize:13,color:"#444",margin:i>0?"10px 0 0":"0",lineHeight:1.85,textAlign:"justify"}}>{p}</p>
         ))},
-      {key:"jinsang",icon:"😤",title:"내가 진상일 때는?",bg:"#fdf2f8",border:"#fbcfe8",tc:"#831843",
+      {key:"jinsang",icon:"😤",title:"내가 진상일 때는?",
         render:()=>cleanText(innerAI?.jinsang||"").split("\n\n").map((p,i)=>(
           <p key={i} style={{fontSize:13,color:"#444",margin:i>0?"10px 0 0":"0",lineHeight:1.85,textAlign:"justify"}}>{p}</p>
         ))},
-    ].map(({key,icon,title,bg,border,tc,render})=>{
+    ].map(({key,icon,title,render})=>{
       const open=basicOpen[key];
       return(
         <div key={key}>
-          <AccHead open={open} onToggle={()=>setBasicOpen(p=>({...p,[key]:!p[key]}))}
-            icon={icon} title={title} bg={bg} border={border} tc={tc}/>
+          <AccHead open={open} onToggle={()=>setBasicOpen(p=>({...p,[key]:!p[key]}))} icon={icon} title={title}/>
           {open&&(
-            <div style={{padding:"14px 16px",background:bg,border:`1px solid ${border}`,borderTop:"none",borderRadius:"0 0 12px 12px"}}>
-              {!innerAI?<SkelBlock err={innerErr}/>:render()}
+            <div style={{padding:"14px 16px",background:"#fff",border:"1px solid #ebebeb",borderTop:"none",borderRadius:"0 0 12px 12px"}}>
+              {!innerAI?<SkelBlock err={innerErr} onRetry={innerErr?runInnerFetch:undefined}/>:render()}
             </div>
           )}
         </div>
       );
     })}
 
-    {/* ③ 딥카드 10개 */}
+    {/* ─── 딥카드 10개 ─── */}
     {DEEP_CARDS.map(card=>{
       const isNewGroup=!renderedGroups.current.has(card.group);
       if(isNewGroup) renderedGroups.current.add(card.group);
@@ -1875,14 +1966,12 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
       return(
         <React.Fragment key={card.key}>
           {isNewGroup&&(
-            <div style={{padding:"8px 2px 2px",fontSize:10,fontWeight:800,color:"#bbb",letterSpacing:0.5,textTransform:"uppercase"}}>
+            <div style={{padding:"8px 2px 2px",fontSize:10,fontWeight:800,color:"#bbb",letterSpacing:0.5}}>
               {card.group}
             </div>
           )}
           <div>
-            <AccHead open={open} onToggle={()=>toggleDeep(card.key)}
-              icon={card.icon} title={card.title}
-              bg={card.bg} border={card.border} tc={card.tc} dark={card.dark}/>
+            <AccHead open={open} onToggle={()=>toggleDeep(card.key)} icon={card.icon} title={card.title}/>
             {open&&<DeepBody cardKey={card.key} bg={card.bg} border={card.border} dark={card.dark}/>}
           </div>
         </React.Fragment>
@@ -2301,7 +2390,7 @@ export default function SajuReport(){
     if(_saved?.data?._innerAI) return _saved.data._innerAI;
     try{const k=_saved?.data?.birth?`fy_inner_v2_${_saved.data.birth}`:null;return k?JSON.parse(sessionStorage.getItem(k)||"null"):null;}catch{return null;}
   });
-  const TABS=["요약","사주","낮과 밤","내면 해부","토정·주역","별자리·타로수비학","MBTI"];
+  const TABS=["요약","사주","내면 해부","토정·주역","별자리·타로수비학","MBTI"];
 
   function changeTab(t){
     setTab(t);
@@ -2351,10 +2440,8 @@ export default function SajuReport(){
       // 2. saveUser 미리 실행해서 userId 확보 (saveReport는 enrichedData 완성 후)
       let savedUserId=null;
       (async()=>{
-        try{
-          const {userId}=await saveUser(formInput);
-          savedUserId=userId;
-        }catch(e){console.warn("saveUser 실패:", e.message);}
+        try{const {userId}=await saveUser(formInput);savedUserId=userId;}
+        catch(e){console.warn("saveUser 실패:", e.message);}
       })();
 
       // 3. 네이탈차트 + 성취카드 API 병렬 호출 (로딩 중)
@@ -2489,11 +2576,7 @@ JSON만 응답: {"sevenInsight":"..."}`;
       // AI 포함된 완성 데이터로 Supabase 저장
       (async()=>{
         try{
-          // saveUser가 아직 완료 안 됐을 수 있으니 여기서 다시 시도
-          if(!savedUserId){
-            const {userId}=await saveUser(formInput);
-            savedUserId=userId;
-          }
+          if(!savedUserId){const {userId}=await saveUser(formInput);savedUserId=userId;}
           await saveReport(savedUserId, enrichedData);
         }catch(e){console.warn("저장 실패:", e.message);}
       })();
@@ -2550,7 +2633,6 @@ JSON만 응답: {"sevenInsight":"..."}`;
     <div style={S.content}>
       {tab==="요약"        && <TabSummary d={d} changeTab={changeTab}/>}
       {tab==="사주"        && <TabSaju d={d} reportData={reportData}/>}
-      {tab==="낮과 밤"     && <TabDayNight d={d}/>}
       {tab==="내면 해부"   && <TabInner d={d} parentInnerAI={parentInnerAI} setParentInnerAI={setParentInnerAI}/>}
       {tab==="토정·주역"   && <TabTojung d={d}/>}
       {tab==="별자리·타로수비학" && <TabAstro d={d} parentAstroAI={parentAstroAI} setParentAstroAI={setParentAstroAI} parentTarotAI={parentTarotAI} setParentTarotAI={setParentTarotAI}/>}
@@ -2900,7 +2982,7 @@ function SajuReport_Preview({data}){
   const [previewAstroAI,setPreviewAstroAI]=useState(data?._astroAI||null);
   const [previewTarotAI,setPreviewTarotAI]=useState(data?._tarotAI||null);
   const [previewInnerAI,setPreviewInnerAI]=useState(data?._innerAI||null);
-  const TABS=["요약","사주","낮과 밤","내면 해부","토정·주역","별자리·타로수비학","MBTI"];
+  const TABS=["요약","사주","내면 해부","토정·주역","별자리·타로수비학","MBTI"];
   if(!data) return <div style={{padding:20,color:"#aaa"}}>데이터 없음</div>;
   return(
     <div style={{maxWidth:480,margin:"0 auto"}}>
@@ -2913,7 +2995,6 @@ function SajuReport_Preview({data}){
       <div style={S.content}>
         {tab==="요약"        && <TabSummary d={data} changeTab={setTab}/>}
         {tab==="사주"        && <TabSaju d={data} reportData={data}/>}
-        {tab==="낮과 밤"     && <TabDayNight d={data}/>}
         {tab==="내면 해부"   && <TabInner d={data} parentInnerAI={previewInnerAI} setParentInnerAI={setPreviewInnerAI}/>}
         {tab==="토정·주역"   && <TabTojung d={data}/>}
         {tab==="별자리·타로수비학" && <TabAstro d={data} parentAstroAI={previewAstroAI} setParentAstroAI={setPreviewAstroAI} parentTarotAI={previewTarotAI} setParentTarotAI={setPreviewTarotAI}/>}
@@ -3041,12 +3122,12 @@ function SajuInputForm({onSubmit}){
         </div>
 
         {/* 태어난 시간 */}
-        <div ref={timeFieldRef} style={{...SF.field,...(dateDone?{borderRadius:12,outline:`2px solid #e65100`,outlineOffset:2}:{})}}>
+        <div ref={timeFieldRef} style={SF.field}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:7}}>
-            <div style={SF.label}>태어난 시간 {dateDone&&<span style={{fontSize:10,color:"#e65100",fontWeight:700,marginLeft:6}}>← 여기 입력해주세요</span>}</div>
+            <div style={SF.label}>태어난 시간</div>
             <span style={{fontSize:10,color:"#aaa",fontWeight:400}}>모르면 비워도 돼요</span>
           </div>
-          <input ref={timeInputRef} style={{...SF.input,...(err.time?SF.inputErr:{}),...(dateDone?{borderColor:"#e65100"}:{})}}
+          <input ref={timeInputRef} style={{...SF.input,...(err.time?SF.inputErr:{})}}
             placeholder="22:25" value={form.timeRaw||""} maxLength={5} inputMode="numeric"
             onFocus={()=>setDateDone(false)}
             onChange={ev=>{
