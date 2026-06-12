@@ -1,4 +1,4 @@
-// SajuReport.jsx — 메인 진입점
+// SajuReport.jsx — 메인 진입점 v2
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { saveUser, saveReport, findCachedReport } from './supabase.js';
 import { buildSajuData } from './utils/saju.js';

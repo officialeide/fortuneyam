@@ -5,7 +5,8 @@ import { OC, GD, JD, GL, JL, GH, JH, gc, jc, OHK, GWAN_O, ILGAN_TITLE, ILGAN_PHI
   getToday, CY, CM, CD, bYS, bMS, calcSeunScore, calcSeunAreas,
   BYEOLSEONG, STAGES, getStage, getIching, GAN_OE, getSibsong, calcWolju, calcSiju,
   calcYeonju, getMonthJi, getTimeJi, calcOhaengDist, STAGE_DESC,
-  _GANO, _JIO, normO, JI_OE, isYang, isYangJ, YONGSIN_TABLE } from '../data/constants.js';
+  _GANO, _JIO, normO, JI_OE, isYang, isYangJ, YONGSIN_TABLE,
+  ILGAN_DESC, ILJU_CHAR, stripLead } from '../data/constants.js';
 import { getComboDesc } from '../data/comboDB.js';
 
 function calcSinsal(ilgan,yearJi,monthJi,dayJi,timeJi){

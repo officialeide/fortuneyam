@@ -4,6 +4,7 @@ import { SajuReport_Preview } from './SajuReportPreview.jsx';
 
 function AdminPage({onClose}){
   const [pw,setPw]=useState("");
+  const [token,setToken]=useState(null);   // 인증 후 받은 단기 토큰
   const [authed,setAuthed]=useState(false);
   const [list,setList]=useState([]);
   const [loading,setLoading]=useState(false);
@@ -19,19 +20,31 @@ function AdminPage({onClose}){
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({pw})
       });
-      if(res.ok){setAuthed(true);loadList(0);}
+      const data=await res.json().catch(()=>({}));
+      if(res.ok && data.token){
+        setToken(data.token);
+        setPw("");              // 인증 후 비밀번호는 메모리에서 비움
+        setAuthed(true);
+        loadList(0, data.token);
+      }
       else alert("비밀번호가 틀렸어요.");
     }catch{alert("인증 오류가 발생했어요.");}
   }
 
-  async function loadList(pg=0){
+  async function loadList(pg=0, tk=token){
+    if(!tk){ alert("인증이 만료됐어요. 다시 로그인해주세요."); setAuthed(false); return; }
     setLoading(true);
     try{
       const res=await fetch("/.netlify/functions/admin-list",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({pw,page:pg})
+        body:JSON.stringify({token:tk,page:pg})
       });
+      if(res.status===401){
+        // 토큰 만료/무효 → 재로그인 유도
+        alert("인증이 만료됐어요. 다시 로그인해주세요.");
+        setToken(null); setAuthed(false); setLoading(false); return;
+      }
       const data=await res.json();
       if(pg===0) setList(data||[]);
       else setList(prev=>[...prev,...(data||[])]);
