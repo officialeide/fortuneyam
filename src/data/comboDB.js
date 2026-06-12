@@ -160,5 +160,6 @@ function getComboDesc(byeolseongName, stage){
   // byeolseongName: "도화성(桃花星)" 형태에서 앞부분만 추출
   const bKey=(byeolseongName||"").replace(/\(.*\)/,"").trim();
   return COMBO_DESC[`${bKey}_${stage}`]||"";
+}
 
 export { COMBO_DESC, getComboDesc };

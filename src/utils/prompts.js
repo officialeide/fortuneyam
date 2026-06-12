@@ -51,7 +51,7 @@ function buildDeepPrompt(key, data){
     talent:      {title:"숨겨진 재능",         combo:"사주 용신 × 네이탈 MC × 수비학 표현수"},
     monthRelease:{title:"이번달 에너지", combo:"주역 × 타로 월간 × 수비학 개인월. '과도한 욕심'이 있다면 어떤 종류의 욕심인지(예: 인정 욕구, 빠른 성과, 관계 집착 등) 구체적으로 서술해줘. 일반론 금지, 이 사람의 데이터에 맞는 구체적 사례로 써줘."},
     soulMission: {title:"소울 미션",           combo:"사주 일주 × 타로 메이저 × 당사주 전생궁 × 네이탈 노스노드 × 수비학 생명수. 전생에서 가져온 업과 이번 생에서 완성해야 할 미션을 연결해서 분석해줘."},
-    guardian:    {title:"수호 에너지",       combo:`사주 용신 × 네이탈 수호성 × 타로 수호 × 당사주. 아래 항성(Fixed Star) 중 이 사람의 네이탈 차트와 가장 가까운 항성의 에너지를 반드시 언급해줘: 알파 스피카(Spica·처녀자리·창의·행운), 레굴루스(Regulus·사자자리·왕의 기운·리더십), 알데바란(Aldebaran·황소자리·용기·강인함), 안타레스(Antares·전갈자리·집중·극단적 에너지), 시리우스(Sirius·큰개자리·충성·지혜), 베가(Vega·거문고자리·예술·감수성), 포말하우트(Fomalhaut·물고기자리·꿈·이상주의). 사주 용신과 수호 항성 에너지가 어떻게 연결되는지 통합 분석해줘. 수호별과 수호 에너지를 함께 통합 분석해줘.`},
+    guardian:    {title:"수호 에너지",       combo:"사주 용신 × 네이탈 수호성 × 타로 수호 × 당사주. 아래 항성(Fixed Star) 중 이 사람의 네이탈 차트와 가장 가까운 항성의 에너지를 반드시 언급해줘: 알파 스피카(Spica·처녀자리·창의·행운), 레굴루스(Regulus·사자자리·왕의 기운·리더십), 알데바란(Aldebaran·황소자리·용기·강인함), 안타레스(Antares·전갈자리·집중·극단적 에너지), 시리우스(Sirius·큰개자리·충성·지혜), 베가(Vega·거문고자리·예술·감수성), 포말하우트(Fomalhaut·물고기자리·꿈·이상주의). 사주 용신과 수호 항성 에너지가 어떻게 연결되는지 통합 분석해줘. 수호별과 수호 에너지를 함께 통합 분석해줘."},
   };
   const topic=TOPIC[key];
   return `당신은 사주, 주역, 토정비결, 당사주, 네이탈차트, 타로, 수비학, MBTI를 통합해서 운세를 분석하는 전문가예요.
@@ -78,18 +78,5 @@ const DEEP_CARDS=[
   {group:"GROUP C", icon:"✨",title:"소울 미션",          key:"soulMission",   bg:"#1e1b4b",border:"#4c1d95",tc:"#c4b5fd",dark:true},
   {group:"GROUP D", icon:"⭐",title:"수호 에너지",        key:"guardian",      bg:"#fff8e1",border:"#fde68a",tc:"#b45309"},
 ];
-
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function AdminPage({onClose}){
-  const [pw,setPw]=useState("");
-  const [authed,setAuthed]=useState(false);
-  const [list,setList]=useState([]);
-  const [loading,setLoading]=useState(false);
-  const [sel,setSel]=useState(null);
-  const [page,setPage]=useState(0);
-  const [hasMore,setHasMore]=useState(false);
-  const PAGE_SIZE=50;
-
 
 export { buildInnerPrompt, buildDeepPrompt, DEEP_CARDS };
