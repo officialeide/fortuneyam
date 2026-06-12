@@ -36,6 +36,11 @@ const HJ=({children,color})=>{
     :p
   )}</>;
 };
+// 본문 텍스트: cleanText + HJ 한 번에 처리
+const RT=({children,color,style})=>{
+  const text=cleanText(String(children||""));
+  return <HJ color={color}>{text}</HJ>;
+};
 // 관성(官星) 오행 = 일간을 극(剋)하는 오행
 const GWAN_O={목:"금",화:"수",토:"목",금:"화",수:"토"};
 // 일간별 인물 키워드 (자연 비유, 동물 X)
@@ -1305,7 +1310,7 @@ function Acc({items}){
             </div>
           </div>
         </button>
-        {op&&<div style={{padding:"12px 14px",background:"#fff",fontSize:12,color:"#444",lineHeight:1.85,borderTop:"1px solid #f0f0f0"}}>{item.desc}</div>}
+        {op&&<div style={{padding:"12px 14px",background:"#fff",fontSize:12,color:"#444",lineHeight:1.85,borderTop:"1px solid #f0f0f0"}}><HJ>{item.desc}</HJ></div>}
       </div>;
     })}
   </div>;
@@ -1319,9 +1324,14 @@ function TabSummary({d,changeTab}){return <>
     <ST icon="🌐" title="7체계 종합 분석" sub="사주·토정비결·주역·당사주·점성술·타로수비학·MBTI"/>
     <GT>일곱 가지 운명 분석 체계가 공통으로 가리키는 핵심 주제입니다.</GT>
     <div style={{marginTop:10,padding:"14px 16px",background:"linear-gradient(135deg,#1e1b4b,#312e81)",borderRadius:12,marginBottom:10}}>
-      {cleanText(d.summary?.sevenInsight||"").split("\n\n").map((para,i)=>(
-        <p key={i} style={{fontSize:12,color:"#e0e7ff",lineHeight:1.9,margin:i>0?"12px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}><HJ color="#e0e7ff">{para}</HJ></p>
-      ))}
+      {d.summary?.sevenInsight
+        ?cleanText(d.summary.sevenInsight).split("\n\n").map((para,i)=>(
+          <p key={i} style={{fontSize:12,color:"#e0e7ff",lineHeight:1.9,margin:i>0?"12px 0 0":"0",textAlign:"justify",whiteSpace:"pre-line"}}><HJ color="#e0e7ff">{para}</HJ></p>
+        ))
+        :<p style={{fontSize:12,color:"#a5b4fc",lineHeight:1.85,margin:0,textAlign:"justify"}}>
+          {(d.summary?.sixSystems||[]).slice(0,3).map(s=>`${s.system}: ${s.key}`).join(" / ")||"7체계 통합 분석 데이터가 없어요. 새로 분석하면 반영돼요."}
+        </p>
+      }
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:6}}>
       {(d.summary?.sixSystems||[]).map((s,i)=>(
@@ -1329,7 +1339,7 @@ function TabSummary({d,changeTab}){return <>
           <div style={{width:60,fontSize:10,fontWeight:700,color:"#e65100",background:"#fff3e0",padding:"3px 5px",borderRadius:6,textAlign:"center",flexShrink:0,lineHeight:1.5}}>{s.system}</div>
           <div style={{flex:1}}>
             <div style={{fontSize:13,fontWeight:800,color:"#111",marginBottom:2}}>{s.key}</div>
-            <div style={{fontSize:12,color:"#666",lineHeight:1.5,whiteSpace:"pre-line"}}>{s.desc}</div>
+            <div style={{fontSize:12,color:"#666",lineHeight:1.5,whiteSpace:"pre-line"}}><HJ>{s.desc}</HJ></div>
           </div>
         </div>
       ))}
@@ -1499,7 +1509,7 @@ function Seun({reportData}){
     <section style={S.card}>
       <ST icon="📅" title="세운(歲運)" sub={`Today ${CY}.${CM}.${CD} 기준 자동 계산`}/>
       <GT>세운은 매년·매월 바뀌는 간지(干支) 에너지입니다. 오늘 날짜 기준으로 자동 계산됩니다.</GT>
-      <div style={{display:"flex",gap:6,marginTop:10}}>{[["year",`연도별 ${CY}~${CY+4}`],["month","월별 12개월"]].map(([k,l])=><button key={k} onClick={()=>setSt(k)} style={{flex:1,padding:"7px 0",borderRadius:9,border:"1.5px solid #e65100",fontSize:11,fontWeight:700,cursor:"pointer",background:st===k?"#e65100":"#fff",color:st===k?"#fff":"#e65100"}}>{l}</button>)}</div>
+      <div style={{display:"flex",gap:6,marginTop:10}}>{[["year","연도별"],["month","월별"]].map(([k,l])=><button key={k} onClick={()=>setSt(k)} style={{flex:1,padding:"7px 0",borderRadius:9,border:"1.5px solid #e65100",fontSize:11,fontWeight:700,cursor:"pointer",background:st===k?"#e65100":"#fff",color:st===k?"#fff":"#e65100"}}>{l}</button>)}</div>
       {st==="year"&&<div style={{display:"flex",flexDirection:"column",gap:8,marginTop:12}}>
         {ys.map((s,i)=>{
           const score=calcSeunScore(s.year,0,reportData?.scoreMeta);
@@ -1609,7 +1619,7 @@ function TabSaju({d,reportData}){
                     <div style={{fontSize:10,color:"#999"}}>{OC[dv.ohaeng]?.name} 기운</div>
                   </div>
                 </div>
-                <p style={{fontSize:11,color:"#555",margin:0,lineHeight:1.75,textAlign:"justify"}}>{dv.desc}</p>
+                <p style={{fontSize:11,color:"#555",margin:0,lineHeight:1.75,textAlign:"justify"}}><HJ>{dv.desc}</HJ></p>
               </div>
             </div>
           );
@@ -1621,55 +1631,8 @@ function TabSaju({d,reportData}){
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 7. 낮과 밤 탭
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function TabDayNight({d}){
-  const dn=d.daynight;
-  return <>
-    <section style={S.card}>
-      <ST icon="☀️" title="낮의 나: 사회적 페르소나"/>
-      <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:8}}>
-        {[
-          {t:"첫인상",c:"#e3f2fd",tc:"#0d47a1",v:dn.day.impression},
-          {t:"사회에서 쓰는 가면",c:"#f3e5f5",tc:"#4a148c",v:dn.day.mask},
-        ].map(({t,c,tc,v})=>(
-          <div key={t} style={{minHeight:72,padding:"10px 14px",background:c,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
-            <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:v?4:0}}>{t}</div>
-            {v&&<p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{v}</p>}
-          </div>
-        ))}
-      </div>
-    </section>
-    <section style={S.card}>
-      <ST icon="🌙" title="밤의 나: 숨겨진 본능과 욕망"/>
-      <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:8}}>
-        {[
-          {key:"desire",bg:"#1a1a2e",tc:"#a78bfa",label:"내면의 결핍과 진짜 욕망",v:dn.night.desire,v2:dn.night.desire2},
-          {key:"trigger",bg:"#1e1b4b",tc:"#818cf8",label:"본능이 폭발하는 트리거 3가지",triggers:dn.night.triggers},
-          {key:"attract",bg:"#312e81",tc:"#c4b5fd",label:"이성에게 치명적인 은밀한 매력",v:dn.night.attraction},
-          {key:"ideal",bg:"#1e293b",tc:"#7dd3fc",label:"이상형",v:dn.night.idealType},
-          {key:"real",bg:"#0f172a",tc:"#86efac",label:"실제 궁합",v:dn.night.idealType2},
-        ].map(({key,bg,tc,label,v,v2,triggers})=>(
-          <div key={key} style={{minHeight:72,padding:"10px 14px",background:bg,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
-            <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:(v||v2||triggers?.length)?5:0}}>{label}</div>
-            {v&&<p style={{fontSize:12,color:"#e8e8f0",margin:0,lineHeight:1.75}}>{v}</p>}
-            {v2&&<p style={{fontSize:12,color:"#d8b4fe",margin:"8px 0 0",lineHeight:1.75,borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:8}}>{v2}</p>}
-            {triggers&&(triggers||[]).map((t,i)=>(
-              <div key={i} style={{fontSize:12,color:"#e8e8f0",padding:"4px 0",borderBottom:i<triggers.length-1?"1px dashed #ffffff22":"none",lineHeight:1.6}}>
-                <span style={{color:tc,fontWeight:700,marginRight:6}}>{i+1}.</span>{t}
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    </section>
-    <div style={{padding:"12px 14px",background:"#f3f0ff",borderRadius:12,border:"1px solid #ddd6fe",fontSize:11,color:"#5b21b6",lineHeight:1.7,textAlign:"center"}}>
-      🔬 분노 패턴·회복 리듬·개운법은 <strong>내면 해부</strong> 탭에서 확인하세요
-    </div>
-  </>;
-}
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 8-B. 내면 해부 탭
+// 7+8. 내면 해부 탭 (낮과 밤 + 내면 분석 통합)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function TabInner({d,parentInnerAI,setParentInnerAI}){
   const cacheKey=k=>`fy_inner_${k}_${d.birth}`;
@@ -1796,9 +1759,51 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
   };
 
   renderedGroups.current=new Set();
+  const dn=d.daynight;
 
   return <>
     <style>{shimmerStyle}</style>
+
+    {/* 낮의 나 */}
+    <section style={S.card}>
+      <ST icon="☀️" title="낮의 나: 사회적 페르소나"/>
+      <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:8}}>
+        {[
+          {t:"첫인상",c:"#e3f2fd",tc:"#0d47a1",v:dn.day.impression},
+          {t:"사회에서 쓰는 가면",c:"#f3e5f5",tc:"#4a148c",v:dn.day.mask},
+        ].map(({t,c,tc,v})=>(
+          <div key={t} style={{minHeight:72,padding:"10px 14px",background:c,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
+            <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:v?4:0}}>{t}</div>
+            {v&&<p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.75,textAlign:"justify"}}>{v}</p>}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* 밤의 나 */}
+    <section style={S.card}>
+      <ST icon="🌙" title="밤의 나: 숨겨진 본능과 욕망"/>
+      <div style={{marginTop:12,display:"flex",flexDirection:"column",gap:8}}>
+        {[
+          {key:"desire",bg:"#1a1a2e",tc:"#a78bfa",label:"내면의 결핍과 진짜 욕망",v:dn.night.desire,v2:dn.night.desire2},
+          {key:"trigger",bg:"#1e1b4b",tc:"#818cf8",label:"본능이 폭발하는 트리거 3가지",triggers:dn.night.triggers},
+          {key:"attract",bg:"#312e81",tc:"#c4b5fd",label:"이성에게 치명적인 은밀한 매력",v:dn.night.attraction},
+          {key:"ideal",bg:"#1e293b",tc:"#7dd3fc",label:"이상형",v:dn.night.idealType},
+          {key:"real",bg:"#0f172a",tc:"#86efac",label:"실제 궁합",v:dn.night.idealType2},
+        ].map(({key,bg,tc,label,v,v2,triggers})=>(
+          <div key={key} style={{minHeight:72,padding:"10px 14px",background:bg,borderRadius:11,display:"flex",flexDirection:"column",justifyContent:"center"}}>
+            <div style={{fontSize:11,fontWeight:800,color:tc,marginBottom:(v||v2||triggers?.length)?5:0}}>{label}</div>
+            {v&&<p style={{fontSize:12,color:"#e8e8f0",margin:0,lineHeight:1.75}}>{v}</p>}
+            {v2&&<p style={{fontSize:12,color:"#d8b4fe",margin:"8px 0 0",lineHeight:1.75,borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:8}}>{v2}</p>}
+            {triggers&&(triggers||[]).map((t,i)=>(
+              <div key={i} style={{fontSize:12,color:"#e8e8f0",padding:"4px 0",borderBottom:i<triggers.length-1?"1px dashed #ffffff22":"none",lineHeight:1.6}}>
+                <span style={{color:tc,fontWeight:700,marginRight:6}}>{i+1}.</span>{t}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </section>
 
     {/* ① 내면의 리듬 — 항상 열림, 자동 로딩 */}
     <section style={S.card}>
@@ -1908,7 +1913,7 @@ function TabTojung({d}){
         <div style={{display:"flex",flexDirection:"column",gap:7}}>
           {tj.yearFlow.map((y,i)=><div key={i} style={{padding:"11px 13px",background:"#fafafa",borderRadius:10,border:"1px solid #eee"}}>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:7}}><Ring score={y.score} size={46}/><div style={{flex:1}}><div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",marginBottom:2}}><span style={{fontSize:13,fontWeight:900,color:y.year===CY?"#2e7d32":"#111"}}>{y.year}년</span>{y.year===CY&&<span style={{fontSize:9,background:"#4caf50",color:"#fff",padding:"2px 6px",borderRadius:99,fontWeight:700}}>올해</span>}<span style={{fontSize:10,background:"#fff8e1",color:"#7b5800",padding:"2px 7px",borderRadius:99,fontWeight:700}}>{y.month}</span></div><div style={{fontSize:11,color:"#555"}}>{y.desc}</div></div></div>
-            <div style={{display:"flex",gap:3,flexWrap:"nowrap"}}>{Object.entries(y.areas).map(([k,v])=><div key={k} style={{flex:1,fontSize:9,padding:"2px 2px",borderRadius:7,background:scBg(v),color:sc(v),fontWeight:700,textAlign:"center",whiteSpace:"nowrap"}}>{k} {v}</div>)}</div>
+            <div style={{display:"flex",gap:4,flexWrap:"wrap",paddingTop:4,borderTop:"1px solid rgba(0,0,0,0.06)"}}>{Object.entries(y.areas).map(([k,v])=><div key={k} style={{fontSize:10,padding:"2px 6px",borderRadius:99,background:scBg(v),color:sc(v),fontWeight:700,border:`1px solid ${sc(v)}44`}}>{k.slice(0,3)} {v}</div>)}</div>
           </div>)}
         </div>
       </div>
@@ -1956,10 +1961,9 @@ function TabTojung({d}){
                 <div style={{fontSize:10,color:"#888"}}>{p.palace}</div>
               </div>
             </div>
-            <p style={{fontSize:11,color:"#555",margin:0,lineHeight:1.75,textAlign:"justify"}}>{p.desc}</p>
+            <p style={{fontSize:11,color:"#555",margin:0,lineHeight:1.75,textAlign:"justify"}}><HJ>{p.desc}</HJ></p>
             {p.stageDesc&&<p style={{fontSize:10,color:"#888",margin:"6px 0 0",lineHeight:1.7,textAlign:"justify",paddingTop:6,borderTop:"1px dashed #eee"}}><span style={{color:"#e65100",fontWeight:700}}>{p.stage} </span>{p.stageDesc}</p>}
-            {(()=>{const combo=getComboDesc(p.byeolseong,p.stage);return combo?<p style={{fontSize:10,color:"#5c6bc0",margin:"5px 0 0",lineHeight:1.75,textAlign:"justify",paddingTop:5,borderTop:"1px dashed #e8eaf6"}}><span style={{fontWeight:700,color:"#3949ab"}}>✦ 조합 </span>{combo}</p>:null;})()}
-          </div>;
+            {(()=>{const combo=getComboDesc(p.byeolseong,p.stage);return combo?<p style={{fontSize:10,color:"#5c6bc0",margin:"5px 0 0",lineHeight:1.75,textAlign:"justify",paddingTop:5,borderTop:"1px dashed #e8eaf6"}}><span style={{fontWeight:700,color:"#3949ab"}}>✦ 조합 </span>{combo}</p>:null;})()}          </div>;
         })}
       </div>
       <div style={{marginTop:10,padding:"11px 13px",background:"#e8f5e0",borderRadius:10}}><div style={{fontSize:11,fontWeight:800,color:"#2d6a2d",marginBottom:5}}>당사주 종합 기질</div><p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.8,textAlign:"justify"}}>{ds.overall}</p></div>
@@ -2301,7 +2305,7 @@ export default function SajuReport(){
     if(_saved?.data?._innerAI) return _saved.data._innerAI;
     try{const k=_saved?.data?.birth?`fy_inner_v2_${_saved.data.birth}`:null;return k?JSON.parse(sessionStorage.getItem(k)||"null"):null;}catch{return null;}
   });
-  const TABS=["요약","사주","낮과 밤","내면 해부","토정·주역","별자리·타로수비학","MBTI"];
+  const TABS=["요약","사주","내면 해부","토정·주역","별자리·타로수비학","MBTI"];
 
   function changeTab(t){
     setTab(t);
@@ -2537,7 +2541,6 @@ JSON만 응답: {"sevenInsight":"..."}`;
     <div style={S.content}>
       {tab==="요약"        && <TabSummary d={d} changeTab={changeTab}/>}
       {tab==="사주"        && <TabSaju d={d} reportData={reportData}/>}
-      {tab==="낮과 밤"     && <TabDayNight d={d}/>}
       {tab==="내면 해부"   && <TabInner d={d} parentInnerAI={parentInnerAI} setParentInnerAI={setParentInnerAI}/>}
       {tab==="토정·주역"   && <TabTojung d={d}/>}
       {tab==="별자리·타로수비학" && <TabAstro d={d} parentAstroAI={parentAstroAI} setParentAstroAI={setParentAstroAI} parentTarotAI={parentTarotAI} setParentTarotAI={setParentTarotAI}/>}
@@ -2561,7 +2564,7 @@ const S={
   pBirth:{fontSize:11,color:"#999",marginTop:2},
   tabBar:{display:"flex",background:"#fff",borderBottom:"2px solid #f0f0f0",position:"sticky",top:49,zIndex:19,justifyContent:"space-around"},
   tab:{flex:"0 0 auto",padding:"11px 6px",fontSize:10,fontWeight:600,background:"none",border:"none",color:"#bbb",cursor:"pointer",borderBottom:"2.5px solid transparent",marginBottom:-2,transition:"color .2s,border-color .2s",textAlign:"center",letterSpacing:"-0.2px"},
-  tabA:{color:"#e65100",borderBottomColor:"#e65100"},
+  tabA:{color:"#e65100"},
   content:{padding:"12px 14px",display:"flex",flexDirection:"column",gap:11},
   card:{background:"#fff",borderRadius:16,padding:"16px",border:"1px solid #ebebeb",boxShadow:"0 1px 5px rgba(0,0,0,0.04)"},
   dCard:{background:"#fafafa",borderRadius:12,padding:"13px",border:"1px solid #eee",position:"relative"},
@@ -2887,7 +2890,7 @@ function SajuReport_Preview({data}){
   const [previewAstroAI,setPreviewAstroAI]=useState(data?._astroAI||null);
   const [previewTarotAI,setPreviewTarotAI]=useState(data?._tarotAI||null);
   const [previewInnerAI,setPreviewInnerAI]=useState(data?._innerAI||null);
-  const TABS=["요약","사주","낮과 밤","내면 해부","토정·주역","별자리·타로수비학","MBTI"];
+  const TABS=["요약","사주","내면 해부","토정·주역","별자리·타로수비학","MBTI"];
   if(!data) return <div style={{padding:20,color:"#aaa"}}>데이터 없음</div>;
   return(
     <div style={{maxWidth:480,margin:"0 auto"}}>
@@ -2900,7 +2903,6 @@ function SajuReport_Preview({data}){
       <div style={S.content}>
         {tab==="요약"        && <TabSummary d={data} changeTab={setTab}/>}
         {tab==="사주"        && <TabSaju d={data} reportData={data}/>}
-        {tab==="낮과 밤"     && <TabDayNight d={data}/>}
         {tab==="내면 해부"   && <TabInner d={data} parentInnerAI={previewInnerAI} setParentInnerAI={setPreviewInnerAI}/>}
         {tab==="토정·주역"   && <TabTojung d={data}/>}
         {tab==="별자리·타로수비학" && <TabAstro d={data} parentAstroAI={previewAstroAI} setParentAstroAI={setPreviewAstroAI} parentTarotAI={previewTarotAI} setParentTarotAI={setPreviewTarotAI}/>}
