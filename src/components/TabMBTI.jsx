@@ -1,6 +1,6 @@
 // components/TabMBTI.jsx
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { S, ST } from './ui.jsx';
+import { S, ST, OHAENG_LOADING } from './ui.jsx';
 
 function TabMBTI({d}){
   const m=d.mbti;
@@ -78,13 +78,6 @@ function TabMBTI({d}){
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 로딩 화면 컴포넌트
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const OHAENG_LOADING=[
-  {img:"/characters/wood.png",  color:"#4caf50", name:"목", label:"목 기운 분석 중"},
-  {img:"/characters/fire.png",  color:"#ef5350", name:"화", label:"화 기운 분석 중"},
-  {img:"/characters/earth.png", color:"#ffb300", name:"토", label:"토 기운 분석 중"},
-  {img:"/characters/metal.png", color:"#78909c", name:"금", label:"금 기운 분석 중"},
-  {img:"/characters/water.png", color:"#5c6bc0", name:"수", label:"수 기운 분석 중"},
-];
 
 
 export default TabMBTI;
