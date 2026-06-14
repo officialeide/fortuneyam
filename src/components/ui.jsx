@@ -206,7 +206,7 @@ const S={
   pName:{fontSize:22,fontWeight:900,color:"#111",letterSpacing:-.5},
   pBirth:{fontSize:11,color:"#999",marginTop:2},
   tabBar:{display:"flex",background:"#fff",borderBottom:"2px solid #f0f0f0",position:"sticky",top:49,zIndex:19,justifyContent:"space-around"},
-  tab:{flex:"0 0 auto",padding:"11px 6px",fontSize:10,fontWeight:600,background:"none",border:"none",color:"#bbb",cursor:"pointer",borderBottom:"2.5px solid transparent",marginBottom:-2,transition:"color .2s,border-color .2s",textAlign:"center",letterSpacing:"-0.2px"},
+  tab:{flex:"0 0 auto",padding:"11px 6px",fontSize:10,fontWeight:600,background:"none",border:"none",color:"#bbb",cursor:"pointer",borderBottom:"2.5px solid transparent",transition:"color .2s,border-color .2s",textAlign:"center",letterSpacing:"-0.2px"},
   tabA:{color:"#e65100",borderBottomColor:"#e65100"},
   content:{padding:"12px 14px",display:"flex",flexDirection:"column",gap:11},
   card:{background:"#fff",borderRadius:16,padding:"16px",border:"1px solid #ebebeb",boxShadow:"0 1px 5px rgba(0,0,0,0.04)"},

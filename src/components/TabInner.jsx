@@ -48,7 +48,7 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
   async function runInnerFetch(){
     setInnerLoading(true);setInnerErr(false);
     try{
-      const text=await callNetlify({model:"claude-haiku-4-5-20251001",max_tokens:2000,messages:[{role:"user",content:buildInnerPrompt(d)}]});
+      const text=await callNetlify({model:"claude-haiku-4-5-20251001",max_tokens:3000,messages:[{role:"user",content:buildInnerPrompt(d)}]});
       const parsed=JSON.parse(text);
       setInnerAI(parsed);
       if(setParentInnerAI) setParentInnerAI(parsed);
@@ -64,7 +64,7 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
     async function run(){
       setInnerLoading(true);setInnerErr(false);
       try{
-        const text=await callNetlify({model:"claude-haiku-4-5-20251001",max_tokens:2000,messages:[{role:"user",content:buildInnerPrompt(d)}]});
+        const text=await callNetlify({model:"claude-haiku-4-5-20251001",max_tokens:3000,messages:[{role:"user",content:buildInnerPrompt(d)}]});
         const parsed=JSON.parse(text);
         if(!cancelled){
           setInnerAI(parsed);
@@ -237,7 +237,7 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
                 <div style={{display:"flex",flexDirection:"column",gap:7,marginBottom:14}}>
                   {(innerAI.exercise||[]).map((ex,i)=>(
                     <div key={i} style={{padding:"10px 13px",background:"#f0fdf4",borderRadius:10,border:"1px solid #bbf7d0"}}>
-                      <div style={{fontSize:12,fontWeight:900,color:"#166534",marginBottom:4,wordBreak:"keep-all"}}>{cleanText(ex.name)}</div>
+                      <div style={{fontSize:12,fontWeight:900,color:"#166534",marginBottom:4,wordBreak:"keep-all"}}>{ex.name}</div>
                       <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.7}}>{cleanText(ex.reason)}</p>
                     </div>
                   ))}
@@ -246,7 +246,7 @@ function TabInner({d,parentInnerAI,setParentInnerAI}){
                 <div style={{display:"flex",flexDirection:"column",gap:7}}>
                   {(innerAI.hobby||[]).map((h,i)=>(
                     <div key={i} style={{padding:"10px 13px",background:"#fdf4ff",borderRadius:10,border:"1px solid #e9d5ff"}}>
-                      <div style={{fontSize:12,fontWeight:900,color:"#6b21a8",marginBottom:4,wordBreak:"keep-all"}}>{cleanText(h.name)}</div>
+                      <div style={{fontSize:12,fontWeight:900,color:"#6b21a8",marginBottom:4,wordBreak:"keep-all"}}>{h.name}</div>
                       <p style={{fontSize:12,color:"#444",margin:0,lineHeight:1.7}}>{cleanText(h.reason)}</p>
                     </div>
                   ))}

@@ -62,7 +62,7 @@ function TabTojung({d}){
       </div>
       <div style={{marginTop:10,padding:"11px 13px",background:"#e8f5e0",borderRadius:10}}>
         <div style={{fontSize:11,fontWeight:800,color:"#2d6a2d",marginBottom:5}}>종합 기질</div>
-        <p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.8,textAlign:"justify"}}>{ds.overall}</p>
+        <p style={{fontSize:12,color:"#333",margin:0,lineHeight:1.8,textAlign:"justify",wordBreak:"keep-all",whiteSpace:"pre-wrap"}}>{ds.overall}</p>
       </div>
     </section>
   </>;
