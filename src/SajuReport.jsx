@@ -281,7 +281,7 @@ JSON만 응답: {"sevenInsight":"..."}`;
       <div style={{padding:"4px 12px",borderRadius:99,fontSize:12,fontWeight:700,background:gBg,color:gC}}>{d.gender}성</div>
     </div>
     <div style={{...S.tabBar,overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}}>
-      {TABS.map(t=><button key={t} onClick={()=>changeTab(t)} style={{...S.tab,whiteSpace:"nowrap",...(tab===t?S.tabA:{})}}>{t}</button>)}
+      {TABS.map(t=><button key={t} onClick={()=>changeTab(t)} onMouseDown={e=>e.preventDefault()} style={{...S.tab,whiteSpace:"nowrap",...(tab===t?S.tabA:{})}}>{t}</button>)}
     </div>
     <div style={S.content}>
       {tab==="요약"        && <TabSummary d={d} changeTab={changeTab}/>}
