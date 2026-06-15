@@ -1,6 +1,6 @@
 // components/ui.jsx
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { OC, GD, JD, JL, JH, gc, jc, yyE, cleanText, _GANO } from '../data/constants.js';
+import { useState, useEffect } from 'react';
+import { OC, gc, jc, yyE } from '../data/constants.js';
 
 const GT=({children})=><p style={{fontSize:12,color:"#666",lineHeight:1.78,margin:"8px 0 0",borderLeft:"3px solid #e8e8e8",paddingLeft:10,textAlign:"justify"}}>{children}</p>;
 const ST=({icon,title,sub})=><div style={{marginBottom:6}}><div style={{fontSize:15,fontWeight:800,color:"#1a1a1a",display:"flex",alignItems:"center",gap:6}}><span>{icon}</span><span>{title}</span></div>{sub&&<div style={{fontSize:10,color:"#aaa",marginTop:1}}>{sub}</div>}</div>;

@@ -1,6 +1,5 @@
 // components/TabMBTI.jsx
-import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { S, ST, OHAENG_LOADING } from './ui.jsx';
+import { S, ST } from './ui.jsx';
 
 function TabMBTI({d}){
   const m=d.mbti;

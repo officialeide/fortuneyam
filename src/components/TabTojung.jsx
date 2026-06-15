@@ -1,5 +1,5 @@
 // components/TabTojung.jsx
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { JH, jc, JL } from '../data/constants.js';
 import { getComboDesc } from '../data/comboDB.js';
 import { S, ST, GT } from './ui.jsx';

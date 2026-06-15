@@ -1,10 +1,11 @@
 // SajuReport.jsx — 메인 진입점 v2
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef } from 'react';
+import { lunarToSolar, getLeapMonth } from './utils/lunar.js';
 import { saveUser, saveReport, findCachedReport } from './supabase.js';
 import { buildSajuData } from './utils/saju.js';
 import { callNetlify } from './utils/callNetlify.js';
 import { buildInnerPrompt, buildAstroPrompt, buildTarotPrompt } from './utils/prompts.js';
-import { CY, CM, CD, cleanText, stripDegree, _GANO, _JIO } from './data/constants.js';
+import { CY, CM, CD, stripDegree, _GANO } from './data/constants.js';
 import { S, SF, LoadingScreen } from './components/ui.jsx';
 import TabSummary from './components/TabSummary.jsx';
 import TabSaju from './components/TabSaju.jsx';
@@ -302,57 +303,6 @@ JSON만 응답: {"sevenInsight":"..."}`;
 // 입력 폼 컴포넌트
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 음력→양력 변환 (간이 알고리즘 1900~2050)
-// 음력 데이터 기반: 정밀도 ±1일 수준
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 각 연도 음력 1월 1일의 양력 날짜 + 월별 대소 정보
-const LUNAR_DATA = {
-  1990:[1,27,[1,0,1,0,1,0,1,0,1,0,1,0]],1991:[2,15,[0,1,0,1,0,1,0,1,0,1,0,1]],
-  1992:[2,4,[1,0,1,0,1,0,1,0,1,0,1,0]],1993:[1,23,[0,1,0,1,0,1,0,0,1,0,1,0]],
-  1994:[2,10,[1,0,1,0,1,0,1,0,1,0,1,0]],1995:[1,31,[0,1,0,1,0,1,0,1,0,1,0,1]],
-  1996:[2,19,[1,0,1,0,1,0,1,0,1,0,1,0]],1997:[2,7,[0,1,0,1,0,1,0,1,0,1,0,0]],
-  1998:[1,28,[1,0,1,0,1,0,1,0,1,0,1,0]],1999:[2,16,[0,1,0,1,0,1,0,1,0,1,0,1]],
-  2000:[2,5,[1,0,1,0,1,0,1,0,1,0,1,0]],2001:[1,24,[0,1,0,1,0,1,0,0,1,0,1,0]],
-  2002:[2,12,[1,0,1,0,1,0,1,0,1,0,1,0]],2003:[2,1,[0,1,0,1,0,1,0,1,0,1,0,1]],
-  2004:[1,22,[1,0,1,0,1,0,0,1,0,1,0,1]],2005:[2,9,[0,1,0,1,0,1,0,1,0,1,0,0]],
-  2006:[1,29,[1,0,1,0,1,0,1,0,1,0,1,0]],2007:[2,18,[0,1,0,1,0,1,0,1,0,1,0,1]],
-  2008:[2,7,[1,0,1,0,1,0,1,0,0,1,0,1]],2009:[1,26,[0,1,0,1,0,1,0,1,0,1,0,0]],
-  2010:[2,14,[1,0,1,0,1,0,1,0,1,0,1,0]],2011:[2,3,[0,1,0,1,0,1,0,1,0,1,0,1]],
-  2012:[1,23,[1,0,1,0,0,1,0,1,0,1,0,1]],2013:[2,10,[0,1,0,1,0,1,0,1,0,1,0,0]],
-  2014:[1,31,[1,0,1,0,1,0,1,0,1,0,1,0]],2015:[2,19,[0,1,0,1,0,1,0,1,0,1,0,1]],
-  2016:[2,8,[1,0,1,0,1,0,1,0,0,1,0,1]],2017:[1,28,[0,1,0,1,0,1,0,1,0,1,0,0]],
-  2018:[2,16,[1,0,1,0,1,0,1,0,1,0,1,0]],2019:[2,5,[0,1,0,1,0,1,0,1,0,1,0,1]],
-  2020:[1,25,[1,0,1,0,0,1,0,1,0,1,0,1]],2021:[2,12,[0,1,0,1,0,1,0,1,0,1,0,0]],
-  2022:[2,1,[1,0,1,0,1,0,1,0,1,0,1,0]],2023:[1,22,[0,1,0,1,0,1,0,1,0,0,1,0]],
-  2024:[2,10,[1,0,1,0,1,0,1,0,1,0,1,0]],2025:[1,29,[0,1,0,1,0,1,0,1,0,1,0,1]],
-};
-
-// 윤달 정보 (연도: [윤달번호, 윤달 대=1/소=0])
-const LEAP_MONTHS = {
-  1990:8,1993:3,1995:8,1998:5,2001:4,2004:2,2006:7,2009:5,2012:4,2014:9,
-  2017:6,2020:4,2023:2,2025:6,
-};
-
-function lunarToSolar(year, month, day) {
-  // 단순 근사 변환 (±1~2일 오차) — 정밀도가 필요하면 korean-lunar-calendar 라이브러리 사용 권장
-  // 음력은 양력보다 약 21~50일 뒤처짐. 월별 오프셋 기반 근사값 사용.
-  const LUNAR_MONTH_DAYS = [30,29,30,29,30,29,30,29,30,29,30,29];
-  try {
-    // 음력 1월 1일 ≈ 양력 해당 연도 1월 20~21일 기준으로 역산
-    const SPRING_OFFSET = 21; // 음력 1월 1일 ≈ 양력 1월 21일 (근사)
-    let totalDays = SPRING_OFFSET - 1;
-    for (let m = 1; m < month; m++) {
-      totalDays += LUNAR_MONTH_DAYS[(m - 1) % 12];
-    }
-    totalDays += day - 1;
-    const date = new Date(year, 0, 1 + totalDays);
-    return { year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() };
-  } catch {
-    return null;
-  }
-}
-
 const CITIES=[
   "서울","부산","대구","인천","광주","대전","울산","세종",
   "경기","강원","충북","충남","전북","전남","경북","경남","제주",
@@ -361,20 +311,13 @@ const CITIES=[
 ];
 
 
-
-
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 딥카드 프롬프트 헬퍼
+// 입력 폼 컴포넌트 (이름·성별·생년월일·시간·출생지·MBTI)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 딥카드 메타데이터
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 관리자용 리포트 미리보기 (탭 없이 전체 표시)
 function SajuInputForm({onSubmit}){
   const [step,setStep]=useState(1);
   const [calType,setCalType]=useState("solar");
+  const [isLeap,setIsLeap]=useState(false);
   const [form,setForm]=useState({
     name:"",year:"",month:"",day:"",
     hour:"12",minute:"00",
@@ -382,7 +325,6 @@ function SajuInputForm({onSubmit}){
     mbti:"",
   });
   const [err,setErr]=useState({});
-  const [dateDone,setDateDone]=useState(false);
   const up=(k,v)=>setForm(f=>({...f,[k]:v}));
   const timeInputRef=useRef(null);
   const timeFieldRef=useRef(null);
@@ -395,8 +337,12 @@ function SajuInputForm({onSubmit}){
     if(!form.month||m<1||m>12) e.month="월을 확인해주세요";
     if(!form.day||d<1||d>31) e.day="일을 확인해주세요";
     if(!Object.keys(e).length && calType==="lunar"){
-      const converted=lunarToSolar(y,m,d);
-      if(!converted){ e.year="해당 음력 날짜를 변환할 수 없어요 (1990~2025 지원)"; }
+      const converted=lunarToSolar(y,m,d,isLeap);
+      if(!converted){
+        e.year = isLeap
+          ? `${m}월에는 윤달이 없어요. 윤달 여부를 확인해주세요`
+          : "해당 음력 날짜를 변환할 수 없어요";
+      }
       else { up("year",String(converted.year)); up("month",String(converted.month)); up("day",String(converted.day)); }
     }
     setErr(e);
@@ -449,7 +395,7 @@ function SajuInputForm({onSubmit}){
             <div style={SF.label}>생년월일</div>
             <div style={{display:"flex",gap:4}}>
               {["solar","lunar"].map(t=>(
-                <button key={t} onClick={()=>{setCalType(t);setIsLeap(false);}}
+                <button key={t} onClick={()=>{setCalType(t);if(t==="solar")setIsLeap(false);}}
                   style={{padding:"4px 12px",borderRadius:99,border:"1.5px solid #e65100",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
                     background:calType===t?"#e65100":"#fff",color:calType===t?"#fff":"#e65100"}}>
                   {t==="solar"?"양력":"음력"}
@@ -470,23 +416,40 @@ function SajuInputForm({onSubmit}){
                 up("year",String(yy<=30?2000+yy:1900+yy));
                 up("month",String(parseInt(raw.slice(2,4))));
                 up("day",String(parseInt(raw.slice(4,6))));
+                setIsLeap(false); // 날짜 다시 입력하면 평달로 초기화
                 // 모바일 대응: focus() 대신 하이라이트 + scrollIntoView
-                setDateDone(true);
                 setTimeout(()=>{
                   timeInputRef.current?.focus();
                   timeFieldRef.current?.scrollIntoView({behavior:"smooth",block:"center"});
                 },80);
-              } else {
-                setDateDone(false);
               }
             }}/>
           {(err.year||err.month||err.day)&&<div style={SF.errMsg}>{err.year||err.month||err.day}</div>}
           <div style={SF.hint}>{calType==="solar"?"양력 기준":"음력 기준: 양력으로 자동 변환돼요"}</div>
-          {calType==="lunar"&&(
-            <div style={{marginTop:6,padding:"7px 11px",background:"#f3f4f6",borderRadius:8,border:"1px solid #e0e0e0",fontSize:10,color:"#888",lineHeight:1.6}}>
-              💡 윤달 태생이라면 해당 달 마지막 날(말일)로 입력해주세요.
-            </div>
-          )}
+          {calType==="lunar"&&(()=>{
+            const ly=parseInt(form.year);
+            const lm=(form.year&&form.month)?getLeapMonth(ly):null;
+            // 입력한 달에 윤달이 존재할 때만 평달/윤달 선택 노출
+            if(lm && parseInt(form.month)===lm){
+              return (
+                <div style={{marginTop:8}}>
+                  <div style={{fontSize:10,color:"#888",marginBottom:6,lineHeight:1.6}}>
+                    {ly}년 {lm}월에는 윤달이 있어요. 어느 쪽 태생인가요?
+                  </div>
+                  <div style={{display:"flex",gap:6}}>
+                    {[{v:false,l:"평달"},{v:true,l:`윤${lm}월`}].map(o=>(
+                      <button key={o.l} onClick={()=>setIsLeap(o.v)}
+                        style={{flex:1,padding:"8px 0",borderRadius:8,border:"1.5px solid #e65100",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",
+                          background:isLeap===o.v?"#e65100":"#fff",color:isLeap===o.v?"#fff":"#e65100"}}>
+                        {o.l}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
         </div>
 
         {/* 태어난 시간 */}
@@ -497,7 +460,6 @@ function SajuInputForm({onSubmit}){
           </div>
           <input ref={timeInputRef} style={{...SF.input,...(err.time?SF.inputErr:{})}}
             placeholder="22:25" value={form.timeRaw||""} maxLength={5} inputMode="numeric"
-            onFocus={()=>setDateDone(false)}
             onChange={ev=>{
               const raw=ev.target.value.replace(/\D/g,"");
               let fmt=raw;

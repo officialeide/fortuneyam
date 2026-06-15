@@ -38,9 +38,31 @@ exports.handler = async (event) => {
     };
   }
 
+  // ── 보안: 모델 허용 목록 + 토큰 상한 ──
+  // 외부에서 임의 모델/대용량 토큰으로 API 키를 남용하지 못하게 제한
+  const ALLOWED_MODELS = [
+    "claude-haiku-4-5-20251001",
+    "claude-sonnet-4-6",
+  ];
+  const MAX_TOKENS_CAP = 4000;
+
+  const model = ALLOWED_MODELS.includes(reqBody.model)
+    ? reqBody.model
+    : "claude-haiku-4-5-20251001";
+  const maxTokens = Math.min(reqBody.max_tokens || 1000, MAX_TOKENS_CAP);
+
+  // messages 기본 검증
+  if (!Array.isArray(reqBody.messages) || reqBody.messages.length === 0) {
+    return {
+      statusCode: 400,
+      headers: { ...CORS, "Content-Type": "application/json" },
+      body: JSON.stringify({ error: { message: "messages가 필요해요." } }),
+    };
+  }
+
   const payload = JSON.stringify({
-    model: reqBody.model || "claude-haiku-4-5-20251001",
-    max_tokens: reqBody.max_tokens || 1000,
+    model,
+    max_tokens: maxTokens,
     messages: reqBody.messages,
   });
 

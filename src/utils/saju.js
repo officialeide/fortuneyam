@@ -1,5 +1,5 @@
 // utils/saju.js
-import { OC, GD, JD, GL, JL, GH, JH, gc, jc, OHK, GWAN_O, ILGAN_TITLE, ILGAN_PHILOSOPHY,
+import { GL, JL, GH, JH, OHK, GWAN_O, ILGAN_TITLE, ILGAN_PHILOSOPHY,
   SAMHAP, YUKHAP, CHUNG, calcHapChungHyeong, TRIGRAM, TOJUNG_SAJA, SIBSONG_ROLE,
   BASE, JASI_START, JASI_END, toJDN, idxToGJ, calcIlju, calcBnd, yearToGJ, mToGJ,
   getToday, CY, CM, CD, bYS, bMS, calcSeunScore, calcSeunAreas,
@@ -7,7 +7,6 @@ import { OC, GD, JD, GL, JL, GH, JH, gc, jc, OHK, GWAN_O, ILGAN_TITLE, ILGAN_PHI
   calcYeonju, getMonthJi, getTimeJi, calcOhaengDist, STAGE_DESC,
   _GANO, _JIO, normO, JI_OE, isYang, isYangJ, YONGSIN_TABLE,
   ILGAN_DESC, ILJU_CHAR, stripLead } from '../data/constants.js';
-import { getComboDesc } from '../data/comboDB.js';
 
 function calcSinsal(ilgan,yearJi,monthJi,dayJi,timeJi){
   const result=[];
@@ -350,7 +349,7 @@ function buildSajuData(input){
   const _ichNature=ichingData?.nature||"";
   const _sajaName=sajaDB?.saja||"";
   const _iljiStar=_dsName(dansajuPillars[2].byeolseong);
-  const dansajuOverall=`${_ilganTitle} 같은 ${OHK[ilO]} 일간의 ${singang.replace(/\(.*\)/,"")} 기질과 어우러져, ${ilganDB.core.replace(/^[^:]*:\s*/,"")} 토정비결 ${_sajaName}의 흐름은 ${sajaDB?.desc?.slice(0,30)||""}…의 에너지를 담고 있어요. 주역 ${ichingData?.name||""}(${_ichNature})의 기운이 이 흐름을 뒷받침해요. 당사주 일주의 ${_iljiStar}이 삶의 중심축이 되고, 나머지 세 별이 시기별로 그 기운을 거들어요.`;
+  const dansajuOverall=`${_ilganTitle} 같은 ${OHK[ilO]} 일간의 ${singang.replace(/\(.*\)/,"")} 기질과 어우러져, ${ilganDB.core.replace(/^[^:]*:\s*/,"")} 토정비결 ${_sajaName}의 흐름은 ${sajaDB?.desc||""} 주역 ${ichingData?.name||""}(${_ichNature})의 기운이 이 흐름을 뒷받침해요. 당사주 일주의 ${_iljiStar}이 삶의 중심축이 되고, 나머지 세 별이 시기별로 그 기운을 거들어요.`;
 
 
   // ━━ 세운 점수 메타 — sajaDB, ichingData, dansajuPillars 모두 정의된 후에 계산 ━━

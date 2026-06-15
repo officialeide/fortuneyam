@@ -1,5 +1,5 @@
 // components/AdminPage.jsx
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { SajuReport_Preview } from './SajuReportPreview.jsx';
 
 function AdminPage({onClose}){

@@ -1,5 +1,5 @@
 // components/SajuReportPreview.jsx
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { S } from './ui.jsx';
 import TabSummary from './TabSummary.jsx';
 import TabSaju from './TabSaju.jsx';
