@@ -1,5 +1,5 @@
 // SajuReport.jsx — 메인 진입점 v2
-import { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { lunarToSolar, getLeapMonth } from './utils/lunar.js';
 import { saveUser, saveReport, findCachedReport } from './supabase.js';
 import { buildSajuData } from './utils/saju.js';
