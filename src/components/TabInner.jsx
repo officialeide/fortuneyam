@@ -1,5 +1,5 @@
 // components/TabInner.jsx
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { cleanText } from '../data/constants.js';
 import { callNetlify } from '../utils/callNetlify.js';
 import { buildInnerPrompt, DEEP_CARDS, buildDeepPrompt } from '../utils/prompts.js';

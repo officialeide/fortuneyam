@@ -1,3 +1,4 @@
+import React from 'react';
 // components/TabMBTI.jsx
 import { S, ST } from './ui.jsx';
 

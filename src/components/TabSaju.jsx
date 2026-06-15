@@ -1,3 +1,4 @@
+import React from 'react';
 // components/TabSaju.jsx
 import { jc, gc, OC } from '../data/constants.js';
 import { BndBanner, S, Acc, ST, GT, Manseryeok, Ohaeng } from './ui.jsx';

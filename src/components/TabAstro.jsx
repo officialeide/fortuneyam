@@ -1,5 +1,5 @@
 // components/TabAstro.jsx
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { CY, stripDegree, cleanText } from '../data/constants.js';
 import { callNetlify } from '../utils/callNetlify.js';
 import { buildTarotPrompt, buildAstroPrompt } from '../utils/prompts.js';

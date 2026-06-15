@@ -1,5 +1,5 @@
 // components/TabSummary.jsx
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { CY, cleanText } from '../data/constants.js';
 import { S, ST, HJ, scBg, GT, sc, Ring } from './ui.jsx';
 
