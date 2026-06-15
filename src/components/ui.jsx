@@ -202,7 +202,7 @@ const S={
   header:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:"#fff",borderBottom:"1px solid #eee",position:"sticky",top:0,zIndex:20},
   navBtn:{background:"none",border:"none",fontSize:22,color:"#333",cursor:"pointer",width:32,padding:0},
   headerTitle:{fontSize:15,fontWeight:700,color:"#111"},
-  profileBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 18px",background:"#fff",borderBottom:"1px solid #f0f0f0"},
+  profileBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 18px",background:"#fff"},
   pName:{fontSize:22,fontWeight:900,color:"#111",letterSpacing:-.5},
   pBirth:{fontSize:11,color:"#999",marginTop:2},
   tabBar:{display:"flex",background:"#fff",position:"sticky",top:49,zIndex:19,justifyContent:"space-around"},
