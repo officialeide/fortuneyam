@@ -1,4 +1,5 @@
 *, *::before, *::after { box-sizing: border-box; }
+button { outline: none; -webkit-tap-highlight-color: transparent; }
 button:focus { outline: none; }
-button:focus-visible { outline: none; }
-button { -webkit-tap-highlight-color: transparent; }
+button:focus-visible { outline: none; box-shadow: none; }
+button::-moz-focus-inner { border: 0; }
