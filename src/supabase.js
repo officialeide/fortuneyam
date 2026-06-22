@@ -9,7 +9,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 // 프롬프트 버전 — 프롬프트 수정 시 이 값을 올리면
 // 이전 버전 캐시는 무시하고 새로 생성함 (v1 → v2 → ...)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-export const PROMPT_VERSION = 'v1'
+export const PROMPT_VERSION = 'v2'
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 캐시 사용 여부 (환경변수 VITE_DISABLE_CACHE=true 면 비활성화)
