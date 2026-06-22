@@ -1,7 +1,7 @@
 // SajuReport.jsx — 메인 진입점 v2
 import React, { useState, useMemo, useRef } from 'react';
 import { lunarToSolar, getLeapMonth } from './utils/lunar.js';
-import { saveUser, saveReport, findCachedReport } from './supabase.js';
+import { saveUser, saveReport, findCachedReport, PROMPT_VERSION } from './supabase.js';
 import { buildSajuData } from './utils/saju.js';
 import { callNetlify } from './utils/callNetlify.js';
 import { buildInnerPrompt, buildAstroPrompt, buildTarotPrompt } from './utils/prompts.js';
