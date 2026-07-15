@@ -170,27 +170,14 @@ function LoadingScreen({name}){
         opacity:visible?1:0,
         transform:visible?"scale(1)":"scale(0.88)",
       }}>
-        <img
-          src={cur.img}
-          alt={cur.name}
-          style={{width:100,height:100,objectFit:"contain"}}
-        />
+        <img src={cur.img} alt={cur.name} style={{width:100,height:100,objectFit:"contain"}}/>
       </div>
-      <div style={{
-        fontSize:18,fontWeight:900,color:cur.color,
-        marginBottom:4,
-        transition:"opacity 0.35s",
-        opacity:visible?1:0,
-      }}>{cur.label}</div>
-      <div style={{fontSize:12,color:"#888",fontWeight:600,marginBottom:4}}>{name||""}님의 사주를 분석하고 있어요</div>
-      <div style={{fontSize:10,color:"#bbb",marginBottom:16}}>별자리·타로수비학까지 모두 준비할게요</div>
+      <div style={{fontSize:18,fontWeight:900,color:cur.color,marginBottom:4,transition:"opacity 0.35s",opacity:visible?1:0}}>{cur.label}</div>
+      <div style={{fontSize:12,color:"#555",fontWeight:600,marginBottom:4}}>{name||""}의 운명을 읽고 있어</div>
+      <div style={{fontSize:10,color:"#bbb",marginBottom:16}}>별자리·타로수비학까지 모두 펼칠게</div>
       <div style={{display:"flex",gap:8,marginTop:4}}>
         {OHAENG_LOADING.map((o,i)=>(
-          <div key={i} style={{
-            width:i===idx?20:6,height:6,borderRadius:99,
-            background:i===idx?OHAENG_LOADING[i].color:"#ddd",
-            transition:"all 0.3s"
-          }}/>
+          <div key={i} style={{width:i===idx?20:6,height:6,borderRadius:99,background:i===idx?OHAENG_LOADING[i].color:"#ddd",transition:"all 0.3s"}}/>
         ))}
       </div>
     </div>
