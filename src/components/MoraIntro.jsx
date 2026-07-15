@@ -294,7 +294,7 @@ export default function MoraIntro({ onEnter }) {
               <input
                 className="mora-input"
                 type="text" inputMode="numeric"
-                placeholder="생년월일  예) 930117"
+                placeholder="생년월일  예) 900101"
                 value={form.birthRaw || ""}
                 onChange={e => handleBirthChange(e.target.value)}
                 maxLength={8}
