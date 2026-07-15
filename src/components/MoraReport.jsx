@@ -1,4 +1,4 @@
-// MoraReport.jsx v3 — 날카로운 무당체
+// MoraReport.jsx v4 — 진짜 무당체
 import React, { useState, useEffect } from 'react'
 import { cleanText } from '../data/constants.js'
 import { buildAstroPrompt, buildTarotPrompt } from '../utils/prompts.js'
@@ -12,23 +12,23 @@ const C = {
   ash: "#9E8F8A", fog: "#5C5158",
 }
 
-// 한자 제거 + ~에요 → 무당체 변환
+// 한자 + 에요체 제거
 function clean(s) {
   if (!s) return ""
   return cleanText(s)
-    .replace(/[（(][一-龯\u4E00-\u9FFF]+[）)]/g, "")
+    .replace(/[（(][一-龯\u4E00-\u9FFF\uAC00-\uD7A3 ]+[）)]/g, "")
     .replace(/[一-龯\u4E00-\u9FFF]{2,}/g, "")
     .replace(/\s{2,}/g, " ")
     .trim()
 }
 
-function mugdang(s) {
+function mug(s) {
   if (!s) return ""
-  const t = clean(s)
+  let t = clean(s)
   const r = [
     ["이에요.", "이야."], ["이에요,", "이야,"], ["이에요 ", "이야 "], ["이에요\n", "이야\n"],
     ["예요.", "야."], ["예요,", "야,"], ["예요 ", "야 "], ["예요\n", "야\n"],
-    ["있어요.", "있어."], ["있어요,", "있어,"], ["있어요 ", "있어 "], ["있어요\n", "있어\n"],
+    ["있어요.", "있어."], ["있어요,", "있어,"], ["있어요 ", "있어 "],
     ["없어요.", "없어."], ["없어요,", "없어,"], ["없어요 ", "없어 "],
     ["해요.", "해."], ["해요,", "해,"], ["해요 ", "해 "], ["해요\n", "해\n"],
     ["돼요.", "돼."], ["돼요,", "돼,"], ["돼요 ", "돼 "],
@@ -36,22 +36,24 @@ function mugdang(s) {
     ["나요.", "나."], ["나요,", "나,"], ["나요 ", "나 "],
     ["거예요.", "거야."], ["거예요,", "거야,"], ["거예요 ", "거야 "],
     ["았어요.", "았어."], ["었어요.", "었어."], ["았어요,", "았어,"], ["었어요,", "었어,"],
-    ["았어요 ", "았어 "], ["었어요 ", "었어 "],
-    ["잖아요.", "잖아."], ["잖아요,", "잖아,"], ["잖아요 ", "잖아 "],
+    ["잖아요.", "잖아."], ["잖아요,", "잖아,"],
     ["네요.", "네."], ["네요,", "네,"], ["네요 ", "네 "],
     ["어요.", "어."], ["어요,", "어,"], ["어요 ", "어 "],
     ["아요.", "아."], ["아요,", "아,"], ["아요 ", "아 "],
     ["ㄹ게요.", "ㄹ게."], ["할게요.", "할게."], ["줄게요.", "줄게."],
-    ["신약(身弱)", "몸이 약한 구조"], ["신강(身强)", "몸이 강한 구조"],
     ["신약", "에너지가 분산된 구조"], ["신강", "에너지가 집중된 구조"],
+    ["하세요.", "해."], ["주세요.", "줘."],
   ]
-  let res = t
-  for (const [o, n] of r) res = res.split(o).join(n)
-  return res
+  for (const [o, n] of r) t = t.split(o).join(n)
+  return t
 }
 
-const txt = { fontSize: 14, color: C.parchment, lineHeight: 1.85, fontWeight: 400, fontFamily: "Georgia, serif" }
-const hdg = (a) => ({ fontSize: 10, letterSpacing: 3, color: a, textTransform: "uppercase", fontFamily: "sans-serif", marginBottom: 8 })
+// 폰트 — 얇은 바탕체
+const FONT = "'Nanum Myeongjo', 'Noto Serif KR', Georgia, serif"
+const FONT_SANS = "'Nanum Gothic', 'Apple SD Gothic Neo', sans-serif"
+
+const txt = { fontSize: 14, color: C.parchment, lineHeight: 1.9, fontWeight: 400, fontFamily: FONT }
+const hdg = (a) => ({ fontSize: 9, letterSpacing: 3, color: a, textTransform: "uppercase", fontFamily: FONT_SANS, marginBottom: 8, fontWeight: 400 })
 const dvd = { borderBottom: `1px solid ${C.ember}`, marginBottom: 20, paddingBottom: 20 }
 
 function Block({ h, text, accent, last }) {
@@ -75,54 +77,15 @@ function ChapterCard({ num, label, tag, tagColor, tagText, accent, title, subtit
     }}>
       <div style={{ background: `linear-gradient(135deg, ${C.mahogany} 0%, ${C.abyss} 100%)`, padding: "24px 24px 18px", borderBottom: `1px solid ${C.ember}` }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-          <div style={{ fontSize: 10, letterSpacing: 4, color: accent, textTransform: "uppercase", fontFamily: "sans-serif" }}>{label}</div>
-          {tag && <div style={{ background: tagColor, borderRadius: 20, padding: "3px 10px", fontSize: 11, color: tagText, fontFamily: "sans-serif" }}>{tag}</div>}
+          <div style={{ fontSize: 9, letterSpacing: 4, color: accent, textTransform: "uppercase", fontFamily: FONT_SANS, fontWeight: 400 }}>{label}</div>
+          {tag && <div style={{ background: tagColor, borderRadius: 20, padding: "3px 10px", fontSize: 11, color: tagText, fontFamily: FONT_SANS, fontWeight: 400 }}>{tag}</div>}
         </div>
-        <div style={{ fontSize: 28, color: C.sand, marginBottom: 4, fontWeight: 400, opacity: 0.35, fontFamily: "Georgia, serif" }}>{num}</div>
-        <div style={{ fontSize: 18, color: C.parchment, lineHeight: 1.55, whiteSpace: "pre-line", fontWeight: 400, fontFamily: "Georgia, serif" }}>{title}</div>
-        {subtitle && <div style={{ fontSize: 11, color: C.ash, marginTop: 6, fontFamily: "sans-serif", letterSpacing: 0.5 }}>{subtitle}</div>}
+        <div style={{ fontSize: 26, color: C.sand, marginBottom: 4, fontWeight: 300, opacity: 0.35, fontFamily: FONT }}>{num}</div>
+        <div style={{ fontSize: 17, color: C.parchment, lineHeight: 1.6, whiteSpace: "pre-line", fontWeight: 400, fontFamily: FONT }}>{title}</div>
+        {subtitle && <div style={{ fontSize: 11, color: C.ash, marginTop: 6, fontFamily: FONT_SANS, letterSpacing: 0.5, fontWeight: 400 }}>{subtitle}</div>}
       </div>
       <div style={{ padding: "20px 24px 24px" }}>
         {blocks.map((b, i) => <Block key={i} h={b.h} text={b.text} accent={accent} last={i === blocks.length - 1} />)}
-      </div>
-    </div>
-  )
-}
-
-function LockedCard({ num, label, title, blocks }) {
-  return (
-    <div style={{ background: C.dusk, border: `1px solid ${C.mahogany}`, borderRadius: 16, overflow: "hidden", minHeight: 480 }}>
-      <div style={{ background: `linear-gradient(135deg, ${C.mahogany} 0%, ${C.abyss} 100%)`, padding: "24px 24px 18px", borderBottom: `1px solid ${C.ember}` }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-          <div style={{ fontSize: 10, letterSpacing: 4, color: C.caramel, textTransform: "uppercase", fontFamily: "sans-serif" }}>{label}</div>
-          <div style={{ background: C.plum, borderRadius: 20, padding: "3px 10px", fontSize: 11, color: C.lavender, fontFamily: "sans-serif" }}>유료</div>
-        </div>
-        <div style={{ fontSize: 28, color: C.sand, marginBottom: 4, fontWeight: 400, opacity: 0.35, fontFamily: "Georgia, serif" }}>{num}</div>
-        <div style={{ fontSize: 18, color: C.parchment, lineHeight: 1.55, whiteSpace: "pre-line", fontWeight: 400, fontFamily: "Georgia, serif" }}>{title}</div>
-      </div>
-      <div style={{ padding: "20px 24px 24px", position: "relative" }}>
-        {blocks.map((b, i) => (
-          <div key={i} style={{ ...(i < blocks.length - 1 ? dvd : {}), filter: "blur(4px)", userSelect: "none", pointerEvents: "none" }}>
-            <div style={hdg(C.caramel)}>{b.h}</div>
-            <div style={txt}>{b.text}</div>
-          </div>
-        ))}
-        <div style={{
-          position: "absolute", inset: 0,
-          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          background: "rgba(13,10,15,0.6)", borderRadius: "0 0 16px 16px",
-        }}>
-          <div style={{ fontSize: 13, color: C.lavender, marginBottom: 16, fontFamily: "sans-serif", textAlign: "center", lineHeight: 1.7 }}>
-            이 챕터는 유료야.
-          </div>
-          <button onClick={() => alert("곧 열려.")} style={{
-            background: C.walnut, border: `1px solid ${C.caramel}`,
-            borderRadius: 8, padding: "12px 28px", color: C.parchment,
-            fontSize: 13, cursor: "pointer", fontFamily: "sans-serif", letterSpacing: 1,
-          }}>
-            열어보기
-          </button>
-        </div>
       </div>
     </div>
   )
@@ -193,75 +156,63 @@ export default function MoraReport({ d, onHome, parentAstroAI, setParentAstroAI,
   const a = astroAI || d.astro || {}
   const t = d.tarot || {}
 
-  const sunSign = a.sun && a.sun !== "분석 중" ? a.sun : null
-  const moonSign = a.moon && a.moon !== "분석 중" ? a.moon : null
-  const ascSign = a.asc && a.asc !== "분석 중" ? a.asc : null
+  const sunSign = a.sun && a.sun !== "분석 중" ? clean(a.sun) : null
+  const moonSign = a.moon && a.moon !== "분석 중" ? clean(a.moon) : null
+  const ascSign = a.asc && a.asc !== "분석 중" ? clean(a.asc) : null
 
-  // 주역 콜론/온점 정리
-  const ichingName = (juyeokSys.key || d.iching?.bonmyeonggae || "").replace(/[.:：]/g, "").trim()
-  const ichingNature = (juyeokSys.desc || d.iching?.gaeNature || "").replace(/^\./, "").trim()
-  const ichingDesc = d.iching?.gaeDesc || ""
+  // 주역 — 콜론/온점 정리
+  const ichingName = (juyeokSys.key || d.iching?.bonmyeonggae || "").replace(/[.:：]/g, "").replace(/[一-龯\u4E00-\u9FFF（(][^）)]*[）)]/g, "").trim()
+  const ichingNature = (juyeokSys.desc || d.iching?.gaeNature || "").replace(/^[.:]/, "").trim()
   const ichingStrategy = d.iching?.strategy || []
-  const dansajuPillars = d.dansaju?.pillars || []
+  const ichingText = `${ichingName} ${mug(ichingNature)}${ichingStrategy.length ? "\n\n지금 이 시기에 맞는 방향 — " + mug(ichingStrategy.slice(0,2).join(". ")) : ""}`
 
-  // 신살 — 천을귀인\n문창귀인 형식
+  // 신살 — 이름\n이름 형식, 설명 포함
   const sinsalText = d.sinsal?.length
     ? d.sinsal.map(s => {
         const nm = s.name.replace(/\([^)]*\)/g, "").trim()
-        const kw = s.kw || ""
-        return `${nm}${kw ? ` — ${kw}` : ""}`
-      }).join("\n")
+        const kw = s.kw ? ` — ${s.kw}` : ""
+        const desc = s.desc ? `\n${mug(s.desc).slice(0, 60)}` : ""
+        return `${nm}${kw}${desc}`
+      }).join("\n\n")
     : "특별한 신살 없이 안정적인 구조네. 튀지 않는 대신 오래 가."
 
-  // 일주 설명 한자 제거 + 무당체
-  const iljuDesc = mugdang(isBnd ? bnd.standardDesc : (sajuSys.desc || ""))
+  // 일주 설명
+  const iljuDesc = mug(isBnd ? bnd.standardDesc : (sajuSys.desc || ""))
 
-  // 당사주 설명
+  // 당사주
+  const dansajuPillars = d.dansaju?.pillars || []
   const dansajuText = (() => {
-    if (!dansajuPillars.length) return mugdang(dansajuSys.desc || "")
+    if (!dansajuPillars.length) return mug(dansajuSys.desc || "")
     const stars = dansajuPillars.map(p => p.byeolseong?.split("(")[0].replace(/\([^)]*\)/g, "").trim() || "").filter(Boolean)
     const kws = dansajuPillars.map(p => p.kw || "").filter(Boolean)
     return `타고난 별의 흐름이야. ${stars.join(", ")} 순서로 흘러가. ${kws.slice(0,2).join("과 ")}의 기운이 삶의 뼈대를 만드네.`
   })()
 
-  // 주역 텍스트
-  const ichingText = (() => {
-    const base = `${ichingName} ${ichingNature}`
-    const desc = ichingDesc ? ` ${mugdang(ichingDesc).slice(0, 120)}` : ""
-    const strat = ichingStrategy.length ? `\n\n지금 이 시기에 맞는 방향 — ${mugdang(ichingStrategy.slice(0,2).join(". "))}` : ""
-    return base + desc + strat
-  })()
+  // 별자리
+  const astroSunText = sunSign ? mug(`태양이 ${sunSign}에 있어. ${clean(a.sunDesc || a.triangle || "")}`) : "별자리 분석을 불러오는 중이야."
+  const astroMoonText = moonSign ? mug(`달이 ${moonSign}, 상승궁이 ${ascSign || ""}에 자리 잡고 있어. ${clean(a.moonDesc || "")}`) : "잠시 후 나타나."
 
-  // 별자리 텍스트 (한자 제거)
-  const astroSunText = sunSign
-    ? mugdang(`태양이 ${clean(sunSign)}에 있어. ${clean(a.sunDesc || a.triangle || "")}`)
-    : "별자리 분석을 불러오는 중이야."
-  const astroMoonText = moonSign
-    ? mugdang(`달이 ${clean(moonSign)}, 상승궁이 ${clean(ascSign || "")}에 자리 잡고 있어. ${clean(a.moonDesc || "")}`)
-    : "잠시 후 나타나."
+  // 타로
+  const tarotLifeText = mug(t.lifePathDesc || tarotSys.desc || "")
+  const tarotSoulText = mug(tarotAI?.soulDesc || t.soulDesc || "")
+  const tarotCardName = (t.lifePathCard || "본명 카드").replace(/\([^)]*\)/g, "").trim()
 
-  // 타로 텍스트
-  const tarotLifeText = mugdang(t.lifePathDesc || tarotSys.desc || "분석 중")
-  const tarotSoulText = mugdang(tarotAI?.soulDesc || t.soulDesc || "분석 중")
+  // MBTI
+  const mbtiText = mug(mbtiSys.desc || "")
+  const mbtiSajuText = mug(d.mbti?.basis || d.summary?.persona?.charPhrase || "사주 오행과 MBTI 교차 분석 결과야.")
 
-  // MBTI 텍스트
-  const mbtiText = mugdang(mbtiSys.desc || "분석 중")
-  const mbtiSajuText = mugdang(d.mbti?.basis || d.summary?.persona?.charPhrase || "사주 오행과 MBTI가 교차 분석된 결과야.")
+  // 경계사주 — 무술 + 기해 둘 다
+  const bndStd = mug(bnd?.standardDesc || "")
+  const bndMid = mug(bnd?.midnightDesc || "")
 
-  // 재물 유료 미리보기 텍스트
-  const yongsinA = d.yongsinA || ""
-  const singang = d.singang || ""
-  const sangBl = mugdang(`${yongsinA ? yongsinA + " 기운이 살길이야." : ""} ${singang.includes("약") ? "에너지가 분산된 구조라 돈을 벌어도 손에 잘 안 남아." : "에너지가 집중돼 있어서 돈을 잡으면 오래 쥐고 있어."}`.trim())
-  const reomulBl = mugdang(d.summary?.yearForecast?.[0]?.areas?.재물 ? `올해 재물 흐름 ${d.summary.yearForecast[0].areas.재물}점이야. ${d.summary.yearForecast[0].summary || ""}` : "재물 흐름이 읽혔어.")
-
-  // 연애 미리보기
-  const nightData = d.summary?.sixSystems || []
-  const loveText = mugdang(d.boundary?.standardDesc ? `관계에서 반복되는 패턴이 있어. 알면 피할 수 있는데, 모르면 또 그 사람 만나.` : "관계 패턴이 읽혔어.")
-
-  // 운명 흐름 미리보기
+  // 재물 유료
   const daeun = d.daeun || []
   const curDaeun = daeun.find(dv => dv.cur)
-  const daeunText = curDaeun ? mugdang(`지금 ${curDaeun.label} 대운이야. 이 흐름이 언제 바뀌는지, 어떻게 올라타야 하는지 다 나와.`) : "대운 흐름이 읽혔어."
+  const daeunText = curDaeun ? mug(`지금 ${curDaeun.label} 대운이야. 이 흐름이 언제 바뀌는지, 어떻게 올라타야 하는지 다 나와.`) : "대운 흐름이 읽혔어."
+
+  // 태그에서 한자 제거
+  const sajuTag = (sajuSys.key || "").replace(/[（(][一-龯\u4E00-\u9FFF]+[）)]/g, "").trim()
+  const tojungTag = (tojungSys.key || "").replace(/[（(][一-龯\u4E00-\u9FFF]+[）)]/g, "").trim()
 
   const freeChapters = [
     ...(isBnd ? [{
@@ -272,16 +223,16 @@ export default function MoraReport({ d, onHome, parentAstroAI, setParentAstroAI,
       subtitle: "두 가지 기운을 동시에 품고 태어났어.",
       blocks: [
         { h: "두 기운을 동시에", text: "태어난 시간이 자정 경계에 걸쳐 있어. 어떤 학파는 한쪽으로, 어떤 학파는 다른 쪽으로 읽어. 틀린 게 아니야. 두 기운을 동시에 품고 태어났다는 뜻이야." },
-        { h: "공통된 흐름", text: "두 기운 모두 겉으로 드러내지 않고 속으로 깊이 담는 타입이야. 조용해 보이는데 속은 훨씬 복잡하고, 한번 마음 열면 완전히 달라지지." },
-        { h: "어느 쪽이 맞을까", text: "둘 다 읽어봐. 어느 쪽이 더 내 얘기처럼 느껴지는지 본인이 제일 잘 알아. 아니면 둘 다 맞는 경우도 있어. 그게 경계 사주의 특징이야." },
+        { h: "무술 — 첫 번째 해석", text: bndStd || "무술의 기운이야. 흙 위에 흙이 쌓인 구조네." },
+        { h: "기해 — 두 번째 해석", text: bndMid || "기해의 기운이야. 부드러운 흙 아래 깊은 물이 흐르는 구조야." },
+        { h: "어느 쪽이 맞을까", text: "둘 다 읽어봐. 어느 쪽이 더 내 얘기처럼 느껴지는지 본인이 제일 잘 알아. 둘 다 맞는 경우도 있어. 그게 경계 사주의 특징이야." },
       ],
     }] : []),
     {
       type: "free",
       num: "I", label: "일주 본질", accent: C.caramel,
-      tag: (sajuSys.key || "").replace(/\([^)]*\)/g, "").trim(),
-      tagColor: C.mahogany, tagText: C.sand,
-      title: `${(sajuSys.key || "").replace(/\([^)]*\)/g, "").trim()}.\n태어날 때부터 이렇게 설계됐어.`,
+      tag: sajuTag, tagColor: C.mahogany, tagText: C.sand,
+      title: `${sajuTag}.\n태어날 때부터 이렇게 설계됐어.`,
       subtitle: "사주",
       blocks: [
         { h: "본질", text: iljuDesc || "분석 중이야." },
@@ -292,12 +243,11 @@ export default function MoraReport({ d, onHome, parentAstroAI, setParentAstroAI,
     {
       type: "free",
       num: "II", label: "내면 구조", accent: C.iris,
-      tag: (tojungSys.key || "").replace(/[（(][一-龯\u4E00-\u9FFF]+[）)]/g, "").trim(),
-      tagColor: C.abyss, tagText: C.lavender,
+      tag: tojungTag, tagColor: C.abyss, tagText: C.lavender,
       title: "겉으로 보이는 게 전부가 아니야.",
       subtitle: "토정비결 · 주역",
       blocks: [
-        { h: "올해의 흐름", text: mugdang(`${clean(tojungSys.key || "")} ${clean(tojungSys.desc || "")}`) },
+        { h: "올해의 흐름", text: mug(`${clean(tojungSys.key || "")} ${clean(tojungSys.desc || "")}`) },
         { h: "삶의 구조", text: ichingText },
       ],
     },
@@ -310,28 +260,26 @@ export default function MoraReport({ d, onHome, parentAstroAI, setParentAstroAI,
       blocks: loadingAstro
         ? [{ h: "분석 중", text: "모라가 별자리를 읽고 있어. 잠깐만 기다려." }]
         : [
-          { h: `태양 ${clean(sunSign || "")}`, text: astroSunText },
-          { h: `달 ${clean(moonSign || "")} · 상승 ${clean(ascSign || "")}`, text: astroMoonText },
-          ...(a.stellium ? [{ h: "집중 에너지", text: mugdang(clean(a.stellium)) }] : []),
+          { h: `태양 ${sunSign || ""}`, text: astroSunText },
+          { h: `달 ${moonSign || ""} · 상승 ${ascSign || ""}`, text: astroMoonText },
+          ...(a.stellium ? [{ h: "집중 에너지", text: mug(clean(a.stellium)) }] : []),
         ],
     },
     {
       type: "free",
       num: "IV", label: "타고난 에너지", accent: C.sand,
-      tag: `생명경로수 ${t.lifePath || ""}`,
-      tagColor: C.mahogany, tagText: C.sand,
+      tag: `생명경로수 ${t.lifePath || ""}`, tagColor: C.mahogany, tagText: C.sand,
       title: "숫자 하나가 삶 전체를\n관통하고 있어.",
       subtitle: "타로수비학",
       blocks: [
         { h: `생명경로수 ${t.lifePath || ""}`, text: tarotLifeText || "분석 중이야." },
-        { h: `${(t.lifePathCard || "본명 카드").replace(/\([^)]*\)/g, "").trim()}`, text: tarotSoulText || "분석 중이야." },
+        { h: tarotCardName, text: tarotSoulText || "분석 중이야." },
       ],
     },
     {
       type: "free",
       num: "V", label: "성향", accent: C.caramel,
-      tag: mbtiSys.key || "",
-      tagColor: C.walnut, tagText: C.parchment,
+      tag: mbtiSys.key || "", tagColor: C.walnut, tagText: C.parchment,
       title: `${mbtiSys.key || "MBTI"}.\n한 줄로 이렇게 설명돼.`,
       subtitle: "MBTI 사주 교차 분석",
       blocks: [
@@ -346,8 +294,8 @@ export default function MoraReport({ d, onHome, parentAstroAI, setParentAstroAI,
       type: "locked", num: "VI", label: "재물 구조",
       title: "돈이 어떻게 들어오고\n어디서 새는지 다 보여.",
       blocks: [
-        { h: "돈의 구조", text: sangBl || "재물 구조가 읽혔어. 어떻게 버는지, 어디서 새는지 다 나와." },
-        { h: "올해 재물 흐름", text: reomulBl || "흐름이 보여." },
+        { h: "돈의 구조", text: "재물 구조가 읽혔어. 어떻게 버는지, 어디서 새는지 다 나와." },
+        { h: "올해 재물 흐름", text: "흐름이 보여. 올해가 채우는 해인지, 쓰는 해인지." },
         { h: "터지는 시기", text: "재물운이 피크를 찍는 연도가 따로 있어. 지금이 그 구간인지 아닌지 봐야 해." },
       ],
     },
@@ -355,7 +303,7 @@ export default function MoraReport({ d, onHome, parentAstroAI, setParentAstroAI,
       type: "locked", num: "VII", label: "연애 관계",
       title: "매번 같은 패턴에\n걸리는 이유가 있어.",
       blocks: [
-        { h: "관계 패턴", text: loveText },
+        { h: "관계 패턴", text: "관계에서 반복되는 패턴이 있어. 알면 피할 수 있는데, 모르면 또 그 사람 만나." },
         { h: "이상형 구조", text: "끌리는 타입이 있어. 근데 그 타입이 맞는 타입인지는 다른 문제야." },
         { h: "만나는 시기", text: "인연이 들어오는 시기가 사주에 찍혀 있어. 지금이 그 구간인지 확인해봐." },
       ],
@@ -382,19 +330,18 @@ export default function MoraReport({ d, onHome, parentAstroAI, setParentAstroAI,
 
   const chapters = [...freeChapters, ...lockedChapters]
   const ch = chapters[current]
-  const isLocked = ch.type === "locked"
   const freeCount = freeChapters.length
 
   return (
     <div style={{
       background: C.void, minHeight: "100vh",
       display: "flex", flexDirection: "column", alignItems: "center",
-      padding: "14px 16px 40px", fontFamily: "Georgia, serif",
+      padding: "14px 16px 40px", fontFamily: FONT,
       color: C.parchment, userSelect: "none",
     }}>
       <div style={{ width: "100%", maxWidth: 480, display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-        <div style={{ fontSize: 11, letterSpacing: 3, color: C.caramel, textTransform: "uppercase", fontFamily: "sans-serif" }}>Mora</div>
-        <div style={{ fontSize: 12, color: C.ash, fontFamily: "sans-serif", textAlign: "center" }}>
+        <div style={{ fontSize: 11, letterSpacing: 3, color: C.caramel, textTransform: "uppercase", fontFamily: FONT_SANS, fontWeight: 400 }}>Mora</div>
+        <div style={{ fontSize: 12, color: C.ash, fontFamily: FONT_SANS, textAlign: "center", fontWeight: 400 }}>
           <div>{d.name}</div>
           <div style={{ fontSize: 10, color: C.fog }}>{d.gender}성</div>
         </div>
@@ -411,14 +358,11 @@ export default function MoraReport({ d, onHome, parentAstroAI, setParentAstroAI,
             }} />
           ))}
         </div>
-        <div style={{ fontSize: 11, color: C.fog, fontFamily: "sans-serif" }}>{current + 1} / {chapters.length}</div>
+        <div style={{ fontSize: 11, color: C.fog, fontFamily: FONT_SANS, fontWeight: 400 }}>{current + 1} / {chapters.length}</div>
       </div>
 
       <div style={{ width: "100%", maxWidth: 480, perspective: 1200, flex: 1 }}>
-        {isLocked
-          ? <LockedCard num={ch.num} label={ch.label} title={ch.title} blocks={ch.blocks} />
-          : <ChapterCard {...ch} flipping={flipping} flipDir={flipDir} />
-        }
+        <ChapterCard {...ch} flipping={flipping} flipDir={flipDir} />
       </div>
 
       <div style={{ width: "100%", maxWidth: 480, display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20 }}>
@@ -428,10 +372,13 @@ export default function MoraReport({ d, onHome, parentAstroAI, setParentAstroAI,
           borderRadius: 10, padding: "11px 18px",
           color: current === 0 ? C.fog : C.sand,
           fontSize: 13, cursor: current === 0 ? "default" : "pointer",
-          fontFamily: "sans-serif", transition: "all 0.2s",
+          fontFamily: FONT_SANS, fontWeight: 400, transition: "all 0.2s",
         }}>이전</button>
 
-        <div style={{ fontSize: 10, color: C.fog, fontFamily: "sans-serif", textAlign: "center" }}>{ch.label}</div>
+        <div style={{ fontSize: 10, color: C.fog, fontFamily: FONT_SANS, textAlign: "center", fontWeight: 400 }}>
+          {ch.label}
+          {ch.type === "locked" && <span style={{ color: C.plum }}> · 유료</span>}
+        </div>
 
         <button onClick={() => goTo(1)} disabled={current === chapters.length - 1} style={{
           background: current === chapters.length - 1 ? "transparent" : C.walnut,
@@ -439,12 +386,12 @@ export default function MoraReport({ d, onHome, parentAstroAI, setParentAstroAI,
           borderRadius: 10, padding: "11px 18px",
           color: current === chapters.length - 1 ? C.fog : C.parchment,
           fontSize: 13, cursor: current === chapters.length - 1 ? "default" : "pointer",
-          fontFamily: "sans-serif", transition: "all 0.2s",
+          fontFamily: FONT_SANS, fontWeight: 400, transition: "all 0.2s",
         }}>다음</button>
       </div>
 
       {current === 0 && (
-        <div style={{ marginTop: 10, fontSize: 11, color: C.fog, fontFamily: "sans-serif", letterSpacing: 1, textAlign: "center" }}>
+        <div style={{ marginTop: 10, fontSize: 11, color: C.fog, fontFamily: FONT_SANS, letterSpacing: 1, textAlign: "center", fontWeight: 400 }}>
           버튼을 눌러 챕터를 넘겨봐
         </div>
       )}
