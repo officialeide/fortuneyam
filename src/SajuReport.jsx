@@ -14,6 +14,7 @@ import TabTojung from './components/TabTojung.jsx';
 import TabAstro from './components/TabAstro.jsx';
 import TabMBTI from './components/TabMBTI.jsx';
 import { AdminPage } from './components/AdminPage.jsx';
+import MoraIntro from './components/MoraIntro.jsx';
 
 export default function SajuReport(){
   // sessionStorage 복원
@@ -26,7 +27,7 @@ export default function SajuReport(){
   },[]);
 
   const [tab,setTab]=useState(_saved?.tab||"요약");
-  const [phase,setPhase]=useState(_saved?"report":"form");
+  const [phase,setPhase]=useState(_saved?"report":"intro");
   const [opacity,setOpacity]=useState(1);
   const [reportData,setReportData]=useState(_saved?.data||null);
   const [showAdmin,setShowAdmin]=useState(()=>new URLSearchParams(window.location.search).has("admin"));
@@ -81,7 +82,7 @@ export default function SajuReport(){
         data=buildSajuData(formInput);
       }catch(e){
         console.error("buildSajuData 오류:", e);
-        setPhase("form");
+        setPhase("intro");
         setOpacity(1);
         alert("분석 중 오류가 발생했어요. 입력값을 확인해주세요.");
         return;
@@ -248,7 +249,66 @@ JSON만 응답: {"sevenInsight":"..."}`;
   function goToForm(){
     setOpacity(0);
     try{sessionStorage.removeItem("fy_report_v2");sessionStorage.removeItem("fy_tab");}catch{}
-    setTimeout(()=>{setPhase("form");setOpacity(1);},300);
+    setTimeout(()=>{setPhase("intro");setOpacity(1);},300);
+  }
+
+  const [pdfLoading,setPdfLoading]=React.useState(false);
+
+  async function handleSavePDF(){
+    if(pdfLoading) return;
+    setPdfLoading(true);
+    try{
+      const loadScript=(src)=>new Promise((res,rej)=>{
+        if(document.querySelector(`script[src="${src}"]`)){res();return;}
+        const s=document.createElement("script");
+        s.src=src;s.onload=res;s.onerror=rej;
+        document.head.appendChild(s);
+      });
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+
+      const container=document.createElement("div");
+      container.style.cssText="position:fixed;left:-9999px;top:0;width:480px;background:#0D0A0F;font-family:'Noto Sans KR',sans-serif;padding:16px;box-sizing:border-box;";
+      document.body.appendChild(container);
+
+      const {createRoot}=await import("react-dom/client");
+      const ce=React.createElement;
+      const AllTabs=()=>ce("div",{style:{background:"#0D0A0F",display:"flex",flexDirection:"column",gap:16}},
+        ce("div",{style:{textAlign:"center",color:"#C8956C",fontSize:11,letterSpacing:4,padding:"12px 0",fontFamily:"sans-serif"}},`MORA · ${d.name}님의 운명 분석`),
+        ce(TabSummary,{d,changeTab:()=>{}}),
+        ce(TabSaju,{d,reportData}),
+        ce(TabTojung,{d}),
+        ce(TabAstro,{d,parentAstroAI,setParentAstroAI:()=>{},parentTarotAI,setParentTarotAI:()=>{}}),
+        ce(TabMBTI,{d}),
+        ce(TabInner,{d,parentInnerAI,setParentInnerAI:()=>{}}),
+        ce("div",{style:{textAlign:"center",color:"#5C5158",fontSize:10,padding:"12px 0",fontFamily:"sans-serif"}},"✦ Mora · fortuneyam.netlify.app")
+      );
+      const root=createRoot(container);
+      await new Promise(res=>{root.render(ce(AllTabs,null));setTimeout(res,1500);});
+
+      const canvas=await window.html2canvas(container,{
+        scale:2,useCORS:true,allowTaint:true,
+        backgroundColor:"#0D0A0F",width:480,windowWidth:480,
+      });
+      root.unmount();
+      document.body.removeChild(container);
+
+      const {jsPDF}=window.jspdf;
+      const pdf=new jsPDF({orientation:"portrait",unit:"px",format:"a4"});
+      const pageW=pdf.internal.pageSize.getWidth();
+      const pageH=pdf.internal.pageSize.getHeight();
+      const imgW=pageW;
+      const imgH=(canvas.height*pageW)/canvas.width;
+      const imgData=canvas.toDataURL("image/jpeg",0.92);
+      let y=0;
+      while(y<imgH){if(y>0)pdf.addPage();pdf.addImage(imgData,"JPEG",0,-y,imgW,imgH);y+=pageH;}
+      pdf.save(`${d.name}_운세종합.pdf`);
+    }catch(e){
+      console.error("PDF 오류:",e);
+      alert("PDF 저장 중 오류가 발생했어요.");
+    }finally{
+      setPdfLoading(false);
+    }
   }
 
   const wrapStyle={transition:"opacity 0.35s ease",opacity};
@@ -256,7 +316,8 @@ JSON만 응답: {"sevenInsight":"..."}`;
 
   if(showAdmin) return <AdminPage onClose={()=>setShowAdmin(false)}/>;
   if(phase==="loading") return <LoadingScreen name={reportData?.name||""}/>;
-  if(phase==="form"||!d) return <div style={wrapStyle}><SajuInputForm onSubmit={handleFormSubmit}/></div>;
+  if(phase==="intro") return <MoraIntro onEnter={(formInput)=>handleFormSubmit(formInput)}/>;
+  if(!d) return null;
 
   const gBg=d.gender==="여"?"#fce4ec":"#e3f2fd";
   const gC=d.gender==="여"?"#880e4f":"#0d47a1";
@@ -264,8 +325,11 @@ JSON만 응답: {"sevenInsight":"..."}`;
   return <div style={{...wrapStyle,...S.root}}>
     <div style={S.header}>
       <button style={S.navBtn} onClick={()=>changeTab("요약")}>‹</button>
-      <div style={S.headerTitle}>Fortuneyam</div>
-      <button style={S.navBtn} onClick={goToForm}>🏠</button>
+      <div style={S.headerTitle}>Mora</div>
+      <div style={{display:"flex",alignItems:"center",gap:4}}>
+        <button onClick={handleSavePDF} disabled={pdfLoading} style={{...S.navBtn,fontSize:13,color:pdfLoading?"#5C5158":"#C8956C",opacity:pdfLoading?0.5:1}} title="PDF 저장">{pdfLoading?"⏳":"📥"}</button>
+        <button style={S.navBtn} onClick={goToForm}>🏠</button>
+      </div>
     </div>
     <div style={S.profileBar}>
       <div>
@@ -292,7 +356,7 @@ JSON만 응답: {"sevenInsight":"..."}`;
       {tab==="MBTI"        && <TabMBTI d={d}/>}
     </div>
     <div style={{textAlign:"center",fontSize:10,color:"#ccc",padding:"20px 0 8px"}}>
-      ✦ Fortuneyam · Today {CY}.{String(CM).padStart(2,"0")}.{String(CD).padStart(2,"0")}
+      ✦ Mora · {CY}.{String(CM).padStart(2,"0")}.{String(CD).padStart(2,"0")}
       <span onClick={()=>setShowAdmin(true)} style={{marginLeft:8,cursor:"pointer",color:"#e0e0e0"}}>· 관리자</span>
     </div>
   </div>;
@@ -303,12 +367,6 @@ JSON만 응답: {"sevenInsight":"..."}`;
 // 입력 폼 컴포넌트
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-const CITIES=[
-  "서울","부산","대구","인천","광주","대전","울산","세종",
-  "경기","강원","충북","충남","전북","전남","경북","경남","제주",
-  "경북 경산","경북 포항","경북 구미","경북 안동",
-  "경남 창원","경남 진주","전남 순천","전북 전주",
-];
 
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
