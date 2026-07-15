@@ -320,7 +320,7 @@ JSON만 응답: {"sevenInsight":"..."}`;
   if(phase==="intro") return <MoraIntro onEnter={(formInput)=>handleFormSubmit(formInput)}/>;
   if(!d) return null;
 
-  return <MoraReport d={d} onHome={goToForm}/>;
+  return <MoraReport d={d} onHome={goToForm} onSavePDF={handleSavePDF} pdfLoading={pdfLoading} parentAstroAI={parentAstroAI} setParentAstroAI={setParentAstroAI} parentTarotAI={parentTarotAI} setParentTarotAI={setParentTarotAI}/>;
 }
 
 
