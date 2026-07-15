@@ -15,7 +15,7 @@ export const PROMPT_VERSION = 'v2'
 // 캐시 사용 여부 (환경변수 VITE_DISABLE_CACHE=true 면 비활성화)
 // 개발/테스트 중 항상 새로 계산하려면 Netlify에 VITE_DISABLE_CACHE=true 추가
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-const CACHE_ENABLED = import.meta.env.VITE_DISABLE_CACHE !== 'true'
+const CACHE_ENABLED = false // 개발 중 캐시 비활성화 — 배포 후 다시 활성화 필요
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // 사용자 저장 또는 기존 사용자 찾기
