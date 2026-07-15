@@ -150,46 +150,31 @@ const OHAENG_LOADING=[
   {img:"/characters/water.png", color:"#5c6bc0", name:"수", label:"수 기운 분석 중"},
 ];
 function LoadingScreen({name}){
+  const msgs=["운명의 실을 읽는 중...","별자리 기운을 모으는 중...","타로의 패를 펼치는 중...","사주 팔자를 해석하는 중...","모라가 읽고 있어..."];
   const [idx,setIdx]=useState(0);
   const [visible,setVisible]=useState(true);
   useEffect(()=>{
     const iv=setInterval(()=>{
       setVisible(false);
-      setTimeout(()=>{setIdx(i=>(i+1)%OHAENG_LOADING.length);setVisible(true);},300);
-    },1200);
+      setTimeout(()=>{setIdx(i=>(i+1)%msgs.length);setVisible(true);},400);
+    },1800);
     return()=>clearInterval(iv);
   },[]);
-  const cur=OHAENG_LOADING[idx];
   return(
-    <div style={{position:"fixed",inset:0,background:"#fafafa",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:50}}>
+    <div style={{position:"fixed",inset:0,background:"#0D0A0F",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:50,fontFamily:"Georgia,serif"}}>
+      <div style={{fontSize:11,letterSpacing:5,color:"#7B4FA6",marginBottom:32,textTransform:"uppercase",fontFamily:"sans-serif"}}>Mora</div>
       <div style={{
-        width:100,height:100,borderRadius:30,
-        display:"flex",alignItems:"center",justifyContent:"center",
-        marginBottom:20,
-        transition:"opacity 0.35s, transform 0.35s",
-        opacity:visible?1:0,
-        transform:visible?"scale(1)":"scale(0.88)",
-      }}>
-        <img
-          src={cur.img}
-          alt={cur.name}
-          style={{width:100,height:100,objectFit:"contain"}}
-        />
-      </div>
-      <div style={{
-        fontSize:18,fontWeight:900,color:cur.color,
-        marginBottom:4,
-        transition:"opacity 0.35s",
-        opacity:visible?1:0,
-      }}>{cur.label}</div>
-      <div style={{fontSize:12,color:"#888",fontWeight:600,marginBottom:4}}>{name||""}님의 사주를 분석하고 있어요</div>
-      <div style={{fontSize:10,color:"#bbb",marginBottom:16}}>별자리·타로수비학까지 모두 준비할게요</div>
-      <div style={{display:"flex",gap:8,marginTop:4}}>
-        {OHAENG_LOADING.map((o,i)=>(
+        fontSize:16,color:"#F0E8DC",marginBottom:8,textAlign:"center",letterSpacing:0.5,
+        opacity:visible?1:0,transform:visible?"translateY(0)":"translateY(8px)",
+        transition:"opacity 0.4s ease, transform 0.4s ease",
+      }}>{msgs[idx]}</div>
+      <div style={{fontSize:12,color:"#5C5158",fontFamily:"sans-serif",marginTop:8}}>{name||""}님의 운명을 펼치는 중</div>
+      <div style={{display:"flex",gap:8,marginTop:40}}>
+        {msgs.map((_,i)=>(
           <div key={i} style={{
-            width:i===idx?20:6,height:6,borderRadius:99,
-            background:i===idx?OHAENG_LOADING[i].color:"#ddd",
-            transition:"all 0.3s"
+            width:i===idx?20:6,height:4,borderRadius:99,
+            background:i===idx?"#A0522D":"#241830",
+            transition:"all 0.4s"
           }}/>
         ))}
       </div>
@@ -198,21 +183,21 @@ function LoadingScreen({name}){
 }
 
 const S={
-  root:{fontFamily:"'Noto Sans KR','Apple SD Gothic Neo',sans-serif",maxWidth:480,margin:"0 auto",background:"#f4f4f6",minHeight:"100vh",paddingBottom:48,textAlign:"justify"},
-  header:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:"#fff",borderBottom:"1px solid #eee",position:"sticky",top:0,zIndex:20},
-  navBtn:{background:"none",border:"none",fontSize:22,color:"#333",cursor:"pointer",width:32,padding:0},
-  headerTitle:{fontSize:15,fontWeight:700,color:"#111"},
-  profileBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 18px",background:"#fff"},
-  pName:{fontSize:22,fontWeight:900,color:"#111",letterSpacing:-.5},
-  pBirth:{fontSize:11,color:"#999",marginTop:2},
-  tabBar:{display:"flex",background:"#fff",position:"sticky",top:49,zIndex:19,justifyContent:"space-around"},
-  tab:{flex:"0 0 auto",padding:"11px 6px",fontSize:10,fontWeight:600,background:"none",border:"none",color:"#bbb",cursor:"pointer",textAlign:"center",letterSpacing:"-0.2px",outline:"none",WebkitTapHighlightColor:"transparent"},
-  tabA:{color:"#e65100",fontWeight:800},
+  root:{fontFamily:"'Noto Sans KR','Apple SD Gothic Neo',sans-serif",maxWidth:480,margin:"0 auto",background:"#0D0A0F",minHeight:"100vh",paddingBottom:48,textAlign:"justify"},
+  header:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 16px",background:"#1A1220",borderBottom:"1px solid #3D2016",position:"sticky",top:0,zIndex:20},
+  navBtn:{background:"none",border:"none",fontSize:22,color:"#C8956C",cursor:"pointer",width:32,padding:0},
+  headerTitle:{fontSize:13,fontWeight:400,color:"#C8956C",letterSpacing:4,textTransform:"uppercase"},
+  profileBar:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 18px",background:"#1A1220",borderBottom:"1px solid #241830"},
+  pName:{fontSize:22,fontWeight:900,color:"#F0E8DC",letterSpacing:-.5},
+  pBirth:{fontSize:11,color:"#5C5158",marginTop:2},
+  tabBar:{display:"flex",background:"#1A1220",position:"sticky",top:49,zIndex:19,justifyContent:"space-around",borderBottom:"1px solid #241830"},
+  tab:{flex:"0 0 auto",padding:"11px 6px",fontSize:10,fontWeight:600,background:"none",border:"none",color:"#5C5158",cursor:"pointer",textAlign:"center",letterSpacing:"-0.2px",outline:"none",WebkitTapHighlightColor:"transparent"},
+  tabA:{color:"#C8956C",fontWeight:800},
   content:{padding:"12px 14px",display:"flex",flexDirection:"column",gap:11},
-  card:{background:"#fff",borderRadius:16,padding:"16px",border:"1px solid #ebebeb",boxShadow:"0 1px 5px rgba(0,0,0,0.04)"},
-  dCard:{background:"#fafafa",borderRadius:12,padding:"13px",border:"1px solid #eee",position:"relative"},
+  card:{background:"#1A1220",borderRadius:16,padding:"16px",border:"1px solid #3D2016",boxShadow:"0 4px 20px rgba(0,0,0,0.3)"},
+  dCard:{background:"#241830",borderRadius:12,padding:"13px",border:"1px solid #3D2016",position:"relative"},
   dBadge:{fontSize:11,fontWeight:700,padding:"4px 7px",borderRadius:8,border:"1px solid"},
-  sRow:{background:"#fafafa",borderRadius:12,padding:"13px",border:"1px solid #ebebeb"},
+  sRow:{background:"#241830",borderRadius:12,padding:"13px",border:"1px solid #3D2016"},
 };
 
 const SF={
