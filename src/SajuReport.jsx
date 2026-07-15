@@ -15,6 +15,7 @@ import TabAstro from './components/TabAstro.jsx';
 import TabMBTI from './components/TabMBTI.jsx';
 import { AdminPage } from './components/AdminPage.jsx';
 import MoraIntro from './components/MoraIntro.jsx';
+import MoraReport from './components/MoraReport.jsx';
 
 export default function SajuReport(){
   // sessionStorage 복원
@@ -319,47 +320,7 @@ JSON만 응답: {"sevenInsight":"..."}`;
   if(phase==="intro") return <MoraIntro onEnter={(formInput)=>handleFormSubmit(formInput)}/>;
   if(!d) return null;
 
-  const gBg=d.gender==="여"?"#fce4ec":"#e3f2fd";
-  const gC=d.gender==="여"?"#880e4f":"#0d47a1";
-
-  return <div style={{...wrapStyle,...S.root}}>
-    <div style={S.header}>
-      <button style={S.navBtn} onClick={()=>changeTab("요약")}>‹</button>
-      <div style={S.headerTitle}>Mora</div>
-      <div style={{display:"flex",alignItems:"center",gap:4}}>
-        <button onClick={handleSavePDF} disabled={pdfLoading} style={{...S.navBtn,fontSize:13,color:pdfLoading?"#5C5158":"#C8956C",opacity:pdfLoading?0.5:1}} title="PDF 저장">{pdfLoading?"⏳":"📥"}</button>
-        <button style={S.navBtn} onClick={goToForm}>🏠</button>
-      </div>
-    </div>
-    <div style={S.profileBar}>
-      <div>
-        <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <img src={(()=>{const gan=d.pillars?.[2]?.gan?.ko||"무";const o=_GANO[gan]||"토";return{"목":"/characters/wood.png","화":"/characters/fire.png","토":"/characters/earth.png","금":"/characters/metal.png","수":"/characters/water.png"}[o];})()} alt="" style={{width:28,height:28,objectFit:"contain",flexShrink:0}}/>
-          <div style={S.pName}>{d.name}</div>
-          <div style={{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#e65100",fontWeight:700,background:"#fff3e0",padding:"2px 10px",borderRadius:99}}>
-            {d.personaTitle}
-          </div>
-        </div>
-        <div style={S.pBirth}>{d.birth} 生</div>
-      </div>
-      <div style={{padding:"4px 12px",borderRadius:99,fontSize:12,fontWeight:700,background:gBg,color:gC}}>{d.gender}성</div>
-    </div>
-    <div style={{...S.tabBar,overflowX:"auto",WebkitOverflowScrolling:"touch",scrollbarWidth:"none"}}>
-      {TABS.map(t=><button key={t} onClick={()=>changeTab(t)} onMouseDown={e=>e.preventDefault()} style={{...S.tab,whiteSpace:"nowrap",...(tab===t?S.tabA:{})}}>{t}</button>)}
-    </div>
-    <div style={S.content}>
-      {tab==="요약"        && <TabSummary d={d} changeTab={changeTab}/>}
-      {tab==="사주"        && <TabSaju d={d} reportData={reportData}/>}
-      {tab==="내면 해부"   && <TabInner d={d} parentInnerAI={parentInnerAI} setParentInnerAI={setParentInnerAI}/>}
-      {tab==="토정·주역"   && <TabTojung d={d}/>}
-      {tab==="별자리·타로수비학" && <TabAstro d={d} parentAstroAI={parentAstroAI} setParentAstroAI={setParentAstroAI} parentTarotAI={parentTarotAI} setParentTarotAI={setParentTarotAI}/>}
-      {tab==="MBTI"        && <TabMBTI d={d}/>}
-    </div>
-    <div style={{textAlign:"center",fontSize:10,color:"#ccc",padding:"20px 0 8px"}}>
-      ✦ Mora · {CY}.{String(CM).padStart(2,"0")}.{String(CD).padStart(2,"0")}
-      <span onClick={()=>setShowAdmin(true)} style={{marginLeft:8,cursor:"pointer",color:"#e0e0e0"}}>· 관리자</span>
-    </div>
-  </div>;
+  return <MoraReport d={d} onHome={goToForm}/>;
 }
 
 
