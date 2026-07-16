@@ -1,4 +1,4 @@
-// MoraReport.jsx v7.1 — 도넛차트, 카테고리 재편, 무당체 완전 통일
+// MoraReport.jsx v7.1 도넛차트, 카테고리 재편, 무당체 완전 통일
 import React, { useState, useEffect } from 'react'
 import { cleanText } from '../data/constants.js'
 import { buildAstroPrompt, buildTarotPrompt } from '../utils/prompts.js'
@@ -36,24 +36,24 @@ function mug(s) {
     .replace(/\s{2,}/g, " ")
     .trim()
   const r = [
-    ["이에요.", "이야."], ["이에요,", "이야,"], ["이에요 ", "이야 "], ["이에요\n", "이야\n"],
-    ["예요.", "야."], ["예요,", "야,"], ["예요 ", "야 "], ["예요\n", "야\n"],
-    ["있어요.", "있어."], ["있어요,", "있어,"], ["있어요 ", "있어 "],
-    ["없어요.", "없어."], ["없어요,", "없어,"], ["없어요 ", "없어 "],
-    ["해요.", "해."], ["해요,", "해,"], ["해요 ", "해 "], ["해요\n", "해\n"],
-    ["돼요.", "돼."], ["돼요,", "돼,"], ["돼요 ", "돼 "],
-    ["가요.", "가."], ["가요,", "가,"], ["가요 ", "가 "],
-    ["나요.", "나."], ["나요,", "나,"], ["나요 ", "나 "],
-    ["거예요.", "거야."], ["거예요,", "거야,"], ["거예요 ", "거야 "],
-    ["았어요.", "았어."], ["었어요.", "었어."], ["았어요,", "았어,"], ["었어요,", "었어,"],
-    ["잖아요.", "잖아."], ["잖아요,", "잖아,"],
-    ["네요.", "네."], ["네요,", "네,"], ["네요 ", "네 "],
-    ["어요.", "어."], ["어요,", "어,"], ["어요 ", "어 "],
-    ["아요.", "아."], ["아요,", "아,"], ["아요 ", "아 "],
-    ["ㄹ게요.", "ㄹ게."], ["할게요.", "할게."], ["줄게요.", "줄게."],
+    ["이야.", "이야."], ["이야,", "이야,"], ["이야 ", "이야 "], ["이에요\n", "이야\n"],
+    ["야.", "야."], ["야,", "야,"], ["야 ", "야 "], ["예요\n", "야\n"],
+    ["있어.", "있어."], ["있어,", "있어,"], ["있어 ", "있어 "],
+    ["없어.", "없어."], ["없어,", "없어,"], ["없어 ", "없어 "],
+    ["해.", "해."], ["해,", "해,"], ["해 ", "해 "], ["해요\n", "해\n"],
+    ["돼.", "돼."], ["돼,", "돼,"], ["돼 ", "돼 "],
+    ["가.", "가."], ["가,", "가,"], ["가 ", "가 "],
+    ["나.", "나."], ["나,", "나,"], ["나 ", "나 "],
+    ["거야.", "거야."], ["거야,", "거야,"], ["거야 ", "거야 "],
+    ["았어.", "았어."], ["었어.", "었어."], ["았어,", "았어,"], ["었어,", "었어,"],
+    ["잖아.", "잖아."], ["잖아,", "잖아,"],
+    ["네.", "네."], ["네,", "네,"], ["네 ", "네 "],
+    ["어.", "어."], ["어,", "어,"], ["어 ", "어 "],
+    ["아.", "아."], ["아,", "아,"], ["아 ", "아 "],
+    ["ㄹ게.", "ㄹ게."], ["할게.", "할게."], ["줄게.", "줄게."],
     ["신약", "에너지 분산 구조"], ["신강", "에너지 집중 구조"],
     ["하세요.", "해."], ["주세요.", "줘."],
-    ["해내요.", "해내."], ["느껴요.", "느껴."], ["보여요.", "보여."], ["바꿔요.", "바꿔."], ["바꿔요,", "바꿔,"], ["바꿔요 ", "바꿔 "], ["줘요.", "줘."], ["줘요,", "줘,"], ["줘요 ", "줘 "],
+    ["해내요.", "해내."], ["느껴.", "느껴."], ["보여.", "보여."], ["바꿔.", "바꿔."], ["바꿔,", "바꿔,"], ["바꿔 ", "바꿔 "], ["줘.", "줘."], ["줘,", "줘,"], ["줘 ", "줘 "],
     ["위치하여", "에 있어."], ["위치해", "에 있어"],
     ["드러내", "드러내"], ["강화하는데", "강화해"],
     ["만들어줘", "만들어줘"],
@@ -169,7 +169,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
   const [current, setCurrent] = useState(0)
   const [flipping, setFlipping] = useState(false)
   const [flipDir, setFlipDir] = useState(null)
-  const [astroAI, setAstroAI] = useState(parentAstroAI || null) // _astroAI 캐시 무시 — 항상 새로 계산
+  const [astroAI, setAstroAI] = useState(parentAstroAI || null) // _astroAI 캐시 무시 항상 새로 계산
   const [tarotAI, setTarotAI] = useState(parentTarotAI || d._tarotAI || null)
   const [loadingAstro, setLoadingAstro] = useState(!astroAI)
 
@@ -240,7 +240,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
   const yongsinA = d.yongsinA || ""
   const gisinA = d.gisinA || ""
 
-  // 별자리 — 띠이름 완전 변환
+  // 별자리 띠이름 완전 변환
   const zodiacFix = (s) => {
     if (!s) return ""
     return s
@@ -259,8 +259,8 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
   const moonSign = a.moon && a.moon !== "분석 중" ? zodiacFix(a.moon) : null
   const ascSign = a.asc && a.asc !== "분석 중" ? zodiacFix(a.asc) : null
 
-  // 신살 — 한 박스, 엔터 구분, 마침표
-  // 신살 — JSX로 렌더링 (이름 색상 + 설명 인라인)
+  // 신살 한 박스, 엔터 구분, 마침표
+  // 신살 JSX로 렌더링 (이름 색상 + 설명 인라인)
   const sinsalJSX = d.sinsal?.length
     ? d.sinsal.map((s, i) => {
         const nm = s.name.replace(/\([^)]*\)/g, "").trim()
@@ -278,12 +278,12 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
   const tojungKw = tojungSys.key?.replace(/[（(][一-龯\u4E00-\u9FFF]+[）)]/g, "").trim() || ""
   const tojungDesc = noColon(tojungSys.desc || "").replace(/^[\n\r]+/, "")
 
-  // 주역 — 콜론 완전 제거
+  // 주역 콜론 완전 제거
   const ichingKw = (juyeokSys.key || d.iching?.bonmyeonggae || "")
     .replace(/[.:：]/g, "").replace(/[一-龯\u4E00-\u9FFF（(][^）)]*[）)]/g, "").trim()
   const ichingNature = noColon(juyeokSys.desc || d.iching?.gaeNature || "").replace(/^[\n\r]+/, "")
   const ichingStrategy = (d.iching?.strategy || []).slice(0, 2).map(noColon)
-  const ichingText = `${ichingNature}${ichingStrategy.length ? "\n\n" + ichingStrategy.join(" ") : ""}`
+  const ichingText = `${ichingNature}${ichingStrategy.length ? " " + ichingStrategy.join(" ") : ""}`
 
   // 일주 설명
   const iljuDescStd = mug(isBnd ? bnd.standardDesc : (sajuSys.desc || ""))
@@ -298,7 +298,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
     return `별이 네 개야. ${stars.join(", ")} 순서로 흘러가. ${kws.slice(0, 2).join("과 ")}의 기운이 삶의 뼈대를 만드네.`
   })()
 
-  // 별자리 텍스트 — 한자 완전 제거
+  // 별자리 텍스트 한자 완전 제거
   const astroSunText = sunSign ? mug(a.sunDesc || a.triangle || "") : "별자리 분석 불러오는 중이야."
   const astroMoonText = moonSign ? mug(a.moonDesc || "") : "잠시 후 나타나."
 
@@ -351,9 +351,9 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
   const curDaeun = daeun.find(dv => dv.cur) || daeun[0]
   const nextDaeun = daeun[daeun.indexOf(curDaeun) + 1]
   const futureDaeun = daeun.slice(0, 5)
-  const daeunCurText = curDaeun ? `지금 ${curDaeun.label?.replace(/[一-龯\u4E00-\u9FFF（(][^）)]*[）)]/g, "").trim()} 대운이야. ${mug(curDaeun.desc || "")}` : "대운 읽는 중이야."
+  const daeunCurText = curDaeun ? `지금 ${curDaeun.label?.replace(/[一-龯\u4E00-\u9FFF（(][^）)]*[）)]/g, "").trim()} 대운이야 (${curDaeun.period || ""}). ${mug(curDaeun.desc || "")}` : "대운 읽는 중이야."
   const daeunNextText = nextDaeun ? `다음 대운은 ${nextDaeun.label?.replace(/[一-龯\u4E00-\u9FFF（(][^）)]*[）)]/g, "").trim()}이야. 이 전환점이 오기 전에 지금을 써야 해.` : ""
-  const daeunFlow = futureDaeun.map(dv => `${dv.label?.replace(/[一-龯\u4E00-\u9FFF（(][^）)]*[）)]/g, "").trim()} ${dv.startAge || ""}세~`).join(" → ")
+  const daeunFlow = futureDaeun.map(dv => { const lb = dv.label?.replace(/[一-龯\u4E00-\u9FFF（(][^）)]*[）)]/g, "").trim(); const pd = dv.period || (dv.startAge ? `만 ${dv.startAge}~${Number(dv.startAge)+9}세` : ""); return `${lb} ${pd}` }).join("\n")
   const yearFlowText = yearForecast.slice(0, 5).map(y => `${y.year}년 ${y.score}점 ${mug(y.summary || "")}`).join("\n")
 
   const sajuTag = (sajuSys.key || "").replace(/[（(][一-龯\u4E00-\u9FFF]+[）)]/g, "").trim()
@@ -371,7 +371,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
       ],
     },
     {
-      label: "무술 — 첫 번째 해석", accent: C.caramel,
+      label: "무술 첫 번째 해석", accent: C.caramel,
       tag: "무술", tagColor: C.mahogany, tagText: C.sand,
       title: "흙 위에 흙.\n버티는 게 무기인 사람이야.",
       subtitle: "사주 · 오행 분포",
@@ -382,7 +382,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
       ],
     },
     {
-      label: "기해 — 두 번째 해석", accent: C.iris,
+      label: "기해 두 번째 해석", accent: C.iris,
       tag: "기해", tagColor: C.abyss, tagText: C.lavender,
       title: "흙 아래 물.\n겉이랑 속이 달라.",
       subtitle: "사주 · 오행 분포",
@@ -457,11 +457,32 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
     },
   ]
 
+  // 인연 시기 관성 대운/세운 기반
+  const loveYears = (() => {
+    if (!daeun.length) return ""
+    const cur = daeun.find(dv => dv.cur)
+    const curIdx = daeun.indexOf(cur)
+    const nearby = daeun.slice(Math.max(0, curIdx-1), curIdx+3)
+    // 관성(화·금 등) 대운 찾기 단순화
+    const hot = nearby.filter(dv => dv.ohaeng && ["화","금","목","수"].includes(dv.ohaeng))
+    if (hot.length) return `${hot.map(dv => dv.period || dv.label).join(", ")} 대운 구간에 인연이 강하게 들어와.`
+    return "지금 대운 흐름에서 인연이 읽혀. 세운이 맞물리는 해를 봐야 해."
+  })()
+
+  // 용신 업종
+const YONGSIN_DETAIL = {"목": {"업종": "교육, 출판, 작가, 콘텐츠 창작, 인테리어, 조경, 의류, 패션, 기획, 스타트업, 코칭", "행동": "새로운 것을 배우고 시작해. 독서, 강의 듣기, 새 프로젝트 시작", "취미": "등산, 원예, 독서, 글쓰기, 악기 배우기", "피해야할것": "너무 많이 시작하고 마무리 못 하는 패턴. 한 가지에 집중해."}, "화": {"업종": "방송, 엔터테인먼트, 뷰티, 마케팅, 강연, 홍보, 요식업, 전기, 에너지", "행동": "사람들 앞에 나서. 발표하고 빛나는 자리에 있어. 네트워킹 적극적으로 해.", "취미": "댄스, 노래, 요리, 사진, 유튜브, 공연 관람", "피해야할것": "너무 빠르게 소진되는 것. 충전 없이 계속 태우면 번아웃이 와."}, "토": {"업종": "부동산, 건축, 토목, 농업, 의료, 컨설팅, 중개업, 유통, 식품, 요양, 복지", "행동": "기반을 다져. 부동산 공부, 자격증 취득, 저축, 안정적인 루틴 만들기", "취미": "요리, 텃밭 가꾸기, 도예, 봉사활동, 명상", "피해야할것": "변화에 너무 느리게 반응하는 것. 한번 굳으면 바꾸기 어려운 게 약점이야."}, "금": {"업종": "법, 금융, 제조, 기계, 외과, 군경, 스포츠, 정밀 기계, 귀금속, IT 하드웨어", "행동": "원칙을 세우고 지켜. 계약서 꼼꼼히 보기, 법률 공부, 재테크, 규칙적인 운동", "취미": "격투기, 검도, 퍼즐, 정밀 공작, 수집", "피해야할것": "너무 날이 서있는 것. 타협 못 하면 주변과 마찰이 생겨."}, "수": {"업종": "무역, 유통, 해운, 여행, IT, 연구, 심리상담, 예술, 영성, 물 관련 사업", "행동": "유연하게 적응해. 새로운 정보 수집하기, 여행, 네트워크 만들기", "취미": "수영, 낚시, 요가, 명상, 글쓰기, 여행", "피해야할것": "방향 없이 흘러가는 것. 목표가 없으면 에너지가 흩어져."}, "화·토": {"업종": "의료, 요식업, 부동산, 에너지, 마케팅, 유통, 건설, 뷰티, 교육", "행동": "열정적으로 일하되 안정적인 기반을 쌓아. 자격증 취득, 꾸준한 저축, 인맥 관리", "취미": "요리, 원예, 댄스, 봉사활동", "피해야할것": "시작만 하고 마무리 못 하는 것."}, "목·화": {"업종": "교육, 출판, 창작, 방송, 마케팅, 강연, 기획, 콘텐츠 제작", "행동": "배우고 나눠. 가르치고, 발표하고, 새로운 프로젝트를 사람들과 함께 해.", "취미": "독서, 강의, 글쓰기, 퍼포먼스, 유튜브", "피해야할것": "산만하게 에너지를 흩뿌리는 것."}, "금·수": {"업종": "금융, IT, 무역, 연구, 귀금속, 해운, 데이터 분석, 컨설팅", "행동": "분석하고 판단해. 투자 공부, 자격증, 해외 네트워크 만들기", "취미": "바둑, 체스, 코딩, 독서, 여행", "피해야할것": "너무 냉정하게만 판단하는 것."}, "수·목": {"업종": "IT, 교육, 여행, 창작, 연구, 심리상담, 플랫폼, 미디어", "행동": "배우고 흘려보내. 지식을 쌓고 나누는 순환이 이 사람의 에너지야.", "취미": "독서, 여행, 수영, 글쓰기, 강의 듣기", "피해야할것": "계속 배우기만 하고 실행 안 하는 것."}, "토·금": {"업종": "건축, 법, 금융, 제조, 농업, 컨설팅, 의료, 부동산, 물류", "행동": "기반을 다지고 원칙을 지켜. 계약서, 법률, 재테크, 자격증", "취미": "도예, 정밀 공작, 격투기, 명상, 요리", "피해야할것": "너무 보수적으로만 가는 것."}}
+
+  const yongsinJobMap = {"목": "교육, 출판, 의류, 인테리어, 조경, 원예, 목재, 가구, 창작, 기획, 성장 관련 분야야. 새로운 걸 시작하고 키우는 일이 맞아.", "화": "방송, 엔터테인먼트, 뷰티, 조명, 전기, 에너지, 요식업, 마케팅, 강연, 홍보 분야야. 빛을 내고 사람들 앞에 서는 일이 맞아.", "토": "부동산, 건축, 토목, 농업, 의료, 컨설팅, 중개업, 유통, 식품 분야야. 실체가 있는 것을 다루고 안정적인 기반을 만드는 일이 맞아.", "금": "법, 금융, 제조, 기계, 외과, 군경, 스포츠, 정밀 기계, 귀금속 분야야. 원칙이 명확하고 결과가 바로 나타나는 일이 맞아.", "수": "무역, 유통, 해운, 여행, IT, 연구, 심리상담, 예술, 영성 분야야. 흐르고 연결되는 성질의 일이 맞아.", "목·화": "교육, 출판, 창작, 방송, 마케팅, 강연, 기획 분야야. 새로운 것을 만들고 알리는 일이 맞아.", "화·토": "의료, 요식업, 부동산, 에너지, 마케팅, 유통, 건설 분야야. 실체 있는 것을 빛나게 만드는 일이 맞아.", "토·금": "건축, 법, 금융, 제조, 농업, 컨설팅, 의료 분야야. 안정적이고 원칙이 있는 일이 맞아.", "금·수": "금융, IT, 무역, 연구, 귀금속, 해운 분야야. 정밀하고 유연하게 흐르는 일이 맞아.", "수·목": "IT, 교육, 여행, 창작, 연구, 심리상담 분야야. 지식을 쌓고 나누는 일이 맞아."}
+  const yongsinJob = yongsinJobMap[yongsinA] || yongsinJobMap[yongsinA?.split("·")[0]] || ""
+
   // 재물 상세
   const reomulType = isSingang
     ? "에너지가 집중된 구조야. 돈 잡으면 오래 쥐고 있어. 근데 욕심이 화근이야. 한 번에 다 가지려다 날리는 패턴, 이미 경험했지?"
     : "에너지가 분산된 구조야. 돈이 들어와도 손에 안 남아. 구조가 그래. 네 잘못이 아닌데 이 패턴 모르면 평생 반복돼."
-  const reomulSurvive = yongsinA ? `살길은 ${yongsinA} 기운이야. 이 방향으로 가야 돈이 따라와. 거슬러 가면 아무리 열심히 해도 제자리야.` : ""
+  const _yd = YONGSIN_DETAIL[yongsinA] || YONGSIN_DETAIL[yongsinA?.split("·")[0]] || {}
+  const reomulSurvive = yongsinA
+    ? `살길은 ${yongsinA} 기운이야. 이 방향으로 가야 돈이 따라와.\n\n맞는 업종 ${_yd["업종"] || yongsinJobMap[yongsinA] || "용신 방향의 분야"}\n\n취미와 일상 ${_yd["취미"] || ""}, ${_yd["행동"] || ""}\n\n피해야 할 것 ${_yd["피해야할것"] || ""}`
+    : ""
   const reomulAvoid = gisinA ? `${gisinA} 기운은 돈을 새게 만들어. 이쪽으로 가면 힘만 빼는 거야. 업종도 관계도 이 방향은 피해야 해.` : ""
   const reomulInvest = isSingang
     ? "적극적으로 투자하고 확장하는 스타일이 맞아. 근데 리스크 관리를 못 하면 한 방에 날려. 욕심의 크기를 조절하는 게 관건이야."
@@ -490,12 +511,12 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
   const yearDetail = yearForecast.slice(0, 5).map(y => {
     const score = y.score || 0
     const areas = y.areas || {}
-    const top = Object.entries(areas).sort((a,b) => b[1]-a[1])[0]
-    return `${y.year}년 ${score}점${top ? ` (${top[0]} ${top[1]}점)` : ""} ${mug(y.summary || "")}`
-  }).join("\n")
+    const areaStr = Object.entries(areas).map(([k,v]) => `${k} ${v}점`).join(" / ")
+    return `${y.year}년 종합 ${score}점\n${areaStr}\n${mug(y.summary || "")}`
+  }).join("\n\n")
 
   const lockedChapters = [
-    // 재물 — 3블록
+    // 재물 3블록
     {
       label: "재물 구조", accent: C.sand,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
@@ -519,7 +540,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
         reomulFlow ? { h: "5년 재물 흐름", text: reomulFlow, accent: C.sand } : null,
       ].filter(Boolean),
     },
-    // 연애 — 3블록
+    // 연애 3블록
     {
       label: "연애 관계", accent: C.lavender,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
@@ -539,7 +560,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
       blocks: [
         (idealType || idealType2) ? { h: "잘 맞는 상대", text: idealType + (idealType2 ? "\n\n" + idealType2 : ""), accent: C.lavender } : null,
         { h: "반복되는 패턴", text: lovePattern, accent: C.lavender },
-        { h: "인연이 오는 시기", text: loveTiming, accent: C.lavender },
+        { h: "인연이 오는 시기", text: loveTiming + (loveYears ? "\n\n" + loveYears : ""), accent: C.lavender },
         loveWarn ? { h: "주의할 점", text: loveWarn, accent: C.lavender } : null,
       ].filter(Boolean),
     },
@@ -570,7 +591,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
         relPoison ? { h: "조심해야 할 관계", text: relPoison, accent: C.iris } : null,
       ].filter(Boolean),
     },
-    // 대운세운 — 2블록
+    // 대운세운 2블록
     {
       label: "대운 흐름", accent: C.iris,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
@@ -590,7 +611,14 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
       subtitle: "세운 심층 분석",
       blocks: [
         yearDetail ? { h: "연도별 운세", text: yearDetail, accent: C.iris } : null,
-        { h: "이 시기를 쓰는 법", text: "지금 대운과 세운이 맞물리는 해가 가장 중요해. 그 해에 무엇을 하느냐가 5년을 결정해.", accent: C.iris },
+        { h: "이 시기를 쓰는 법", text: (() => {
+          const isGood = yearForecast[0]?.score >= 70
+          const doList = _yd["행동"] || "용신 방향의 행동을 늘려"
+          const hobby = _yd["취미"] || "에너지를 채우는 활동"
+          const avoid = _yd["피해야할것"] || ""
+          if (isGood) return `지금이 올라타야 할 시기야. 적극적으로 치고 나가.\n\n할 것 ${doList}\n\n취미 ${hobby}로 에너지 강화\n\n피할 것 ${avoid}`
+          return `지금은 버티고 쌓는 시기야. 무리하게 치고 나가면 오히려 손해야.\n\n할 것 실력을 키우고 인맥을 다져. ${doList}\n\n피할 것 ${avoid}\n\n이 시기를 잘 버티면 다음 대운이 크게 열려.`
+        })(), accent: C.iris },
       ].filter(Boolean),
     },
   ]

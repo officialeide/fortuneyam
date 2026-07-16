@@ -59,8 +59,8 @@ const FloatText = ({ text, isLast, onDone }) => {
 
   useEffect(() => {
     const t1 = setTimeout(() => setState("hold"), 100)
-    const t2 = setTimeout(() => setState("out"), 2000)
-    const t3 = setTimeout(() => onDone(), 2800)
+    const t2 = setTimeout(() => setState("out"), 1000)
+    const t3 = setTimeout(() => onDone(), 1800)
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, [])
 
@@ -80,9 +80,9 @@ const FloatText = ({ text, isLast, onDone }) => {
       letterSpacing: 0.5,
       ...style,
       transition: state === "in"
-        ? "opacity 2s ease, transform 2s ease, filter 2.2s ease"
+        ? "opacity 1.2s ease, transform 1.2s ease, filter 1.4s ease"
         : state === "out"
-        ? "opacity 1.6s ease, transform 1.6s ease, filter 1.8s ease"
+        ? "opacity 0.8s ease, transform 0.8s ease, filter 1s ease"
         : "none",
     }}>
       {text}
