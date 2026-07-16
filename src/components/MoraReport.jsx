@@ -88,30 +88,37 @@ function DonutChart({ ohaeng, dominant }) {
     })
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
-      <svg width={size} height={size} style={{ flexShrink: 0 }}>
-        {segments.map(s => (
-          <circle key={s.key} cx={cx} cy={cy} r={r}
-            fill="none" stroke={s.color} strokeWidth={stroke}
-            strokeDasharray={`${s.dash} ${s.gap}`}
-            strokeDashoffset={-s.offset}
-            style={{ transform: "rotate(-90deg)", transformOrigin: `${cx}px ${cy}px` }}
-          />
-        ))}
-        <text x={cx} y={cy - 4} textAnchor="middle" fill={OHK_COLOR[dominant] || C.sand} fontSize="11" fontFamily={FONT_SANS} fontWeight="400">
-          {OHK_KR[dominant] || dominant}
-        </text>
-        <text x={cx} y={cy + 10} textAnchor="middle" fill={C.ash} fontSize="9" fontFamily={FONT_SANS}>
-          {ohaeng[dominant] || 0}개
-        </text>
-      </svg>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 13, color: C.parchment, lineHeight: 1.7, fontFamily: FONT, fontWeight: 400 }}>
-          {OHK_DESC[dominant] || ""}
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 10 }}>
+        <svg width={size} height={size} style={{ flexShrink: 0 }} viewBox={`0 0 ${size} ${size}`}>
+          <g transform={`rotate(-90 ${cx} ${cy})`}>
+            {segments.map(s => (
+              <circle key={s.key} cx={cx} cy={cy} r={r}
+                fill="none" stroke={s.color} strokeWidth={stroke}
+                strokeDasharray={`${s.dash} ${s.gap}`}
+                strokeDashoffset={-s.offset}
+              />
+            ))}
+          </g>
+          <text x={cx} y={cy - 3} textAnchor="middle" fill={OHK_COLOR[dominant] || C.sand} fontSize="11" fontFamily={FONT_SANS} fontWeight="400">
+            {OHK_KR[dominant] || dominant}
+          </text>
+          <text x={cx} y={cy + 11} textAnchor="middle" fill={C.ash} fontSize="9" fontFamily={FONT_SANS}>
+            {ohaeng[dominant] || 0}개
+          </text>
+        </svg>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 11, color: C.fog, fontFamily: FONT_SANS, fontWeight: 400 }}>
+            {Object.entries(ohaeng).filter(([, v]) => v > 0).map(([k, v]) => (
+              <span key={k} style={{ marginRight: 8 }}>
+                <span style={{ color: OHK_COLOR[k] || C.fog }}>■</span> {OHK_KR[k] || k} {v}
+              </span>
+            ))}
+          </div>
         </div>
-        <div style={{ fontSize: 11, color: C.fog, marginTop: 4, fontFamily: FONT_SANS, fontWeight: 400 }}>
-          {Object.entries(ohaeng).filter(([, v]) => v > 0).map(([k, v]) => `${OHK_KR[k] || k} ${v}`).join(" · ")}
-        </div>
+      </div>
+      <div style={{ fontSize: 13, color: C.parchment, lineHeight: 1.8, fontFamily: FONT, fontWeight: 400 }}>
+        {OHK_DESC[dominant] || ""}
       </div>
     </div>
   )
@@ -162,7 +169,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
   const [current, setCurrent] = useState(0)
   const [flipping, setFlipping] = useState(false)
   const [flipDir, setFlipDir] = useState(null)
-  const [astroAI, setAstroAI] = useState(parentAstroAI || d._astroAI || null)
+  const [astroAI, setAstroAI] = useState(parentAstroAI || null) // _astroAI 캐시 무시 — 항상 새로 계산
   const [tarotAI, setTarotAI] = useState(parentTarotAI || d._tarotAI || null)
   const [loadingAstro, setLoadingAstro] = useState(!astroAI)
 
@@ -450,43 +457,106 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
     },
   ]
 
+  // 재물 상세
+  const reomulType = isSingang
+    ? "에너지가 집중된 구조야. 돈 잡으면 오래 쥐고 있어. 근데 욕심이 화근이야. 한 번에 다 가지려다 날리는 패턴, 이미 경험했지?"
+    : "에너지가 분산된 구조야. 돈이 들어와도 손에 안 남아. 구조가 그래. 네 잘못이 아닌데 이 패턴 모르면 평생 반복돼."
+  const reomulSurvive = yongsinA ? `살길은 ${yongsinA} 기운이야. 이 방향으로 가야 돈이 따라와. 거슬러 가면 아무리 열심히 해도 제자리야.` : ""
+  const reomulAvoid = gisinA ? `${gisinA} 기운은 돈을 새게 만들어. 이쪽으로 가면 힘만 빼는 거야. 업종도 관계도 이 방향은 피해야 해.` : ""
+  const reomulInvest = isSingang
+    ? "적극적으로 투자하고 확장하는 스타일이 맞아. 근데 리스크 관리를 못 하면 한 방에 날려. 욕심의 크기를 조절하는 게 관건이야."
+    : "안정적으로 쌓아가는 스타일이 맞아. 한 번에 크게 가려다 다 잃는 경우가 많아. 꾸준히 쌓는 게 이 구조의 정답이야."
+
+  // 연애 상세
+  const lovePattern = triggers.length
+    ? `매번 같은 상황에서 무너져. ${triggers[0]}. 이게 반복된다면 구조적인 문제야.`
+    : "연애에서 반복되는 패턴이 있어. 상대가 문제가 아니야. 내 구조가 그렇게 돼 있어."
+  const loveTiming = `인연이 들어오는 시기가 따로 있어. 대운과 세운이 맞아야 제대로 된 사람이 와. 아무리 노력해도 안 되는 시기가 있고, 가만 있어도 오는 시기가 있어.`
+  const loveWarn = idealType2 ? `근데 주의해. ${mug(d.mbti?.challenges?.[0] || "")} 이 약점이 관계에서도 그대로 나타나.` : ""
+
+  // 커리어 상세
+  const careerStrength = (d.mbti?.strengths || []).slice(0,2).map(mug).join(" ") || `${yongsinA || ""} 기운이 강한 분야에서 실력이 빛나.`
+  const careerWeak = (d.mbti?.challenges || []).slice(0,1).map(mug).join("") || "약점을 알고 보완하는 게 커리어의 핵심이야."
+  const careerBest = yongsinA ? `${yongsinA} 기운이 살아있는 직종이야. 이 방향이 맞아. 돈도 따라오고 실력도 인정받아.` : ""
+  const careerTiming = `지금 대운이 커리어에 유리한 시기인지, 내부를 다지는 시기인지가 중요해. 타이밍을 잘못 읽으면 아무리 잘해도 결과가 안 나와.`
+
+  // 인간관계 상세
+  const relGuardian = yongsinA ? `${yongsinA} 기운을 가진 사람이 귀인이야. 이 에너지가 나를 살려. 직관적으로 편한 사람, 같이 있으면 뭔가 잘 풀리는 사람이 그 타입이야.` : ""
+  const relPoison = gisinA ? `${gisinA} 기운이 강한 사람과 가까이 있으면 이유 없이 지쳐. 나쁜 사람이 아닐 수 있어. 그냥 에너지가 안 맞는 거야. 가까이 할수록 손해야.` : ""
+  const relStyle = dayMask ? `겉으로는 ${dayMask} 근데 실제 속모습은 달라. 이 차이를 아는 사람이 진짜 인연이야.` : ""
+
+  // 대운 상세
+  const daeunDetail = curDaeun ? mug(curDaeun.longDesc || curDaeun.desc || "") : ""
+  const yearDetail = yearForecast.slice(0, 5).map(y => {
+    const score = y.score || 0
+    const areas = y.areas || {}
+    const top = Object.entries(areas).sort((a,b) => b[1]-a[1])[0]
+    return `${y.year}년 ${score}점${top ? ` (${top[0]} ${top[1]}점)` : ""} ${mug(y.summary || "")}`
+  }).join("\n")
+
   const lockedChapters = [
+    // 재물 — 3블록
     {
       label: "재물 구조", accent: C.sand,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "돈이 어떻게 들어오고\n어디서 새는지 다 보여.",
-      subtitle: "재물 심층 분석",
+      subtitle: "재물 심층 분석 1",
       blocks: [
-        { h: "구조", text: reomulStructure, accent: C.sand },
-        reomulYongsin ? { h: "살길", text: reomulYongsin, accent: C.sand } : null,
-        reomulGisin ? { h: "피해야 할 방향", text: reomulGisin, accent: C.sand } : null,
-        reomulYear ? { h: "올해 재물", text: reomulYear, accent: C.sand } : null,
-        reomulBest ? { h: "터지는 시기", text: reomulBest, accent: C.sand } : null,
-        reomulFlow ? { h: "5년 흐름", text: reomulFlow, accent: C.sand } : null,
+        { h: "돈의 구조", text: reomulType, accent: C.sand },
+        reomulSurvive ? { h: "살길", text: reomulSurvive, accent: C.sand } : null,
+        reomulAvoid ? { h: "피해야 할 방향", text: reomulAvoid, accent: C.sand } : null,
       ].filter(Boolean),
     },
+    {
+      label: "재물 흐름", accent: C.sand,
+      tag: "유료", tagColor: C.plum, tagText: C.lavender,
+      title: "올해가 채우는 해인지\n쓰는 해인지.",
+      subtitle: "재물 심층 분석 2",
+      blocks: [
+        reomulYear ? { h: "올해 재물", text: reomulYear, accent: C.sand } : { h: "올해 흐름", text: "올해 재물 흐름이 읽혔어.", accent: C.sand },
+        { h: "투자 vs 저축 체질", text: reomulInvest, accent: C.sand },
+        reomulBest ? { h: "터지는 시기", text: reomulBest, accent: C.sand } : null,
+        reomulFlow ? { h: "5년 재물 흐름", text: reomulFlow, accent: C.sand } : null,
+      ].filter(Boolean),
+    },
+    // 연애 — 3블록
     {
       label: "연애 관계", accent: C.lavender,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "매번 같은 패턴에\n걸리는 이유가 있어.",
-      subtitle: "연애 심층 분석",
+      subtitle: "연애 심층 분석 1",
       blocks: [
         desire ? { h: "속에서 원하는 것", text: desire + (desire2 ? "\n\n" + desire2 : ""), accent: C.lavender } : null,
         attraction ? { h: "매력 발산 방식", text: attraction, accent: C.lavender } : null,
         triggers.length ? { h: "무너지는 순간", text: triggers.join("\n"), accent: C.lavender } : null,
-        (idealType || idealType2) ? { h: "잘 맞는 상대", text: idealType + (idealType2 ? "\n\n" + idealType2 : ""), accent: C.lavender } : null,
       ].filter(Boolean),
     },
+    {
+      label: "연애 심화", accent: C.lavender,
+      tag: "유료", tagColor: C.plum, tagText: C.lavender,
+      title: "잘 맞는 상대와\n인연이 오는 시기.",
+      subtitle: "연애 심층 분석 2",
+      blocks: [
+        (idealType || idealType2) ? { h: "잘 맞는 상대", text: idealType + (idealType2 ? "\n\n" + idealType2 : ""), accent: C.lavender } : null,
+        { h: "반복되는 패턴", text: lovePattern, accent: C.lavender },
+        { h: "인연이 오는 시기", text: loveTiming, accent: C.lavender },
+        loveWarn ? { h: "주의할 점", text: loveWarn, accent: C.lavender } : null,
+      ].filter(Boolean),
+    },
+    // 커리어 + 인간관계
     {
       label: "커리어", accent: C.caramel,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "어떤 일을 해야\n에너지가 살아나.",
       subtitle: "커리어 심층 분석",
       blocks: [
-        { h: "맞는 환경", text: bestEnv || "전문성이 인정받는 환경이야. 성과가 명확하게 보이는 곳.", accent: C.caramel },
-        { h: "맞는 업종 방향", text: yongsinA ? `${yongsinA} 기운이 살아있는 분야가 맞아. 이 방향으로 가야 실력이 빛나.` : "용신 방향을 봐야 해.", accent: C.caramel },
-        { h: "충전 방식", text: recovery || "혼자만의 시간이 필요해. 그게 다음을 위한 준비야.", accent: C.caramel },
-      ],
+        { h: "강점", text: careerStrength, accent: C.caramel },
+        { h: "약점", text: careerWeak, accent: C.caramel },
+        careerBest ? { h: "맞는 방향", text: careerBest, accent: C.caramel } : null,
+        { h: "타이밍", text: careerTiming, accent: C.caramel },
+        bestEnv ? { h: "맞는 환경", text: mug(bestEnv), accent: C.caramel } : null,
+        recovery ? { h: "충전 방식", text: mug(recovery), accent: C.caramel } : null,
+      ].filter(Boolean),
     },
     {
       label: "인간관계", accent: C.iris,
@@ -495,21 +565,32 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
       subtitle: "인간관계 심층 분석",
       blocks: [
         dayImp ? { h: "사람들이 보는 나", text: dayImp, accent: C.iris } : null,
-        dayMask ? { h: "실제 속모습", text: dayMask, accent: C.iris } : null,
-        { h: "귀인의 조건", text: yongsinA ? `${yongsinA} 기운을 가진 사람이 귀인이야. 이 에너지가 나를 살려.` : "귀인 분석 중이야.", accent: C.iris },
-        { h: "조심해야 할 관계", text: gisinA ? `${gisinA} 기운이 강한 사람이 에너지를 빼앗아. 가까이 하면 이유 없이 지쳐.` : "기신 방향 분석 중이야.", accent: C.iris },
+        relStyle ? { h: "실제 속모습", text: relStyle, accent: C.iris } : null,
+        relGuardian ? { h: "귀인의 조건", text: relGuardian, accent: C.iris } : null,
+        relPoison ? { h: "조심해야 할 관계", text: relPoison, accent: C.iris } : null,
+      ].filter(Boolean),
+    },
+    // 대운세운 — 2블록
+    {
+      label: "대운 흐름", accent: C.iris,
+      tag: "유료", tagColor: C.plum, tagText: C.lavender,
+      title: "언제 치고 나가고\n언제 버텨야 하는지.",
+      subtitle: "대운 심층 분석",
+      blocks: [
+        { h: "지금 대운", text: daeunCurText, accent: C.iris },
+        daeunDetail ? { h: "이 대운의 의미", text: daeunDetail, accent: C.iris } : null,
+        daeunNextText ? { h: "다음 전환점", text: daeunNextText, accent: C.iris } : null,
+        daeunFlow ? { h: "대운 전체 흐름", text: daeunFlow, accent: C.iris } : null,
       ].filter(Boolean),
     },
     {
-      label: "대운 · 세운", accent: C.iris,
+      label: "세운 흐름", accent: C.iris,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "언제 치고 나가고\n언제 버텨야 하는지.",
-      subtitle: "대운 · 세운 심층 분석",
+      title: "올해부터 5년\n연도별로 다 보여.",
+      subtitle: "세운 심층 분석",
       blocks: [
-        { h: "지금 대운", text: daeunCurText, accent: C.iris },
-        daeunNextText ? { h: "다음 전환점", text: daeunNextText, accent: C.iris } : null,
-        daeunFlow ? { h: "대운 흐름", text: daeunFlow, accent: C.iris } : null,
-        yearFlowText ? { h: "연도별 흐름", text: yearFlowText, accent: C.iris } : null,
+        yearDetail ? { h: "연도별 운세", text: yearDetail, accent: C.iris } : null,
+        { h: "이 시기를 쓰는 법", text: "지금 대운과 세운이 맞물리는 해가 가장 중요해. 그 해에 무엇을 하느냐가 5년을 결정해.", accent: C.iris },
       ].filter(Boolean),
     },
   ]
