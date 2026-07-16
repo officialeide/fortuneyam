@@ -13,13 +13,13 @@ function calcSinsal(ilgan,yearJi,monthJi,dayJi,timeJi){
   const taeul={갑:["축","미"],무:["축","미"],경:["축","미"],을:["자","신"],기:["자","신"],병:["해","유"],정:["해","유"],임:["묘","사"],계:["묘","사"],신:["오","인"]};
   const tj=taeul[ilgan]||[];
   const tf=[yearJi,monthJi,dayJi,timeJi].filter(j=>tj.includes(j));
-  if(tf.length>0)result.push({name:"천을귀인",hanja:"天乙貴人",found:tf.join("·"),easy:"귀인이 곁에 있는 축복받은 구조예요.",desc:`${ilgan} 일간의 천을귀인: 위기마다 반드시 조력자가 나타나요.`});
+  if(tf.length>0)result.push({name:"천을귀인",hanja:"天乙貴人",found:tf.join("·"),easy:"귀인이 곁에 있는 축복받은 구조야.",desc:"위기마다 반드시 조력자가 나타나. 혼자인 것 같아도 결정적인 순간엔 누군가 손을 내밀어."});
   const mc={갑:"사",을:"오",병:"신",정:"유",무:"신",기:"유",경:"해",신:"자",임:"인",계:"묘"};
-  if(mc[ilgan]&&[yearJi,monthJi,dayJi,timeJi].includes(mc[ilgan]))result.push({name:"문창귀인",hanja:"文昌貴人",found:mc[ilgan],easy:"학문·글·시험에서 두각을 나타내는 에너지예요.",desc:"글재주와 언변이 타고난 편이에요."});
+  if(mc[ilgan]&&[yearJi,monthJi,dayJi,timeJi].includes(mc[ilgan]))result.push({name:"문창귀인",hanja:"文昌貴人",found:mc[ilgan],easy:"학문·글·시험에서 두각을 나타내는 에너지야.",desc:"글재주와 언변이 타고난 편이야. 말과 글로 사람을 움직이는 능력이 있어."});
   const dh={해:"자",묘:"자",미:"자",신:"유",자:"유",진:"유",인:"묘",오:"묘",술:"묘",사:"오",유:"오",축:"오"};
-  if(dh[dayJi]&&[yearJi,monthJi,timeJi].includes(dh[dayJi]))result.push({name:"도화살",hanja:"桃花殺",found:dh[dayJi],easy:"타고난 자연스러운 흡인력이 있어요.",desc:"자신도 모르게 눈에 띄고 기억에 남는 사람이에요."});
+  if(dh[dayJi]&&[yearJi,monthJi,timeJi].includes(dh[dayJi]))result.push({name:"도화살",hanja:"桃花殺",found:dh[dayJi],easy:"타고난 자연스러운 흡인력이 있어.",desc:"자신도 모르게 눈에 띄고 기억에 남는 사람이야. 억지로 꾸미지 않아도 끌려오게 되어 있어."});
   const ym={신:"인",자:"인",진:"인",인:"신",오:"신",술:"신",사:"해",유:"해",축:"해",해:"사",묘:"사",미:"사"};
-  if(ym[yearJi]&&[monthJi,dayJi,timeJi].includes(ym[yearJi]))result.push({name:"역마살",hanja:"驛馬殺",found:ym[yearJi],easy:"이동·변화·해외 에너지가 강해요.",desc:"한 곳에 오래 머물면 답답함을 느끼기 쉬운 타입이에요."});
+  if(ym[yearJi]&&[monthJi,dayJi,timeJi].includes(ym[yearJi]))result.push({name:"역마살",hanja:"驛馬殺",found:ym[yearJi],easy:"이동·변화·해외 에너지가 강해.",desc:"한 곳에 오래 머물면 답답해. 움직임 속에서 에너지가 살아나는 구조야."});
   return result;
 }
 

@@ -53,7 +53,7 @@ function mug(s) {
     ["ㄹ게요.", "ㄹ게."], ["할게요.", "할게."], ["줄게요.", "줄게."],
     ["신약", "에너지 분산 구조"], ["신강", "에너지 집중 구조"],
     ["하세요.", "해."], ["주세요.", "줘."],
-    ["해내요.", "해내."], ["느껴요.", "느껴."], ["보여요.", "보여."],
+    ["해내요.", "해내."], ["느껴요.", "느껴."], ["보여요.", "보여."], ["바꿔요.", "바꿔."], ["바꿔요,", "바꿔,"], ["바꿔요 ", "바꿔 "], ["줘요.", "줘."], ["줘요,", "줘,"], ["줘요 ", "줘 "],
     ["위치하여", "에 있어."], ["위치해", "에 있어"],
     ["드러내", "드러내"], ["강화하는데", "강화해"],
     ["만들어줘", "만들어줘"],
@@ -122,9 +122,10 @@ function Block({ h, text, jsxContent, highlight, accent, last }) {
   return (
     <div style={last ? {} : dvd}>
       {h && <div style={hdg(accent || C.caramel)}>{h}</div>}
-      {highlight && <span style={{ color: C.sand, fontSize: 15, fontFamily: FONT, fontWeight: 400 }}>{highlight} </span>}
+      {highlight && !text && <span style={{ color: C.sand, fontSize: 15, fontFamily: FONT, fontWeight: 400 }}>{highlight}</span>}
+      {highlight && text && <div style={txt}><span style={{ color: C.sand, fontWeight: 400 }}>{highlight}</span>{text}</div>}
+      {!highlight && text && <div style={txt}>{text}</div>}
       {jsxContent && <div>{jsxContent}</div>}
-      {text && <div style={txt}>{text}</div>}
     </div>
   )
 }
@@ -256,7 +257,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
   const sinsalJSX = d.sinsal?.length
     ? d.sinsal.map((s, i) => {
         const nm = s.name.replace(/\([^)]*\)/g, "").trim()
-        const desc = s.kw ? ` ${mug(s.kw)}.` : "."
+        const desc = s.kw ? ` ${mug(s.kw)}` : ""
         const fullDesc = s.desc ? ` ${mug(s.desc).slice(0, 80)}` : ""
         return React.createElement("div", { key: i, style: { marginBottom: i < d.sinsal.length - 1 ? 10 : 0 } },
           React.createElement("span", { style: { color: C.sand, fontSize: 14, fontFamily: FONT, fontWeight: 400 } }, nm),
@@ -268,12 +269,12 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
 
   // 토정비결
   const tojungKw = tojungSys.key?.replace(/[（(][一-龯\u4E00-\u9FFF]+[）)]/g, "").trim() || ""
-  const tojungDesc = noColon(tojungSys.desc || "")
+  const tojungDesc = noColon(tojungSys.desc || "").replace(/^[\n\r]+/, "")
 
   // 주역 — 콜론 완전 제거
   const ichingKw = (juyeokSys.key || d.iching?.bonmyeonggae || "")
     .replace(/[.:：]/g, "").replace(/[一-龯\u4E00-\u9FFF（(][^）)]*[）)]/g, "").trim()
-  const ichingNature = noColon(juyeokSys.desc || d.iching?.gaeNature || "")
+  const ichingNature = noColon(juyeokSys.desc || d.iching?.gaeNature || "").replace(/^[\n\r]+/, "")
   const ichingStrategy = (d.iching?.strategy || []).slice(0, 2).map(noColon)
   const ichingText = `${ichingNature}${ichingStrategy.length ? "\n\n" + ichingStrategy.join(" ") : ""}`
 
