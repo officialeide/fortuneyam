@@ -15,11 +15,11 @@ const C = {
 const OHK_KR = { 목: "나무", 화: "불", 토: "흙", 금: "쇠", 수: "물" }
 const OHK_COLOR = { 목: "#4CAF50", 화: "#FF5722", 토: "#8D6E63", 금: "#FFB300", 수: "#2196F3" }
 const OHK_DESC = {
-  목: "성장·추진력·창의성. 새로운 걸 시작하는 에너지야.",
-  화: "열정·표현력·직관. 타오르는 에너지야. 화려하지만 소진도 빨라.",
-  토: "안정·포용·지구력. 묵직하게 버티는 에너지야.",
-  금: "결단력·원칙·실행력. 자르고 정리하는 에너지야.",
-  수: "지혜·직관·유연성. 흐르면서 스며드는 에너지야.",
+  목: "성장을 향해 끊임없이 뻗어나가는 에너지야. 새로운 것을 시작하고 가능성을 여는 힘이 강해. 창의적이고 추진력이 넘치지만, 뿌리가 약하면 방향이 흔들리기 쉬워. 한번 꽂히면 빠르게 달려가는데, 그 속도가 주변을 앞질러버리는 경우가 많아. 시작은 잘하는데 마무리가 약한 게 이 기운의 함정이야.",
+  화: "뜨겁게 타오르는 에너지야. 표현력과 직관이 강하고, 주변을 밝히는 존재감이 있어. 사람을 끌어당기는 매력이 있지만, 타오르는 만큼 소진도 빨라. 감정의 기복이 크고, 흥미가 식으면 급격히 식어버리는 구조야. 이 기운이 강하면 화려하지만 지속성이 문제고, 너무 많으면 오히려 자기 자신을 태워버려.",
+  토: "묵직하게 버티는 에너지야. 어떤 상황에서도 중심을 잡고, 주변을 안정시키는 힘이 있어. 포용력이 강하고 신뢰를 주는 존재가 되지만, 그 무게를 혼자 다 짊어지는 게 문제야. 변화에 느리고, 한번 굳으면 바꾸기 어려워. 안정감이 강점이지만, 지나치면 정체가 돼.",
+  금: "자르고 정리하는 에너지야. 원칙이 뚜렷하고 결단력이 강해. 불필요한 것을 제거하고 핵심에 집중하는 능력이 있어. 하지만 날이 서있는 만큼 주변과 마찰이 생기기 쉬워. 타협을 못 하는 게 강점이기도 하고 약점이기도 해. 이 기운이 강하면 냉철한 대신 차갑게 보일 수 있어.",
+  수: "깊이 스며드는 에너지야. 표면이 잔잔해 보여도 내면에 엄청난 깊이가 있어. 직관이 예리하고, 보이지 않는 것을 먼저 감지하는 능력이 있어. 유연하게 흐르면서 어떤 형태에도 적응하지만, 방향을 잃으면 어디로 흘러야 할지 모르는 구조야. 이 기운이 너무 많으면 생각이 깊어지는 대신 행동이 느려지고, 감정을 혼자 담아두다 무너지는 경우가 있어.",
 }
 
 const FONT = "'Nanum Myeongjo', 'Noto Serif KR', Georgia, serif"
@@ -117,12 +117,13 @@ function DonutChart({ ohaeng, dominant }) {
   )
 }
 
-function Block({ h, text, highlight, accent, last }) {
-  if (!text && !h) return null
+function Block({ h, text, jsxContent, highlight, accent, last }) {
+  if (!text && !h && !jsxContent) return null
   return (
     <div style={last ? {} : dvd}>
       {h && <div style={hdg(accent || C.caramel)}>{h}</div>}
       {highlight && <span style={{ color: C.sand, fontSize: 15, fontFamily: FONT, fontWeight: 400 }}>{highlight} </span>}
+      {jsxContent && <div>{jsxContent}</div>}
       {text && <div style={txt}>{text}</div>}
     </div>
   )
@@ -251,13 +252,19 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
   const ascSign = a.asc && a.asc !== "분석 중" ? zodiacFix(a.asc) : null
 
   // 신살 — 한 박스, 엔터 구분, 마침표
-  const sinsalText = d.sinsal?.length
-    ? d.sinsal.map(s => {
+  // 신살 — JSX로 렌더링 (이름 색상 + 설명 인라인)
+  const sinsalJSX = d.sinsal?.length
+    ? d.sinsal.map((s, i) => {
         const nm = s.name.replace(/\([^)]*\)/g, "").trim()
-        const kw = s.kw ? ` ${s.kw}.` : "."
-        return `${nm}${kw}`
-      }).join("\n")
-    : "특별한 신살 없어. 안정적인 구조야. 튀지 않는 대신 오래 가."
+        const desc = s.kw ? ` ${mug(s.kw)}.` : "."
+        const fullDesc = s.desc ? ` ${mug(s.desc).slice(0, 80)}` : ""
+        return React.createElement("div", { key: i, style: { marginBottom: i < d.sinsal.length - 1 ? 10 : 0 } },
+          React.createElement("span", { style: { color: C.sand, fontSize: 14, fontFamily: FONT, fontWeight: 400 } }, nm),
+          React.createElement("span", { style: { color: C.parchment, fontSize: 14, fontFamily: FONT, fontWeight: 400 } }, desc + fullDesc)
+        )
+      })
+    : [React.createElement("div", { key: 0, style: { color: C.parchment, fontSize: 14, fontFamily: FONT } }, "특별한 신살 없어. 안정적인 구조야. 튀지 않는 대신 오래 가.")]
+  const sinsalText = ""
 
   // 토정비결
   const tojungKw = tojungSys.key?.replace(/[（(][一-龯\u4E00-\u9FFF]+[）)]/g, "").trim() || ""
@@ -363,7 +370,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
       extra: <DonutChart ohaeng={ohaeng} dominant={dominant} />,
       blocks: [
         { h: "일주 본질", text: iljuDescStd || "흙 위에 흙이 쌓인 구조야. 산이 두 개야, 이 사람은.", accent: C.caramel },
-        { h: "타고난 에너지", text: sinsalText, accent: C.caramel },
+        { h: "타고난 에너지", jsxContent: sinsalJSX, accent: C.caramel },
       ],
     },
     {
@@ -374,7 +381,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
       extra: <DonutChart ohaeng={ohaeng} dominant={dominant} />,
       blocks: [
         { h: "일주 본질", text: iljuDescMid || "부드러운 흙 아래 깊은 물이 흐르는 구조야.", accent: C.iris },
-        { h: "타고난 에너지", text: sinsalText, accent: C.iris },
+        { h: "타고난 에너지", jsxContent: sinsalJSX, accent: C.iris },
       ],
     },
   ] : [
@@ -386,7 +393,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
       extra: <DonutChart ohaeng={ohaeng} dominant={dominant} />,
       blocks: [
         { h: "본질", text: iljuDescStd || "분석 중이야.", accent: C.caramel },
-        { h: "타고난 에너지", text: sinsalText, accent: C.caramel },
+        { h: "타고난 에너지", jsxContent: sinsalJSX, accent: C.caramel },
       ],
     },
   ]
@@ -400,8 +407,8 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, parentAst
       subtitle: "당사주 · 토정비결 · 주역",
       blocks: [
         dansajuText ? { h: "당사주", text: dansajuText, accent: C.iris } : null,
-        { h: "토정비결", text: tojungDesc, accent: C.iris, highlight: tojungKw },
-        { h: "주역", text: ichingText, accent: C.iris, highlight: ichingKw },
+        { h: "토정비결", text: tojungDesc, accent: C.iris, highlight: tojungKw + " " },
+        { h: "주역", text: ichingText, accent: C.iris, highlight: ichingKw + " " },
       ].filter(Boolean),
     },
     {
