@@ -516,6 +516,7 @@ function buildSajuData(input){
     isSolo: input?.isSolo !== false,
     personaTitle,scoreMeta:scoreMetaSaju,
     boundary:{...bnd,isBoundary:bnd.inBoundary,
+      stdIlju:ilju.ko, midIlju:iljuB.ko,
       standardDesc:`${stripLead(ILJU_CHAR[iljuKey])||OHK[ilO]+" 기운의 일주야."} ${stripLead(ilganDB.core)}`,
       midnightDesc:`${stripLead(ILJU_CHAR[iljuB.ko])||OHK[normO(GAN_OE[ilganB])]+" 기운의 일주야."} ${stripLead((ILGAN_DESC[ilganB]||ILGAN_DESC["기"]).core)}`,
     },
