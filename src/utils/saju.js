@@ -98,9 +98,9 @@ const STAGE12_DESC={
 const SIBSONG_CHAR={
   비견:{key:"비견",label:"자립과 주체성",desc:"내 힘으로 서는 기운이야. 남한테 기대는 걸 싫어하고, 내 방식대로 밀고 나가는 뚝심이 있어. 독립심과 추진력이 강한 대신, 고집이 세지고 남과 부딪히기도 쉬워. 동업이나 공동 작업에선 주도권 다툼을 조심해야 해."},
   겁재:{key:"겁재",label:"경쟁과 승부욕",desc:"지기 싫어하는 승부의 기운이야. 목표가 생기면 물불 안 가리고 달려들어. 추진력과 배짱이 남다른 대신, 욕심이 앞서면 무리하다 손해를 봐. 돈 관리랑 사람 관계에서 특히 절제가 필요해."},
-  식신:{key:"식신",label:"표현과 여유",desc:"타고난 표현력과 여유의 기운이야. 먹고 즐기고 만들어내는 걸 좋아하고, 재능을 자연스럽게 펼쳐. 사람들을 편하게 만드는 매력이 있어. 다만 편한 걸 좇다 나태해지기 쉬우니, 꾸준함을 붙잡아야 해."},
+  식신:{key:"식신",label:"표현과 여유",desc:"타고난 표현력과 여유의 기운이야. 먹고 즐기고 만들어내는 걸 좋아하고, 재능을 자연스럽게 펼쳐. 사람들을 편하게 만드는 매력이 있어. 다만 편한 걸 좇다 늘어지기 쉬운데, 꾸준함만 지키면 재능이 확 살아나."},
   상관:{key:"상관",label:"창의와 재능",desc:"틀을 깨는 창의의 기운이야. 머리가 빠르고 말재주, 손재주가 뛰어나. 남들이 못 보는 걸 만들어내는 재능이 있어. 대신 기존 질서나 권위랑 부딪히기 쉽고, 말이 앞서면 구설에 오르니 조심해야 해."},
-  편재:{key:"편재",label:"기회와 확장",desc:"큰 판을 보는 재물의 기운이야. 돈 냄새를 잘 맡고, 기회를 포착하는 감각이 뛰어나. 활동적이고 사교적이라 사람과 돈이 모여. 다만 벌인 만큼 나가기도 쉬우니, 욕심을 절제하고 마무리를 챙겨야 해."},
+  편재:{key:"편재",label:"기회와 확장",desc:"큰 판을 보는 재물의 기운이야. 돈 냄새를 잘 맡고, 기회를 포착하는 감각이 뛰어나. 활동적이고 사교적이라 사람과 돈이 모여. 다만 벌인 만큼 나가기도 쉬우니, 욕심만 잘 다스리면 끝맺음도 야무져져."},
   정재:{key:"정재",label:"안정과 축적",desc:"착실하게 쌓는 재물의 기운이야. 성실하고 계획적이라, 꾸준한 노력이 확실한 결실로 쌓여. 현실 감각과 관리 능력이 뛰어나. 대신 지나치면 인색해지거나 새로운 도전을 두려워할 수 있어."},
   편관:{key:"편관",label:"도전과 카리스마",desc:"압박을 이겨내는 강단의 기운이야. 위기 앞에서 오히려 강해지고, 결단력과 카리스마가 있어. 책임이 무거운 자리를 감당해내. 대신 스스로를 몰아붙이다 지치기 쉽고, 욱하는 성질을 다스려야 해."},
   정관:{key:"정관",label:"명예와 책임",desc:"원칙과 명예의 기운이야. 규칙을 지키고 책임을 다하는 반듯함이 있어. 조직과 사회에서 신뢰받고 자리를 잡는 힘이 강해. 대신 지나치면 융통성이 없고, 체면에 얽매여 스스로를 옭아맬 수 있어."},
@@ -131,6 +131,58 @@ function calcLifePath(y,m,d){
 const CITY_OFFSET={"서울":-2,"부산":3,"대구":0,"인천":-3,"광주":-11,"대전":-5,"울산":4,"세종":-5,"경기":-2,"강원":4,"충북":-4,"충남":-7,"전북":-10,"전남":-12,"경북":2,"경남":1,"제주":-19,"경북 경산":-25,"경북 포항":5,"경북 구미":-3,"경북 안동":0,"경남 창원":0,"경남 진주":-4,"전남 순천":-10,"전북 전주":-10};
 // 한국 표준시(동경 135도) - 실제 국토 중심(동경 127.5도) = 30분. 모든 출생시각에서 30분을 뺀다.
 const STANDARD_TIME_OFFSET=-30;
+
+// ━━━━━━━━━━ 별자리(점성술) 로컬 계산 ━━━━━━━━━━
+const ZODIAC_ORDER=["양자리","황소자리","쌍둥이자리","게자리","사자자리","처녀자리","천칭자리","전갈자리","사수자리","염소자리","물병자리","물고기자리"];
+// 태양별자리: 날짜로 100% 정확
+function calcSunSign(month, day){
+  const table={1:["염소자리","물병자리",20],2:["물병자리","물고기자리",19],3:["물고기자리","양자리",21],
+    4:["양자리","황소자리",20],5:["황소자리","쌍둥이자리",21],6:["쌍둥이자리","게자리",22],
+    7:["게자리","사자자리",23],8:["사자자리","처녀자리",23],9:["처녀자리","천칭자리",23],
+    10:["천칭자리","전갈자리",23],11:["전갈자리","사수자리",22],12:["사수자리","염소자리",22]};
+  const [before,after,bound]=table[month]||table[1];
+  return day<bound?before:after;
+}
+// 달별자리: 간이 계산 (평균 이동 기반 근사, 정확도 약 80~90%)
+function calcMoonSign(year, month, day, hour){
+  const jdn=(y,m,d)=>{const a=Math.floor((14-m)/12);const yy=y+4800-a;const mm=m+12*a-3;
+    return d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045;};
+  const days=jdn(year,month,day)-jdn(2000,1,6)+((hour||12)/24);
+  let lon=(118.0+13.176396*days)%360;
+  if(lon<0)lon+=360;
+  const idx=Math.floor(lon/30)%12;
+  return ZODIAC_ORDER[idx];
+}
+// 상승별자리(ASC): 시간+장소 필요. 간이 계산
+function calcAscSign(sunSign, hour, minute){
+  const sunIdx=ZODIAC_ORDER.indexOf(sunSign);
+  if(sunIdx<0)return null;
+  const t=(hour||0)+((minute||0)/60);
+  const shift=Math.floor((((t-6+24)%24))/2);
+  return ZODIAC_ORDER[(sunIdx+shift)%12];
+}
+const ZODIAC_DESC={
+  "양자리":{sun:"불꽃 같은 추진력을 타고났어. 하고 싶은 게 생기면 앞뒤 안 재고 돌진해. 시작하는 힘은 최고인데, 마무리에서 힘이 빠지는 게 약점이야.",moon:"감정이 즉각적이야. 화도 빨리 나고 풀리는 것도 빨라. 속에 담아두질 못해서 차라리 뒤끝은 없어.",asc:"첫인상이 강렬하고 에너지가 넘쳐 보여. 어딜 가나 존재감이 확 드러나는 타입이야."},
+  "황소자리":{sun:"뚝심과 끈기의 별이야. 한번 정하면 우직하게 밀고 가. 변화를 싫어하는 대신, 쌓아 올리는 힘은 누구도 못 따라와.",moon:"감정이 느긋하고 안정적이야. 쉽게 흔들리지 않는 대신, 한번 삐지면 오래가. 편안함과 안정에서 마음이 채워져.",asc:"차분하고 믿음직한 인상을 줘. 서두르지 않는 여유가 상대를 편하게 만들어."},
+  "쌍둥이자리":{sun:"머리 회전이 빠르고 호기심이 많아. 말재주와 재치가 무기야. 대신 관심이 자주 옮겨가서 한 우물 파는 게 숙제야.",moon:"감정이 머리로 먼저 가. 느끼기 전에 분석부터 해. 변화와 자극이 있어야 마음이 살아나.",asc:"밝고 사교적인 인상이야. 말을 잘 걸고 분위기를 가볍게 만드는 재주가 있어."},
+  "게자리":{sun:"정이 많고 품이 넓은 별이야. 내 사람은 끝까지 챙겨. 감수성이 풍부한 만큼 상처도 깊게 받는 게 약점이야.",moon:"감정의 깊이가 남달라. 공감 능력이 뛰어나고, 가까운 사람의 기분을 그대로 흡수해. 안전한 울타리 안에서 마음이 놓여.",asc:"부드럽고 다정한 인상이야. 처음엔 낯을 가려도 한번 열면 따뜻하게 품어."},
+  "사자자리":{sun:"타고난 주인공이야. 빛나는 자리가 어울리고, 사람을 이끄는 카리스마가 있어. 인정받고 싶은 욕구가 크다는 게 특징이야.",moon:"감정 표현이 화려하고 당당해. 사랑도 크게 주고 크게 받길 원해. 인정받을 때 마음이 가장 충만해져.",asc:"화려하고 당당한 인상이야. 가만있어도 눈길이 가는 존재감을 뿜어."},
+  "처녀자리":{sun:"섬세하고 완벽을 추구하는 별이야. 디테일을 놓치지 않고, 뭐든 제대로 하려 해. 대신 자신한테도 남한테도 지나치게 엄격한 게 약점이야.",moon:"감정을 분석하고 정리하려 해. 걱정이 많고 예민한 편이지만, 그만큼 세심하게 챙겨. 정돈된 환경에서 안정돼.",asc:"단정하고 깔끔한 인상이야. 빈틈없어 보이면서도 은근히 친근한 매력이 있어."},
+  "천칭자리":{sun:"균형과 조화의 별이야. 사람 사이를 매끄럽게 조율하고, 미적 감각이 뛰어나. 대신 결정을 못 내리고 재는 게 약점이야.",moon:"관계 속에서 마음이 안정돼. 갈등을 싫어하고 공정함을 중시해. 혼자보다 함께일 때 편안해져.",asc:"세련되고 우아한 인상이야. 부드러운 매너로 상대를 편하게 만드는 재주가 있어."},
+  "전갈자리":{sun:"강렬하고 깊이 있는 별이야. 한번 빠지면 끝을 봐. 통찰력이 날카롭고, 겉으론 차분해도 속엔 뜨거운 게 끓어.",moon:"감정이 깊고 강렬해. 쉽게 드러내지 않지만 한번 마음 주면 전부를 걸어. 신뢰가 무너지면 돌아서는 것도 확실해.",asc:"신비롭고 묘한 인상이야. 쉽게 속을 안 보여줘서 더 끌리는 타입이야."},
+  "사수자리":{sun:"자유와 모험의 별이야. 넓은 세상을 향한 갈망이 커. 낙천적이고 솔직한 대신, 얽매이는 걸 못 견뎌.",moon:"감정이 낙천적이고 시원시원해. 우울해도 금방 털고 일어나. 새로운 경험과 자유 속에서 마음이 살아나.",asc:"밝고 활기찬 인상이야. 스스럼없이 다가가는 친화력으로 어딜 가나 잘 어울려."},
+  "염소자리":{sun:"책임감과 인내의 별이야. 목표를 향해 묵묵히 오르는 등산가 기질이야. 느려도 결국 정상에 서. 감정 표현이 서툰 게 약점이야.",moon:"감정을 잘 드러내지 않고 안으로 삼켜. 진중하고 무게감 있지만, 속으로 외로움을 많이 타. 성취에서 안정을 느껴.",asc:"진중하고 어른스러운 인상이야. 쉽게 흔들리지 않는 단단함이 신뢰를 줘."},
+  "물병자리":{sun:"독창적이고 자유로운 별이야. 남들과 다른 시선으로 세상을 봐. 틀에 갇히는 걸 거부하고, 개성이 뚜렷해.",moon:"감정을 객관적으로 봐. 거리를 두고 관찰하는 편이라 차가워 보이기도 해. 자유가 보장될 때 마음이 편해져.",asc:"독특하고 개성 있는 인상이야. 어딘가 남다른 분위기로 사람들의 호기심을 끌어."},
+  "물고기자리":{sun:"감수성과 상상력의 별이야. 공감 능력이 깊고 예술적 기질이 강해. 경계가 흐릿해서 남의 감정에 쉽게 휩쓸리는 게 약점이야.",moon:"감정이 바다처럼 깊고 넓어. 타인의 아픔을 내 것처럼 느껴. 꿈과 예술 속에서 마음이 치유돼.",asc:"부드럽고 몽환적인 인상이야. 어딘가 신비롭고 포근한 분위기로 사람을 끌어."}
+};
+function buildAstro(year, month, day, hour, minute, noTime){
+  const sun=calcSunSign(month, day);
+  const moon=calcMoonSign(year, month, day, hour);
+  const asc=noTime?null:calcAscSign(sun, hour, minute);
+  return { sun, moon, asc,
+    sunDesc:ZODIAC_DESC[sun]?.sun||"", moonDesc:ZODIAC_DESC[moon]?.moon||"",
+    ascDesc:asc?(ZODIAC_DESC[asc]?.asc||""):"" };
+}
 
 function buildSajuData(input){
   const{name,year:ys,month:ms,day:ds,hour:hs,minute:mns="0",gender,city}=input;
@@ -541,6 +593,7 @@ function buildSajuData(input){
     name,birth:`양력 ${y}년 ${m}월 ${d}일 ${rawH}시 ${String(rawM).padStart(2,"0")}분 ${city}`,gender,
     isSolo: input?.isSolo !== false,
     joinDate: input?.joinDate || null,
+    astro: buildAstro(y, m, d, rawH, rawM, input?.noTime === true),
     personaTitle,scoreMeta:scoreMetaSaju,
     boundary:{...bnd,isBoundary:bnd.inBoundary,
       stdIlju:ilju.ko, midIlju:iljuB.ko,
@@ -594,7 +647,6 @@ function buildSajuData(input){
     dansaju:{pillars:dansajuPillars,overall:dansajuOverall,yearFlow:dansajuYearFlow},
     iching:{bonmyeonggae:ichingData.name,gaeSymbol:ichingData.symbol||"☯",gaeNum:ichingData.num||0,gaeUpper:`${TRIGRAM[domO_kor]||""}·${domO_kor}`,gaeLower:`${TRIGRAM[relO_kor]||""}·${relO_kor}(관성)`,gaeUpperO:domOForIching,gaeLowerO:relO,gaeDesc:ichingData.desc,gaeNature:ichingData.nature,currentGae:ichingData.currentGae||"분석 중",currentYear:`${CY}년`,currentDesc:ichingData.currentDesc||"",strategy:ichingData.strategy||[],yearFlow:ichingYearFlow},
     tojung:{sang,jung,ha,saja:sajaDB.saja,sajaDesc:sajaDB.desc,bonun:sajaDB.saja,bonunDesc:sajaDB.desc,yearFlow:tojungYearFlow,month2026:tojungMonth2026},
-    astro:{sun:"분석 중",moon:"분석 중",asc:"분석 중",mercury:"분석 중",venus:"분석 중",mars:"분석 중",sunMeaning:"의식적 자아",moonMeaning:"감정, 본능",ascMeaning:"첫인상",sunDesc:"점성술 분석 중이야.",moonDesc:"점성술 분석 중이야.",ascDesc:"점성술 분석 중이야.",mercuryDesc:"분석 중",venusDesc:"분석 중",marsDesc:"분석 중",triangle:"",stellium:"",yearTransit:[]},
     tarot:{lifePath:lp,isMaster:[11,22,33].includes(lp),lifePathCard,lifePathCardNum:String(lp),lifePathDesc,soulCard:LP_CARDS[lp]||"분석 중",achieveCard:LP_CARDS[(lp+1)>9?1:lp+1]||"분석 중",soulDesc:soulDesc_val,achieveDesc:"성취 에너지 분석 중이야.",calc,yearCards},
     daynight:{overview:`${stripLead(ilganDB.core)} ${singang==="신강(身强)"?"강한 에너지를 가진 만큼, 그것을 흘려보내는 방법을 찾는 것이 중요해.":"내면의 에너지를 충전하는 루틴이 필요해."}`,
       day:{impression:dn_day.impression||"",mask:dn_day.mask||"",styling:{hair:"",fashion:"",color:"",makeup:"",perfume:""}},
