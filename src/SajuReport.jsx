@@ -283,25 +283,25 @@ JSON만 응답: {"sevenInsight":"..."}`;
       const pageH=pdf.internal.pageSize.getHeight();
       const margin=16;
 
-      // 각 챕터를 개별 캡처해서 1챕터=1페이지로
+      // 각 챕터 = 1페이지. 가로폭은 (페이지폭 - 여백)에 고정해서 모든 장의 가로 스케일을 동일하게.
+      // 내용이 짧으면 위쪽 정렬 + 아래는 배경색으로 채움. 아주 긴 챕터만 예외적으로 세로에 맞춰 축소.
       const chapterEls=container.querySelectorAll("[data-pdf-chapter]");
+      const availW=pageW-margin*2;
+      const availH=pageH-margin*2;
       let first=true;
       for(const el of chapterEls){
-        const canvas=await window.html2canvas(el,{
-          scale:2,useCORS:true,allowTaint:true,
-          backgroundColor:"#0D0A0F",
-        });
-        const imgData=canvas.toDataURL("image/jpeg",0.92);
-        const availW=pageW-margin*2;
+        const canvas=await window.html2canvas(el,{scale:2,useCORS:true,allowTaint:true,backgroundColor:"#0D0A0F"});
         let imgW=availW;
         let imgH=(canvas.height*imgW)/canvas.width;
-        // 한 페이지보다 크면 세로 기준으로 축소
-        const availH=pageH-margin*2;
+        // 페이지보다 길면 세로 기준으로 축소 (가로 중앙정렬)
         if(imgH>availH){ imgH=availH; imgW=(canvas.width*imgH)/canvas.height; }
         const x=(pageW-imgW)/2;
         if(!first) pdf.addPage();
         first=false;
-        pdf.addImage(imgData,"JPEG",x,margin,imgW,imgH);
+        // 배경색으로 페이지 전체를 먼저 채움 (짧은 페이지 빈 공간 처리)
+        pdf.setFillColor(13,10,15);
+        pdf.rect(0,0,pageW,pageH,"F");
+        pdf.addImage(canvas.toDataURL("image/jpeg",0.92),"JPEG",x,margin,imgW,imgH);
       }
       root.unmount();
       document.body.removeChild(container);
