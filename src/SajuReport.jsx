@@ -277,22 +277,34 @@ JSON만 응답: {"sevenInsight":"..."}`;
       const root=createRoot(container);
       await new Promise(res=>{root.render(ce(MoraReport,{d,onHome:()=>{},onSavePDF:null,pdfLoading:false,pdfMode:true,parentAstroAI,parentTarotAI}));setTimeout(res,1800);});
 
-      const canvas=await window.html2canvas(container,{
-        scale:2,useCORS:true,allowTaint:true,
-        backgroundColor:"#0D0A0F",width:480,windowWidth:480,
-      });
-      root.unmount();
-      document.body.removeChild(container);
-
       const {jsPDF}=window.jspdf;
       const pdf=new jsPDF({orientation:"portrait",unit:"px",format:"a4"});
       const pageW=pdf.internal.pageSize.getWidth();
       const pageH=pdf.internal.pageSize.getHeight();
-      const imgW=pageW;
-      const imgH=(canvas.height*pageW)/canvas.width;
-      const imgData=canvas.toDataURL("image/jpeg",0.92);
-      let y=0;
-      while(y<imgH){if(y>0)pdf.addPage();pdf.addImage(imgData,"JPEG",0,-y,imgW,imgH);y+=pageH;}
+      const margin=16;
+
+      // 각 챕터를 개별 캡처해서 1챕터=1페이지로
+      const chapterEls=container.querySelectorAll("[data-pdf-chapter]");
+      let first=true;
+      for(const el of chapterEls){
+        const canvas=await window.html2canvas(el,{
+          scale:2,useCORS:true,allowTaint:true,
+          backgroundColor:"#0D0A0F",
+        });
+        const imgData=canvas.toDataURL("image/jpeg",0.92);
+        const availW=pageW-margin*2;
+        let imgW=availW;
+        let imgH=(canvas.height*imgW)/canvas.width;
+        // 한 페이지보다 크면 세로 기준으로 축소
+        const availH=pageH-margin*2;
+        if(imgH>availH){ imgH=availH; imgW=(canvas.width*imgH)/canvas.height; }
+        const x=(pageW-imgW)/2;
+        if(!first) pdf.addPage();
+        first=false;
+        pdf.addImage(imgData,"JPEG",x,margin,imgW,imgH);
+      }
+      root.unmount();
+      document.body.removeChild(container);
       pdf.save(`${d.name}_운세종합.pdf`);
     }catch(e){
       console.error("PDF 오류:",e);
