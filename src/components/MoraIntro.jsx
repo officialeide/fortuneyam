@@ -100,7 +100,7 @@ export default function MoraIntro({ onEnter }) {
   const [isLeap, setIsLeap] = useState(false)
   const [form, setForm] = useState({
     name: "", birthRaw: "", year: "", month: "", day: "",
-    hour: "12", minute: "00", gender: "여", sido: "", sigungu: "", loveStatus: "솔로",
+    hour: "12", minute: "00", gender: "여", sido: "", sigungu: "", loveStatus: "솔로", noTime: false, noPlace: false,
   })
   const [err, setErr] = useState({})
   const timeRef = useRef(null)
@@ -151,8 +151,10 @@ export default function MoraIntro({ onEnter }) {
     if (!form.name.trim()) e.name = "이름을 알려줘"
     const y = parseInt(form.year), m = parseInt(form.month), d = parseInt(form.day)
     if (!form.year || !form.birthRaw || y < 1931 || y > 2030) e.birth = "생년월일 6자리를 입력해줘"
-    if (!form.sido) e.sido = "태어난 곳을 알려줘"
-    if (!form.sigungu) e.sigungu = "시군구를 선택해줘"
+    if (!form.noPlace) {
+      if (!form.sido) e.sido = "태어난 곳을 알려줘"
+      if (!form.sigungu) e.sigungu = "시군구를 선택해줘"
+    }
     if (!Object.keys(e).length && calType === "lunar") {
       const converted = lunarToSolar(y, m, d, isLeap)
       if (!converted) {
@@ -169,12 +171,17 @@ export default function MoraIntro({ onEnter }) {
 
   const handleSubmit = () => {
     if (!validate()) return
-    const sido = form.sido
-    const sigungu = form.sigungu
-    const cityShort = CITY_MAP[sido] || sido.slice(0, 2)
-    const city = sigungu === sido.replace(/특별시|광역시|특별자치시|특별자치도|도/, "").trim()
-      ? cityShort
-      : `${cityShort} ${sigungu}`
+    let city
+    if (form.noPlace) {
+      city = "서울"
+    } else {
+      const sido = form.sido
+      const sigungu = form.sigungu
+      const cityShort = CITY_MAP[sido] || sido.slice(0, 2)
+      city = sigungu === sido.replace(/특별시|광역시|특별자치시|특별자치도|도/, "").trim()
+        ? cityShort
+        : `${cityShort} ${sigungu}`
+    }
 
     onEnter({
       name: form.name,
@@ -186,6 +193,7 @@ export default function MoraIntro({ onEnter }) {
       gender: form.gender === "여" ? "여" : "남",
       city,
       isSolo: form.loveStatus !== "연애중",
+      noTime: form.noTime === true,
     })
   }
 
@@ -325,25 +333,39 @@ export default function MoraIntro({ onEnter }) {
                 ref={timeRef}
                 className="mora-input"
                 type="text" inputMode="numeric"
-                placeholder="태어난 시간  예) 23:28  (모르면 비워도 돼)"
+                placeholder="태어난 시간  예) 23:28"
                 value={form.timeRaw || ""}
                 onChange={e => handleTimeChange(e.target.value)}
                 maxLength={5}
-                style={iStyle(false)}
+                disabled={form.noTime}
+                style={{ ...iStyle(false), opacity: form.noTime ? 0.4 : 1 }}
               />
+              <div
+                onClick={() => up("noTime", !form.noTime)}
+                style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", margin: "4px 2px 0" }}
+              >
+                <span style={{
+                  width: 18, height: 18, borderRadius: 5, flexShrink: 0,
+                  border: `1px solid ${form.noTime ? C.caramel : C.fog}`,
+                  background: form.noTime ? C.mahogany : "transparent",
+                  color: C.sand, fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center",
+                }}>{form.noTime ? "✓" : ""}</span>
+                <span style={{ fontSize: 13, color: C.ash, fontFamily: "sans-serif" }}>태어난 시간을 몰라요 (시주 제외하고 봄)</span>
+              </div>
 
               <select
                 className="mora-select"
                 value={form.sido}
                 onChange={e => { up("sido", e.target.value); up("sigungu", "") }}
-                style={sStyle(!!err.sido)}
+                disabled={form.noPlace}
+                style={{ ...sStyle(!!err.sido), opacity: form.noPlace ? 0.4 : 1 }}
               >
                 <option value="" disabled>태어난 곳  시도 선택</option>
                 {Object.keys(REGIONS).map(s => <option key={s} value={s}>{s}</option>)}
               </select>
               {err.sido && <div style={errStyle}>{err.sido}</div>}
 
-              {form.sido && (
+              {form.sido && !form.noPlace && (
                 <select
                   className="mora-select"
                   value={form.sigungu}
@@ -355,6 +377,19 @@ export default function MoraIntro({ onEnter }) {
                 </select>
               )}
               {err.sigungu && <div style={errStyle}>{err.sigungu}</div>}
+
+              <div
+                onClick={() => up("noPlace", !form.noPlace)}
+                style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", margin: "4px 2px 0" }}
+              >
+                <span style={{
+                  width: 18, height: 18, borderRadius: 5, flexShrink: 0,
+                  border: `1px solid ${form.noPlace ? C.caramel : C.fog}`,
+                  background: form.noPlace ? C.mahogany : "transparent",
+                  color: C.sand, fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center",
+                }}>{form.noPlace ? "✓" : ""}</span>
+                <span style={{ fontSize: 13, color: C.ash, fontFamily: "sans-serif" }}>태어난 곳을 몰라요 (서울 기준으로 봄)</span>
+              </div>
             </div>
           </div>
 
