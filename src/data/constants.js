@@ -123,7 +123,7 @@ const SIBSONG_ROLE={
 // 2. 검증된 일주 엔진 BASE=2451551 (2000-01-07=甲子 확정)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const BASE=2451551;
-const JASI_START=22*60+50; // 야자시 시작 (22:50)
+const JASI_START=23*60;    // 야자시 시작 (23:00, 시각 보정 후 기준)
 const JASI_END=23*60+59;   // 야자시 끝 (23:59)
 function toJDN(y,m,d){const a=Math.floor((14-m)/12),yr=y+4800-a,mo=m+12*a-3;return d+Math.floor((153*mo+2)/5)+365*yr+Math.floor(yr/4)-Math.floor(yr/100)+Math.floor(yr/400)-32045;}
 // 60갑자 인덱스 → 간지 객체 (공통 헬퍼)
@@ -623,7 +623,13 @@ const normO=o=>({Fire:"火",Water:"水"}[o]||o);
 function getSibsong(ilgan,target,isGan=true){
   const ilO=normO(GAN_OE[ilgan]);
   const tO=normO(isGan?GAN_OE[target]:JI_OE[target]);
-  const same=isGan?isYang(ilgan)===isYang(target):isYang(ilgan)===isYangJ(target);
+  // 지지 십성은 지장간 본기(용) 음양으로 판정: 자·오는 음, 사·해는 양으로 반전
+  const _yongYangJ=(j)=>{
+    if(j==="자"||j==="오") return false; // 체는 양이나 용은 음
+    if(j==="사"||j==="해") return true;  // 체는 음이나 용은 양
+    return isYangJ(j);
+  };
+  const same=isGan?isYang(ilgan)===isYang(target):isYang(ilgan)===_yongYangJ(target);
   const gen={木:"火",火:"土",土:"金",金:"水",水:"木"};
   const kek={木:"土",土:"水",水:"火",火:"金",金:"木"};
   if(ilO===tO) return same?"비견":"겁재";
