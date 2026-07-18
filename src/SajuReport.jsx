@@ -269,23 +269,13 @@ JSON만 응답: {"sevenInsight":"..."}`;
       await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
 
       const container=document.createElement("div");
-      container.style.cssText="position:fixed;left:-9999px;top:0;width:480px;background:#0D0A0F;font-family:'Noto Sans KR',sans-serif;padding:16px;box-sizing:border-box;";
+      container.style.cssText="position:fixed;left:-9999px;top:0;width:480px;background:#0D0A0F;font-family:'Noto Sans KR',sans-serif;box-sizing:border-box;";
       document.body.appendChild(container);
 
       const {createRoot}=await import("react-dom/client");
       const ce=React.createElement;
-      const AllTabs=()=>ce("div",{style:{background:"#0D0A0F",display:"flex",flexDirection:"column",gap:16}},
-        ce("div",{style:{textAlign:"center",color:"#C8956C",fontSize:11,letterSpacing:4,padding:"12px 0",fontFamily:"sans-serif"}},`MORA · ${d.name}님의 운명 분석`),
-        ce(TabSummary,{d,changeTab:()=>{}}),
-        ce(TabSaju,{d,reportData}),
-        ce(TabTojung,{d}),
-        ce(TabAstro,{d,parentAstroAI,setParentAstroAI:()=>{},parentTarotAI,setParentTarotAI:()=>{}}),
-        ce(TabMBTI,{d}),
-        ce(TabInner,{d,parentInnerAI,setParentInnerAI:()=>{}}),
-        ce("div",{style:{textAlign:"center",color:"#5C5158",fontSize:10,padding:"12px 0",fontFamily:"sans-serif"}},"✦ Mora · fortuneyam.netlify.app")
-      );
       const root=createRoot(container);
-      await new Promise(res=>{root.render(ce(AllTabs,null));setTimeout(res,1500);});
+      await new Promise(res=>{root.render(ce(MoraReport,{d,onHome:()=>{},onSavePDF:null,pdfLoading:false,pdfMode:true,parentAstroAI,parentTarotAI}));setTimeout(res,1800);});
 
       const canvas=await window.html2canvas(container,{
         scale:2,useCORS:true,allowTaint:true,
