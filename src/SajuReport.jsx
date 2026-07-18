@@ -85,7 +85,7 @@ export default function SajuReport(){
         console.error("buildSajuData 오류:", e);
         setPhase("intro");
         setOpacity(1);
-        alert("분석 중 오류가 발생했어요. 입력값을 확인해주세요.");
+        alert("분석 중 오류가 발생했어. 입력값을 확인해줘.");
         return;
       }
       setReportData(data);
@@ -306,7 +306,7 @@ JSON만 응답: {"sevenInsight":"..."}`;
       pdf.save(`${d.name}_운세종합.pdf`);
     }catch(e){
       console.error("PDF 오류:",e);
-      alert("PDF 저장 중 오류가 발생했어요.");
+      alert("PDF 저장 중 오류가 발생했어.");
     }finally{
       setPdfLoading(false);
     }
