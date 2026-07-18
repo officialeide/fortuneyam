@@ -20,7 +20,7 @@ function calcSinsal(ilgan,yearJi,monthJi,dayJi,timeJi,noTime){
   const dh={해:"자",묘:"자",미:"자",신:"유",자:"유",진:"유",인:"묘",오:"묘",술:"묘",사:"오",유:"오",축:"오"};
   if(dh[dayJi]&&[yearJi,monthJi,timeJi].includes(dh[dayJi]))result.push({name:"도화살",hanja:"桃花殺",found:dh[dayJi],easy:"타고난 자연스러운 흡인력이 있어.",desc:"자신도 모르게 눈에 띄고 기억에 남는 사람이야. 억지로 꾸미지 않아도 끌려오게 되어 있어."});
   const ym={신:"인",자:"인",진:"인",인:"신",오:"신",술:"신",사:"해",유:"해",축:"해",해:"사",묘:"사",미:"사"};
-  if(ym[yearJi]&&[monthJi,dayJi,timeJi].includes(ym[yearJi]))result.push({name:"역마살",hanja:"驛馬殺",found:ym[yearJi],easy:"이동·변화·해외 에너지가 강해.",desc:"한 곳에 오래 머물면 답답해. 움직임 속에서 에너지가 살아나는 구조야."});
+  if(ym[yearJi]&&[monthJi,dayJi,timeJi].includes(ym[yearJi]))result.push({name:"역마살",hanja:"驛馬殺",found:ym[yearJi],easy:"이동, 변화, 해외 에너지가 강해.",desc:"한 곳에 오래 머물면 답답해. 움직임 속에서 에너지가 살아나는 구조야."});
   const hy={갑:"오",을:"오",병:"인",정:"미",무:"진",기:"진",경:"술",신:"유",임:"자",계:"신"};
   if(hy[ilgan]&&[yearJi,monthJi,dayJi,timeJi].includes(hy[ilgan]))result.push({name:"홍염살",hanja:"紅艶殺",found:hy[ilgan],easy:"타고난 매력과 색기가 도는 에너지야.",desc:"본인은 의식하지 않아도 주변에서 먼저 끌려. 관계에서 늘 주목받는 자리에 서게 되는 구조야."});
   const hc=["묘","오","신","미"];
@@ -35,12 +35,12 @@ function calcSinsal(ilgan,yearJi,monthJi,dayJi,timeJi,noTime){
   const taegeuk={갑:["자","오"],을:["자","오"],병:["묘","유"],정:["묘","유"],무:["진","술","축","미"],기:["진","술","축","미"],경:["인","해"],신:["인","해"],임:["사","신"],계:["사","신"]};
   const tgFound=[yearJi,monthJi,dayJi,timeJi].filter(j=>(taegeuk[ilgan]||[]).includes(j));
   if(tgFound.length)result.push({name:"태극귀인",hanja:"太極貴人",found:tgFound.join("·"),easy:"끝을 맺고 완성하는 대기만성의 기운이야.",desc:"한번 붙잡은 것을 끝까지 물고 늘어져 결국 완성해내. 늦게라도 크게 이루는 힘이 있어."});
-  // 천의성 (월지 바로 앞 지지) — 의료·치유의 별
+  // 천의성 (월지 바로 앞 지지) — 의료, 치유의 별
   const _jiOrder=["자","축","인","묘","진","사","오","미","신","유","술","해"];
   const _mi=_jiOrder.indexOf(monthJi);
   const cheonui=_mi>=0?_jiOrder[(_mi+11)%12]:null;
   if(cheonui&&[yearJi,dayJi,timeJi].includes(cheonui))result.push({name:"천의성",hanja:"天醫星",found:cheonui,easy:"남을 살리고 돌보는 치유의 기운이야.",desc:"의료, 상담, 돌봄 쪽으로 타고난 감각이 있어. 사람을 낫게 하고 어루만지는 자리에서 빛나."});
-  // 관귀학관 (일간 기준) — 관운·학문의 별
+  // 관귀학관 (일간 기준) — 관운, 학문의 별
   const gwan={갑:"사",을:"사",병:"신",정:"신",무:"해",기:"해",경:"인",신:"인",임:"신",계:"신"};
   if(gwan[ilgan]&&[yearJi,monthJi,dayJi,timeJi].includes(gwan[ilgan]))result.push({name:"관귀학관",hanja:"官貴學館",found:gwan[ilgan],easy:"학문과 관직으로 이름을 얻는 기운이야.",desc:"공부와 시험, 자격, 승진 쪽으로 힘이 실려. 배움을 통해 자리를 잡는 구조야."});
   return result;
@@ -66,7 +66,7 @@ const SINSAL12_DESC={
   반안살:{hanja:"攀鞍殺",easy:"말안장에 오르는 출세의 자리야.",desc:"승진, 합격, 인정이 따라붙는 기운이야. 실력을 쌓아두면 결정적인 순간에 자리가 열려. 겸손하게 때를 기다리는 자가 크게 올라타."},
   역마살:{hanja:"驛馬殺",easy:"쉼 없이 움직이는 자리야.",desc:"이동, 여행, 해외의 기운이 강해. 한 곳에 묶이면 시들고, 움직일수록 살아나. 변화를 두려워하지 말고 올라타."},
   육해살:{hanja:"六害殺",easy:"발목 잡히고 얽매이는 자리야.",desc:"건강이나 관계에서 은근히 소모되기 쉬워. 근데 그만큼 눈치가 빠르고 위기를 미리 감지해. 무리하지 말고 몸과 마음을 먼저 챙겨."},
-  화개살:{hanja:"華蓋殺",easy:"홀로 깊어지는 예술과 수행의 자리야.",desc:"고독을 견디는 힘 속에서 재능이 피어나. 예술, 학문, 종교, 영성 쪽으로 타고난 깊이가 있어. 외로움이 곧 이 사람의 무기야."},
+  화개살:{hanja:"華蓋殺",easy:"홀로 깊어지는 예술과 수행의 자리야.",desc:"고독을 견디는 힘 속에서 재능이 피어나. 예술, 학문, 종교, 영성 쪽으로 타고난 깊이가 있어. 외로움이 곧 이 사주의 무기야."},
 };
 function calc12Sinsal(baseJi, targetJi){
   const start=SINSAL12_START[baseJi];
@@ -94,6 +94,32 @@ const STAGE12_DESC={
   "양(養)":{easy:"품에서 길러지는 자리야.",desc:"온순하고 낙천적이야. 사람들 사이에서 무난하게 어울리며 도움을 잘 받아. 큰 굴곡 없이 꾸준히 자라나는 안정적인 기운이야."},
 };
 
+// ━━ 십성 10종 성격, 재능 해석 (유료 분석용) ━━
+const SIBSONG_CHAR={
+  비견:{key:"비견",label:"자립과 주체성",desc:"내 힘으로 서는 기운이야. 남한테 기대는 걸 싫어하고, 내 방식대로 밀고 나가는 뚝심이 있어. 독립심과 추진력이 강한 대신, 고집이 세지고 남과 부딪히기도 쉬워. 동업이나 공동 작업에선 주도권 다툼을 조심해야 해."},
+  겁재:{key:"겁재",label:"경쟁과 승부욕",desc:"지기 싫어하는 승부의 기운이야. 목표가 생기면 물불 안 가리고 달려들어. 추진력과 배짱이 남다른 대신, 욕심이 앞서면 무리하다 손해를 봐. 돈 관리랑 사람 관계에서 특히 절제가 필요해."},
+  식신:{key:"식신",label:"표현과 여유",desc:"타고난 표현력과 여유의 기운이야. 먹고 즐기고 만들어내는 걸 좋아하고, 재능을 자연스럽게 펼쳐. 사람들을 편하게 만드는 매력이 있어. 다만 편한 걸 좇다 나태해지기 쉬우니, 꾸준함을 붙잡아야 해."},
+  상관:{key:"상관",label:"창의와 재능",desc:"틀을 깨는 창의의 기운이야. 머리가 빠르고 말재주, 손재주가 뛰어나. 남들이 못 보는 걸 만들어내는 재능이 있어. 대신 기존 질서나 권위랑 부딪히기 쉽고, 말이 앞서면 구설에 오르니 조심해야 해."},
+  편재:{key:"편재",label:"기회와 확장",desc:"큰 판을 보는 재물의 기운이야. 돈 냄새를 잘 맡고, 기회를 포착하는 감각이 뛰어나. 활동적이고 사교적이라 사람과 돈이 모여. 다만 벌인 만큼 나가기도 쉬우니, 욕심을 절제하고 마무리를 챙겨야 해."},
+  정재:{key:"정재",label:"안정과 축적",desc:"착실하게 쌓는 재물의 기운이야. 성실하고 계획적이라, 꾸준한 노력이 확실한 결실로 쌓여. 현실 감각과 관리 능력이 뛰어나. 대신 지나치면 인색해지거나 새로운 도전을 두려워할 수 있어."},
+  편관:{key:"편관",label:"도전과 카리스마",desc:"압박을 이겨내는 강단의 기운이야. 위기 앞에서 오히려 강해지고, 결단력과 카리스마가 있어. 책임이 무거운 자리를 감당해내. 대신 스스로를 몰아붙이다 지치기 쉽고, 욱하는 성질을 다스려야 해."},
+  정관:{key:"정관",label:"명예와 책임",desc:"원칙과 명예의 기운이야. 규칙을 지키고 책임을 다하는 반듯함이 있어. 조직과 사회에서 신뢰받고 자리를 잡는 힘이 강해. 대신 지나치면 융통성이 없고, 체면에 얽매여 스스로를 옭아맬 수 있어."},
+  편인:{key:"편인",label:"직관과 재충전",desc:"남다른 직관의 기운이야. 독특한 관점으로 세상을 보고, 한 분야를 깊이 파고들어. 예술, 학문, 영성 쪽 감각이 뛰어나. 대신 생각이 많아 실행이 늦고, 혼자만의 세계에 빠지기 쉬워."},
+  정인:{key:"정인",label:"배움과 보호",desc:"받아들이고 품는 기운이야. 배움이 깊고, 어질고 따뜻해서 주변의 신뢰와 도움을 받아. 문서, 자격, 학문 운이 좋아. 대신 의존적이 되거나, 받는 데 익숙해져 결단이 늦어질 수 있어."},
+};
+function analyzeSibsong(pillars, noTime){
+  const cnt={};
+  const cols=noTime?pillars.slice(0,3):pillars;
+  cols.forEach(p=>{
+    for(const s of [p.gan.sibsong,p.ji.sibsong]){
+      if(s&&s!=="일간") cnt[s]=(cnt[s]||0)+1;
+    }
+  });
+  // 개수 많은 순 상위 3개
+  const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
+  const top=sorted.slice(0,3).map(([name,n])=>({...(SIBSONG_CHAR[name]||{key:name,label:name,desc:""}),count:n}));
+  return {counts:cnt, top};
+}
 
 function calcLifePath(y,m,d){
   const s=[...String(y),...String(m).padStart(2,"0"),...String(d).padStart(2,"0")].map(Number).reduce((a,b)=>a+b,0);
@@ -181,19 +207,19 @@ function buildSajuData(input){
   // 12신살 (연지 기준 삼합국) — 각 기둥 지지에 배치
   const _yJi=yeonju.ji.ko;
   const sinsal12=[
-    {pos:"연지",label:"조상·초년",ji:_yJi,name:calc12Sinsal(_yJi,_yJi)},
-    {pos:"월지",label:"부모·청년",ji:wolju.ji.ko,name:calc12Sinsal(_yJi,wolju.ji.ko)},
-    {pos:"일지",label:"자신·중년",ji:ilju.ji.ko,name:calc12Sinsal(_yJi,ilju.ji.ko)},
-    ...(noTime?[]:[{pos:"시지",label:"자녀·말년",ji:siJi,name:calc12Sinsal(_yJi,siJi)}]),
+    {pos:"연지",label:"조상, 초년",ji:_yJi,name:calc12Sinsal(_yJi,_yJi)},
+    {pos:"월지",label:"부모, 청년",ji:wolju.ji.ko,name:calc12Sinsal(_yJi,wolju.ji.ko)},
+    {pos:"일지",label:"자신, 중년",ji:ilju.ji.ko,name:calc12Sinsal(_yJi,ilju.ji.ko)},
+    ...(noTime?[]:[{pos:"시지",label:"자녀, 말년",ji:siJi,name:calc12Sinsal(_yJi,siJi)}]),
   ].filter(s=>s.name).map(s=>({...s,...(SINSAL12_DESC[s.name]||{})}));
 
   // 12운성 (일간 기준 각 지지)
   const _stage=(jji)=>{const st=getStage(ilgan,jji);return st;};
   const unseong12=[
-    {pos:"연지",label:"조상·초년",ji:_yJi,stage:_stage(_yJi)},
-    {pos:"월지",label:"부모·청년",ji:wolju.ji.ko,stage:_stage(wolju.ji.ko)},
-    {pos:"일지",label:"자신·중년",ji:ilju.ji.ko,stage:_stage(ilju.ji.ko)},
-    ...(noTime?[]:[{pos:"시지",label:"자녀·말년",ji:siJi,stage:_stage(siJi)}]),
+    {pos:"연지",label:"조상, 초년",ji:_yJi,stage:_stage(_yJi)},
+    {pos:"월지",label:"부모, 청년",ji:wolju.ji.ko,stage:_stage(wolju.ji.ko)},
+    {pos:"일지",label:"자신, 중년",ji:ilju.ji.ko,stage:_stage(ilju.ji.ko)},
+    ...(noTime?[]:[{pos:"시지",label:"자녀, 말년",ji:siJi,stage:_stage(siJi)}]),
   ].filter(s=>s.stage).map(s=>({...s,...(STAGE12_DESC[s.stage]||{})}));
 
 
@@ -247,7 +273,7 @@ function buildSajuData(input){
   })();
   const startAge=calcDaeunStartAge;
   const wGi=GL.indexOf(wolju.gan.ko),wJi=JL.indexOf(wolju.ji.ko);
-  // 용신/희신/기신 오행 리스트 (대운 역할·세운 점수에 사용)
+  // 용신/희신/기신 오행 리스트 (대운 역할, 세운 점수에 사용)
   const yongDB0=YONGSIN_TABLE[ilO]||YONGSIN_TABLE["土"];
   const vsKey0=monthHelps?"strong":"weak";
   const parseO=str=>(str||"").replace(/[^가-힣·]/g,"").split("·").map(x=>x.trim()).filter(o=>["목","화","토","금","수"].includes(o));
@@ -359,7 +385,7 @@ function buildSajuData(input){
     {axis:`${_fWins?"F (감정)":"T (사고)"}`,score:_fBlend>=50?_fBlend:100-_fBlend,
       basis:`천간 음간 ${_eumCnt}개 vs 양간 ${_yangCnt}개, ${_isSingang?"에너지가 강한 신강":"에너지가 약한 신약"} 구조 반영이야.`},
     {axis:`${_jWins?"J (판단)":"P (인식)"}`,score:_jBlend>=50?_jBlend:100-_jBlend,
-      basis:`태어난 날의 지지 십이운성 ${_iljiStage} (60%), 태어난 달 천간 ${wolju.gan.ko}(${_monthGanYang?"양간·주도적":"음간·수용적"}) (40%) 반영이야.`},
+      basis:`태어난 날의 지지 십이운성 ${_iljiStage} (60%), 태어난 달 천간 ${wolju.gan.ko}(${_monthGanYang?"양간, 주도적":"음간, 수용적"}) (40%) 반영이야.`},
   ];
   // 타로 연도별 개인연도수
   function getPersonalYear(yr){
@@ -387,14 +413,14 @@ function buildSajuData(input){
   });
   // 생명경로수 타로 카드
   const LP_CARDS={1:"마법사(The Magician)",2:"고위여사제(High Priestess)",3:"황후(The Empress)",4:"황제(The Emperor)",5:"교황(The Hierophant)",6:"연인(The Lovers)",7:"전차(The Chariot)",8:"힘(Strength)",9:"은둔자(The Hermit)",11:"정의(Justice)",22:"위대한 건축가"};
-  const LP_DESC2={1:"의지와 실행으로 아이디어를 현실로 만드는 마법사야.",2:"보이지 않는 것을 읽어내는 직관과 신비의 조율자야.",3:"무언가를 낳고 키우고 표현하는 게 삶의 핵심인 창조자야.",4:"꾸준히 쌓아 탑을 세우는 질서와 체계의 황제야.",5:"경험을 통해 성장하는 자유와 변화의 모험가야.",6:"관계 속에서 꽃피는 책임과 사랑의 조력자야.",7:"깊이 파고들어 본질을 캐내는 탐구와 지혜의 분석가야.",8:"현실적인 성공을 향해 밀어붙이는 힘과 성취의 사람이야.",9:"세상에 나눠주고 마무리 짓는 완성과 봉사의 사람이야.",11:"특별한 사명을 품은 영감과 이상의 마스터 넘버야.",22:"꿈을 현실의 구조로 세우는 대건축가의 마스터 넘버야.",33:"조건 없는 사랑으로 세상을 품는 마스터 넘버야."};
+  const LP_DESC2={1:"의지와 실행으로 아이디어를 현실로 만드는 마법사 카드야.",2:"보이지 않는 것을 읽어내는 직관과 신비의 고위여사제 카드야.",3:"무언가를 낳고 키우고 표현하는 게 삶의 핵심인 황후 카드야.",4:"꾸준히 쌓아 탑을 세우는 질서와 체계의 황제 카드야.",5:"경험을 통해 성장하는 자유와 변화의 교황 카드야.",6:"관계 속에서 꽃피는 책임과 사랑의 연인 카드야.",7:"깊이 파고들어 본질을 캐내는 탐구와 지혜의 전차 카드야.",8:"현실적인 성공을 향해 밀어붙이는 힘과 성취의 힘 카드야.",9:"세상에 나눠주고 마무리 짓는 완성과 봉사의 은둔자 카드야.",11:"특별한 사명을 품은 영감과 이상의 정의 카드야. 마스터 넘버라 기운이 특히 강해.",22:"꿈을 현실의 구조로 세우는 대건축가 카드야. 마스터 넘버라 그릇이 남달라.",33:"조건 없는 사랑으로 세상을 품는 마스터 넘버 카드야."};
   const lifePathCard=LP_CARDS[lp]||`${lp}번 카드`;
   const lifePathDesc=LP_DESC2[lp]||`생명경로수 ${lp}번의 에너지야.`;
   // 영혼 카드 긴 설명 (성취 카드와 유사한 분량)
   const SOUL_DESC={
     1:"내면 깊은 곳에 '내 힘으로 무언가를 시작하고 싶다'는 강한 의지가 자리해. 누군가 정해준 길을 따라가기보다, 스스로 첫 발자국을 찍을 때 비로소 살아있음을 느끼는 영혼이야. 혼자 결정하고 책임지는 것을 두려워하지 않고, 오히려 그 과정에서 자신의 본질을 확인해. 다만 모든 걸 혼자 짊어지려다 지칠 수 있으니, 의지할 줄 아는 것도 성장의 일부야.",
     2:"겉으로 드러내기보다 조용히 느끼고 헤아리는 데서 안정을 얻는 영혼이야. 말로 다 표현되지 않는 미묘한 감정과 분위기를 예민하게 감지하고, 사람과 사람 사이를 부드럽게 잇는 역할에서 깊은 보람을 느껴. 직관이 곧 나침반이라, 머리로 따지기 전에 마음이 먼저 답을 알아. 다만 타인의 감정에 너무 깊이 물들지 않도록 자기만의 중심을 지키는 것이 중요해.",
-    3:"무언가를 만들어내고 표현할 때 영혼이 가장 환하게 빛나. 감정과 생각을 안에만 담아두면 답답해지고, 그것을 말·글·작품·관계로 풀어낼 때 비로소 자유로워져. 사람들을 즐겁게 하고 분위기를 살리는 타고난 감각이 있어. 다만 가볍게 흩어지기 쉬운 에너지라, 하나에 깊이 몰입하는 연습이 더 큰 결실을 만들어줘.",
+    3:"무언가를 만들어내고 표현할 때 영혼이 가장 환하게 빛나. 감정과 생각을 안에만 담아두면 답답해지고, 그것을 말·글·작품, 관계로 풀어낼 때 비로소 자유로워져. 사람들을 즐겁게 하고 분위기를 살리는 타고난 감각이 있어. 다만 가볍게 흩어지기 쉬운 에너지라, 하나에 깊이 몰입하는 연습이 더 큰 결실을 만들어줘.",
     4:"질서와 안정 속에서 마음이 편안해지는 영혼이야. 단단한 기초를 다지고 하나하나 쌓아 올릴 때 깊은 만족을 느끼고, 약속과 책임을 지키는 것에서 자기 가치를 확인해. 화려함보다 꾸준함, 즉흥보다 계획을 신뢰하는 성실한 본성이 있어. 다만 너무 틀에 갇히면 숨이 막힐 수 있으니, 가끔은 변화를 허용하는 유연함이 필요해.",
     5:"자유롭게 움직이고 새로운 것을 경험할 때 영혼이 숨을 쉬어. 한 자리에 오래 묶여 있으면 답답함을 느끼고, 변화와 모험 속에서 자신을 발견하는 타입이야. 호기심이 넘쳐 다양한 세계를 탐험하며 끊임없이 성장해. 다만 모든 가능성을 열어두려다 정작 깊이 뿌리내리지 못할 수 있으니, 진짜 중요한 것에는 머무를 줄 아는 지혜가 필요해.",
     6:"사랑하고 보살피는 관계 속에서 영혼이 완성되는 타입이야. 가까운 사람을 챙기고 책임지는 데서 깊은 의미를 찾고, 따뜻함과 조화를 만들어내는 능력이 탁월해. 누군가에게 기댈 곳이 되어줄 때 가장 자기다움을 느껴. 다만 타인을 위하느라 자신을 잃지 않도록, 나를 돌보는 것도 사랑임을 기억하는 게 중요해.",
@@ -454,7 +480,7 @@ function buildSajuData(input){
   // ━━ 세운 점수 메타 sajaDB, ichingData, dansajuPillars 모두 정의된 후에 계산 ━━
   const curDaeun=daeun.find(dv=>dv.cur);
   const TOJUNG_BONUS={"일출동방(日出東方)":5,"입신양명(立身揚名)":5,"순풍거범(順風擧帆)":4,"고목봉춘(枯木逢春)":4,"대기만성(大器晩成)":3,"운개견일(雲開見日)":3,"금상첨화(錦上添花)":2,"고진감래(苦盡甘來)":2};
-  const ICHING_BONUS_MAP={"완성·성취·균형의 유지":3,"형통·소통·막힘이 뚫림":3,"포용·수용·대지의 힘":3,"기쁨·열정·준비된 행동":3,"연대·협력·친밀한 관계":2,"해방·풀림·막혔던 것이 해소":2,"회복·새 출발·본래로 돌아감":2,"기다림·준비·때를 기다리는 지혜":1,"조직·리더십·군중을 이끄는 힘":1,"어려운 탄생·씨앗·고통 뒤의 성장":-2,"위험·도전·거듭되는 시련":-3,"빛이 가려짐·인내·내면의 빛을 지킴":-2};
+  const ICHING_BONUS_MAP={"완성, 성취, 균형의 유지":3,"형통, 소통, 막힘이 뚫림":3,"포용, 수용, 대지의 힘":3,"기쁨, 열정, 준비된 행동":3,"연대, 협력, 친밀한 관계":2,"해방, 풀림, 막혔던 것이 해소":2,"회복·새 출발, 본래로 돌아감":2,"기다림, 준비, 때를 기다리는 지혜":1,"조직, 리더십, 군중을 이끄는 힘":1,"어려운 탄생, 씨앗, 고통 뒤의 성장":-2,"위험, 도전, 거듭되는 시련":-3,"빛이 가려짐, 인내, 내면의 빛을 지킴":-2};
   const STAGE_BONUS={"장생(長生)":3,"관대(冠帶)":2,"건록(建祿)":3,"제왕(帝旺)":3,"목욕(沐浴)":1,"쇠(衰)":-1,"병(病)":-2,"사(死)":-2,"묘(墓)":-1,"절(絶)":-3,"태(胎)":1,"양(養)":2};
   const pyNow=(()=>{const digits=[...String(CY),...String(m).padStart(2,"0"),...String(d).padStart(2,"0")].map(Number);let sv=digits.reduce((a,b)=>a+b,0);while(sv>9&&![11,22,33].includes(sv))sv=String(sv).split("").reduce((a,b)=>a+parseInt(b),0);return sv;})();
   const scoreMeta={
@@ -514,6 +540,7 @@ function buildSajuData(input){
   return{
     name,birth:`양력 ${y}년 ${m}월 ${d}일 ${rawH}시 ${String(rawM).padStart(2,"0")}분 ${city}`,gender,
     isSolo: input?.isSolo !== false,
+    joinDate: input?.joinDate || null,
     personaTitle,scoreMeta:scoreMetaSaju,
     boundary:{...bnd,isBoundary:bnd.inBoundary,
       stdIlju:ilju.ko, midIlju:iljuB.ko,
@@ -562,12 +589,12 @@ function buildSajuData(input){
         return `${charConclusion}\n\n${todayPart} ${hlPart}`;
       })(),
     },
-    sinsal,sinsal12,unseong12,noTime,hap:hapChungHyeong.hap,hyeong:hapChungHyeong.hyeong,chung:hapChungHyeong.chung,
+    sinsal,sinsal12,unseong12,sibsongAnalysis:analyzeSibsong(pillars,noTime),noTime,hap:hapChungHyeong.hap,hyeong:hapChungHyeong.hyeong,chung:hapChungHyeong.chung,
     daeun,daeunStart:startAge,daeunDir:forward?"순행(順行)":"역행(逆行)",
     dansaju:{pillars:dansajuPillars,overall:dansajuOverall,yearFlow:dansajuYearFlow},
     iching:{bonmyeonggae:ichingData.name,gaeSymbol:ichingData.symbol||"☯",gaeNum:ichingData.num||0,gaeUpper:`${TRIGRAM[domO_kor]||""}·${domO_kor}`,gaeLower:`${TRIGRAM[relO_kor]||""}·${relO_kor}(관성)`,gaeUpperO:domOForIching,gaeLowerO:relO,gaeDesc:ichingData.desc,gaeNature:ichingData.nature,currentGae:ichingData.currentGae||"분석 중",currentYear:`${CY}년`,currentDesc:ichingData.currentDesc||"",strategy:ichingData.strategy||[],yearFlow:ichingYearFlow},
     tojung:{sang,jung,ha,saja:sajaDB.saja,sajaDesc:sajaDB.desc,bonun:sajaDB.saja,bonunDesc:sajaDB.desc,yearFlow:tojungYearFlow,month2026:tojungMonth2026},
-    astro:{sun:"분석 중",moon:"분석 중",asc:"분석 중",mercury:"분석 중",venus:"분석 중",mars:"분석 중",sunMeaning:"의식적 자아",moonMeaning:"감정·본능",ascMeaning:"첫인상",sunDesc:"점성술 분석 중이야.",moonDesc:"점성술 분석 중이야.",ascDesc:"점성술 분석 중이야.",mercuryDesc:"분석 중",venusDesc:"분석 중",marsDesc:"분석 중",triangle:"",stellium:"",yearTransit:[]},
+    astro:{sun:"분석 중",moon:"분석 중",asc:"분석 중",mercury:"분석 중",venus:"분석 중",mars:"분석 중",sunMeaning:"의식적 자아",moonMeaning:"감정, 본능",ascMeaning:"첫인상",sunDesc:"점성술 분석 중이야.",moonDesc:"점성술 분석 중이야.",ascDesc:"점성술 분석 중이야.",mercuryDesc:"분석 중",venusDesc:"분석 중",marsDesc:"분석 중",triangle:"",stellium:"",yearTransit:[]},
     tarot:{lifePath:lp,isMaster:[11,22,33].includes(lp),lifePathCard,lifePathCardNum:String(lp),lifePathDesc,soulCard:LP_CARDS[lp]||"분석 중",achieveCard:LP_CARDS[(lp+1)>9?1:lp+1]||"분석 중",soulDesc:soulDesc_val,achieveDesc:"성취 에너지 분석 중이야.",calc,yearCards},
     daynight:{overview:`${stripLead(ilganDB.core)} ${singang==="신강(身强)"?"강한 에너지를 가진 만큼, 그것을 흘려보내는 방법을 찾는 것이 중요해.":"내면의 에너지를 충전하는 루틴이 필요해."}`,
       day:{impression:dn_day.impression||"",mask:dn_day.mask||"",styling:{hair:"",fashion:"",color:"",makeup:"",perfume:""}},
