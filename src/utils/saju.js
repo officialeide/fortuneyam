@@ -20,6 +20,13 @@ function calcSinsal(ilgan,yearJi,monthJi,dayJi,timeJi){
   if(dh[dayJi]&&[yearJi,monthJi,timeJi].includes(dh[dayJi]))result.push({name:"도화살",hanja:"桃花殺",found:dh[dayJi],easy:"타고난 자연스러운 흡인력이 있어.",desc:"자신도 모르게 눈에 띄고 기억에 남는 사람이야. 억지로 꾸미지 않아도 끌려오게 되어 있어."});
   const ym={신:"인",자:"인",진:"인",인:"신",오:"신",술:"신",사:"해",유:"해",축:"해",해:"사",묘:"사",미:"사"};
   if(ym[yearJi]&&[monthJi,dayJi,timeJi].includes(ym[yearJi]))result.push({name:"역마살",hanja:"驛馬殺",found:ym[yearJi],easy:"이동·변화·해외 에너지가 강해.",desc:"한 곳에 오래 머물면 답답해. 움직임 속에서 에너지가 살아나는 구조야."});
+  const hy={갑:"오",을:"오",병:"인",정:"미",무:"진",기:"진",경:"술",신:"유",임:"자",계:"신"};
+  if(hy[ilgan]&&[yearJi,monthJi,dayJi,timeJi].includes(hy[ilgan]))result.push({name:"홍염살",hanja:"紅艶殺",found:hy[ilgan],easy:"타고난 매력과 색기가 도는 에너지야.",desc:"본인은 의식하지 않아도 주변에서 먼저 끌려. 관계에서 늘 주목받는 자리에 서게 되는 구조야."});
+  const hc=["묘","오","신","미"];
+  if(hc.includes(dayJi)&&(hc.includes(monthJi)||hc.includes(yearJi)))result.push({name:"현침살",hanja:"懸針殺",found:dayJi,easy:"예리하고 정확한 판단력을 타고났어.",desc:"바늘처럼 날카롭게 핵심을 짚어내는 힘이 있어. 말과 판단이 정확한 대신, 그만큼 스스로에게도 엄격해지기 쉬워."});
+  const cw=["해","축","인","사","신","술"];
+  const cwCount=[yearJi,monthJi,dayJi,timeJi].filter(j=>cw.includes(j)).length;
+  if(cwCount>=2)result.push({name:"천문성",hanja:"天門星",found:`${cwCount}개`,easy:"직관과 영감이 예민하게 열려 있어.",desc:"보이지 않는 흐름을 먼저 감지하는 감각이 있어. 종교, 철학, 치유, 상담 쪽 기운과 잘 통하는 구조야."});
   return result;
 }
 
@@ -295,7 +302,7 @@ function buildSajuData(input){
   const SOUL_DESC={
     1:"내면 깊은 곳에 '내 힘으로 무언가를 시작하고 싶다'는 강한 의지가 자리해. 누군가 정해준 길을 따라가기보다, 스스로 첫 발자국을 찍을 때 비로소 살아있음을 느끼는 영혼이야. 혼자 결정하고 책임지는 것을 두려워하지 않고, 오히려 그 과정에서 자신의 본질을 확인해. 다만 모든 걸 혼자 짊어지려다 지칠 수 있으니, 의지할 줄 아는 것도 성장의 일부야.",
     2:"겉으로 드러내기보다 조용히 느끼고 헤아리는 데서 안정을 얻는 영혼이야. 말로 다 표현되지 않는 미묘한 감정과 분위기를 예민하게 감지하고, 사람과 사람 사이를 부드럽게 잇는 역할에서 깊은 보람을 느껴. 직관이 곧 나침반이라, 머리로 따지기 전에 마음이 먼저 답을 알아. 다만 타인의 감정에 너무 깊이 물들지 않도록 자기만의 중심을 지키는 것이 중요해.",
-    3:"무언가를 만들어내고 표현할 때 영혼이 가장 환하게 빛나. 감정과 생각을 안에만 담아두면 답답해지고, 그것을 말·글·작품·관계로 풀어낼 때 비로소 자유로워져요. 사람들을 즐겁게 하고 분위기를 살리는 타고난 감각이 있어. 다만 가볍게 흩어지기 쉬운 에너지라, 하나에 깊이 몰입하는 연습이 더 큰 결실을 만들어줘.",
+    3:"무언가를 만들어내고 표현할 때 영혼이 가장 환하게 빛나. 감정과 생각을 안에만 담아두면 답답해지고, 그것을 말·글·작품·관계로 풀어낼 때 비로소 자유로워져. 사람들을 즐겁게 하고 분위기를 살리는 타고난 감각이 있어. 다만 가볍게 흩어지기 쉬운 에너지라, 하나에 깊이 몰입하는 연습이 더 큰 결실을 만들어줘.",
     4:"질서와 안정 속에서 마음이 편안해지는 영혼이야. 단단한 기초를 다지고 하나하나 쌓아 올릴 때 깊은 만족을 느끼고, 약속과 책임을 지키는 것에서 자기 가치를 확인해. 화려함보다 꾸준함, 즉흥보다 계획을 신뢰하는 성실한 본성이 있어. 다만 너무 틀에 갇히면 숨이 막힐 수 있으니, 가끔은 변화를 허용하는 유연함이 필요해.",
     5:"자유롭게 움직이고 새로운 것을 경험할 때 영혼이 숨을 쉬어. 한 자리에 오래 묶여 있으면 답답함을 느끼고, 변화와 모험 속에서 자신을 발견하는 타입이야. 호기심이 넘쳐 다양한 세계를 탐험하며 끊임없이 성장해. 다만 모든 가능성을 열어두려다 정작 깊이 뿌리내리지 못할 수 있으니, 진짜 중요한 것에는 머무를 줄 아는 지혜가 필요해.",
     6:"사랑하고 보살피는 관계 속에서 영혼이 완성되는 타입이야. 가까운 사람을 챙기고 책임지는 데서 깊은 의미를 찾고, 따뜻함과 조화를 만들어내는 능력이 탁월해. 누군가에게 기댈 곳이 되어줄 때 가장 자기다움을 느껴. 다만 타인을 위하느라 자신을 잃지 않도록, 나를 돌보는 것도 사랑임을 기억하는 게 중요해.",
@@ -414,6 +421,7 @@ function buildSajuData(input){
 
   return{
     name,birth:`양력 ${y}년 ${m}월 ${d}일 ${rawH}시 ${String(rawM).padStart(2,"0")}분 ${city}`,gender,
+    isSolo: input?.isSolo !== false,
     personaTitle,scoreMeta:scoreMetaSaju,
     boundary:{...bnd,isBoundary:bnd.inBoundary,
       standardDesc:`${stripLead(ILJU_CHAR[iljuKey])||OHK[ilO]+" 기운의 일주야."} ${stripLead(ilganDB.core)}`,
@@ -468,7 +476,7 @@ function buildSajuData(input){
     tojung:{sang,jung,ha,saja:sajaDB.saja,sajaDesc:sajaDB.desc,bonun:sajaDB.saja,bonunDesc:sajaDB.desc,yearFlow:tojungYearFlow,month2026:tojungMonth2026},
     astro:{sun:"분석 중",moon:"분석 중",asc:"분석 중",mercury:"분석 중",venus:"분석 중",mars:"분석 중",sunMeaning:"의식적 자아",moonMeaning:"감정·본능",ascMeaning:"첫인상",sunDesc:"점성술 분석 중이야.",moonDesc:"점성술 분석 중이야.",ascDesc:"점성술 분석 중이야.",mercuryDesc:"분석 중",venusDesc:"분석 중",marsDesc:"분석 중",triangle:"",stellium:"",yearTransit:[]},
     tarot:{lifePath:lp,isMaster:[11,22,33].includes(lp),lifePathCard,lifePathCardNum:String(lp),lifePathDesc,soulCard:LP_CARDS[lp]||"분석 중",achieveCard:LP_CARDS[(lp+1)>9?1:lp+1]||"분석 중",soulDesc:soulDesc_val,achieveDesc:"성취 에너지 분석 중이야.",calc,yearCards},
-    daynight:{overview:`${ilganDB.core} ${singang==="신강(身强)"?"강한 에너지를 가진 만큼, 그것을 흘려보내는 방법을 찾는 것이 중요해.":"내면의 에너지를 충전하는 루틴이 필요해."}`,
+    daynight:{overview:`${stripLead(ilganDB.core)} ${singang==="신강(身强)"?"강한 에너지를 가진 만큼, 그것을 흘려보내는 방법을 찾는 것이 중요해.":"내면의 에너지를 충전하는 루틴이 필요해."}`,
       day:{impression:dn_day.impression||"",mask:dn_day.mask||"",styling:{hair:"",fashion:"",color:"",makeup:"",perfume:""}},
       night:{desire:dn_night.desire||"",desire2:dn_night.desire2||"",triggers:dn_night.triggers||[],attraction:dn_night.attraction||"",idealType:dn_night.idealType||"",idealType2:dn_night.idealType2||""}},
     mbti:{estimated:mbtiType,userType:input?.mbti||"",basis:mbtiDesc,axes:mbtiAxes,borderline:`${mbtiType[2]==='F'?'F':'T'}↔${mbtiType[2]==='F'?'T':'F'} 경계: 상황에 따라 유연하게 전환돼.`,strengths:ilganDB.strengths||[`${OHK[ilO]} 일간의 강점이 발휘되는 환경에서 최고의 실력이 나와.`],challenges:ilganDB.challenges||[`용신 ${yongsinA_val} 기운이 부족하면 균형이 깨질 수 있어.`],bestEnv:ilganDB.bestEnv||`${OHK[ilO]} 에너지가 잘 발휘되는 환경이야.`,recovery:ilganDB.recovery||`용신인 ${yongsinA_val}를 활용한 루틴이 도움이 돼.`},
