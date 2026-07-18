@@ -100,7 +100,7 @@ export default function MoraIntro({ onEnter }) {
   const [isLeap, setIsLeap] = useState(false)
   const [form, setForm] = useState({
     name: "", birthRaw: "", year: "", month: "", day: "",
-    hour: "12", minute: "00", gender: "여", sido: "", sigungu: "", loveStatus: "솔로", noTime: false, noPlace: false,
+    hour: "12", minute: "00", gender: "여", sido: "", sigungu: "", loveStatus: "솔로", noTime: false, noPlace: false, joinRaw: "",
   })
   const [err, setErr] = useState({})
   const timeRef = useRef(null)
@@ -194,6 +194,13 @@ export default function MoraIntro({ onEnter }) {
       city,
       isSolo: form.loveStatus !== "연애중",
       noTime: form.noTime === true,
+      joinDate: (() => {
+        const m = (form.joinRaw || "").match(/(\d{4})\.?(\d{1,2})?/)
+        if (!m) return null
+        const jy = parseInt(m[1]); const jmo = m[2] ? parseInt(m[2]) : 1
+        if (jy < 1950 || jy > 2035) return null
+        return { year: jy, month: jmo }
+      })(),
     })
   }
 
@@ -350,7 +357,7 @@ export default function MoraIntro({ onEnter }) {
                   background: form.noTime ? C.mahogany : "transparent",
                   color: C.sand, fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center",
                 }}>{form.noTime ? "✓" : ""}</span>
-                <span style={{ fontSize: 13, color: C.ash, fontFamily: "sans-serif" }}>태어난 시간을 몰라요 (시주 제외하고 봄)</span>
+                <span style={{ fontSize: 13, color: C.ash, fontFamily: "sans-serif" }}>태어난 시간을 몰라요</span>
               </div>
 
               <select
@@ -388,7 +395,7 @@ export default function MoraIntro({ onEnter }) {
                   background: form.noPlace ? C.mahogany : "transparent",
                   color: C.sand, fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center",
                 }}>{form.noPlace ? "✓" : ""}</span>
-                <span style={{ fontSize: 13, color: C.ash, fontFamily: "sans-serif" }}>태어난 곳을 몰라요 (서울 기준으로 봄)</span>
+                <span style={{ fontSize: 13, color: C.ash, fontFamily: "sans-serif" }}>태어난 곳을 몰라요</span>
               </div>
             </div>
           </div>
@@ -434,6 +441,27 @@ export default function MoraIntro({ onEnter }) {
                   {s}
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* 입사일 (선택) */}
+          <div style={{ marginBottom: 36 }}>
+            <div style={qStyle}>지금 다니는 회사 입사일{"\n"}알려줄 수 있어? (선택)</div>
+            <input
+              className="mora-input"
+              type="text" inputMode="numeric"
+              placeholder="입사 연월  예) 2021.03  (없으면 비워둬)"
+              value={form.joinRaw || ""}
+              onChange={e => {
+                let v = e.target.value.replace(/[^0-9]/g, "").slice(0, 6)
+                if (v.length > 4) v = v.slice(0, 4) + "." + v.slice(4)
+                up("joinRaw", v)
+              }}
+              maxLength={7}
+              style={iStyle(false)}
+            />
+            <div style={{ fontSize: 12, color: C.fog, fontFamily: "sans-serif", margin: "4px 2px 0" }}>
+              입사일을 넣으면 지금 회사와의 궁합을, 비워두면 취업운을 봐줄게.
             </div>
           </div>
 
