@@ -100,7 +100,7 @@ export default function MoraIntro({ onEnter }) {
   const [isLeap, setIsLeap] = useState(false)
   const [form, setForm] = useState({
     name: "", birthRaw: "", year: "", month: "", day: "",
-    hour: "12", minute: "00", gender: "여", sido: "", sigungu: "",
+    hour: "12", minute: "00", gender: "여", sido: "", sigungu: "", loveStatus: "솔로",
   })
   const [err, setErr] = useState({})
   const timeRef = useRef(null)
@@ -185,6 +185,7 @@ export default function MoraIntro({ onEnter }) {
       minute: parseInt(form.minute) || 0,
       gender: form.gender === "여" ? "여" : "남",
       city,
+      isSolo: form.loveStatus !== "연애중",
     })
   }
 
@@ -374,6 +375,28 @@ export default function MoraIntro({ onEnter }) {
                   }}
                 >
                   {g === "여" ? "여성" : "남성"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 연애 상태 */}
+          <div style={{ marginBottom: 36 }}>
+            <div style={qStyle}>지금 연애 중이야, 혼자야?</div>
+            <div style={{ display: "flex", gap: 10 }}>
+              {["솔로", "연애중"].map(s => (
+                <button key={s}
+                  onClick={() => up("loveStatus", s)}
+                  style={{
+                    flex: 1, padding: "13px", borderRadius: 8,
+                    border: `1px solid ${form.loveStatus === s ? C.caramel : C.fog}`,
+                    background: form.loveStatus === s ? C.mahogany : "transparent",
+                    color: form.loveStatus === s ? C.sand : C.fog,
+                    fontSize: 14, cursor: "pointer", fontFamily: "sans-serif",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  {s}
                 </button>
               ))}
             </div>
