@@ -188,7 +188,8 @@ function buildSajuData(input){
   const{name,year:ys,month:ms,day:ds,hour:hs,minute:mns="0",gender,city}=input;
   const y=parseInt(ys),m=parseInt(ms),d=parseInt(ds);
   const rawH=parseInt(hs),rawM=parseInt(mns);
-  const offset=(CITY_OFFSET[city]||0)+STANDARD_TIME_OFFSET;
+  const _cityOff = CITY_OFFSET[city] ?? CITY_OFFSET[String(city || "").split(" ")[0]] ?? 0;
+  const offset=_cityOff+STANDARD_TIME_OFFSET;
   const totalMin=rawH*60+rawM+offset;
   // 보정으로 자정을 넘겨 전날로 밀리면 날짜도 하루 당겨서 계산
   const dayShift=Math.floor(totalMin/1440);
@@ -593,6 +594,8 @@ function buildSajuData(input){
     name,birth:`양력 ${y}년 ${m}월 ${d}일 ${rawH}시 ${String(rawM).padStart(2,"0")}분 ${city}`,gender,
     isSolo: input?.isSolo !== false,
     joinDate: input?.joinDate || null,
+    companyElement: input?.companyElement || "",
+    foundDate: input?.foundDate || null,
     astro: buildAstro(y, m, d, rawH, rawM, input?.noTime === true),
     personaTitle,scoreMeta:scoreMetaSaju,
     boundary:{...bnd,isBoundary:bnd.inBoundary,
