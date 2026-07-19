@@ -119,6 +119,7 @@ export default function MoraIntro({ onEnter }) {
   const [err, setErr] = useState({})
   const timeRef = useRef(null)
   const nameRef = useRef(null)
+  const foundRef = useRef(null)
 
   const isLast = msgIndex === MESSAGES.length - 1
 
@@ -168,7 +169,6 @@ export default function MoraIntro({ onEnter }) {
     if (!form.year || !form.birthRaw || y < 1931 || y > 2030) e.birth = "생년월일 6자리를 입력해줘"
     if (!form.noPlace) {
       if (!form.sido) e.sido = "태어난 곳을 알려줘"
-      else if ((REGIONS[form.sido] || []).length > 0 && !form.sigungu) e.sigungu = "시·군을 선택해줘"
     }
     if (!Object.keys(e).length && calType === "lunar") {
       const converted = lunarToSolar(y, m, d, isLeap)
@@ -191,11 +191,8 @@ export default function MoraIntro({ onEnter }) {
       city = "서울"
     } else {
       const sido = form.sido
-      const sigungu = form.sigungu
       const cityShort = CITY_MAP[sido] || sido.slice(0, 2)
-      city = (REGIONS[sido] || []).length === 0 || !sigungu
-        ? cityShort
-        : `${cityShort} ${sigungu.replace(/시$|군$/, "")}`
+      city = cityShort
     }
 
     onEnter({
@@ -390,23 +387,10 @@ export default function MoraIntro({ onEnter }) {
                 disabled={form.noPlace}
                 style={{ ...sStyle(!!err.sido), opacity: form.noPlace ? 0.4 : 1 }}
               >
-                <option value="" disabled>태어난 곳  시도 선택</option>
+                <option value="" disabled>태어난 곳  시/도 선택</option>
                 {Object.keys(REGIONS).map(s => <option key={s} value={s}>{s}</option>)}
               </select>
               {err.sido && <div style={errStyle}>{err.sido}</div>}
-
-              {form.sido && !form.noPlace && sigunguList.length > 0 && (
-                <select
-                  className="mora-select"
-                  value={form.sigungu}
-                  onChange={e => up("sigungu", e.target.value)}
-                  style={sStyle(!!err.sigungu)}
-                >
-                  <option value="" disabled>시·군 선택</option>
-                  {sigunguList.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              )}
-              {err.sigungu && <div style={errStyle}>{err.sigungu}</div>}
 
               <div
                 onClick={() => up("noPlace", !form.noPlace)}
@@ -479,7 +463,7 @@ export default function MoraIntro({ onEnter }) {
                 let digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 6)
                 let v = digits.length > 4 ? digits.slice(0, 4) + "." + digits.slice(4) : digits
                 up("joinRaw", v)
-                if (digits.length === 6) nameRef.current?.focus()  // yyyymm 다 채우면 이름칸으로
+                if (digits.length === 6) foundRef.current?.focus()  // 입사일 채우면 창립일로
               }}
               maxLength={7}
               style={iStyle(false)}
@@ -489,19 +473,11 @@ export default function MoraIntro({ onEnter }) {
             </div>
           </div>
 
-          {/* 회사 업종·창립일 (선택) */}
+          {/* 회사 창립일·업종 (선택) */}
           <div style={{ marginBottom: 36 }}>
-            <div style={qStyle}>회사 업종과 창립 연월도{"\n"}알면 궁합이 더 정확해져. (선택)</div>
-            <select
-              className="mora-select"
-              value={form.industry}
-              onChange={e => up("industry", e.target.value)}
-              style={sStyle(false)}
-            >
-              <option value="">회사 업종 선택 (선택 안 함)</option>
-              {INDUSTRY.map(it => <option key={it.label} value={it.label}>{it.label}</option>)}
-            </select>
+            <div style={qStyle}>회사 창립 연월과 업종도{"\n"}알면 궁합이 더 정확해져. (선택)</div>
             <input
+              ref={foundRef}
               className="mora-input"
               type="text" inputMode="numeric"
               placeholder="창립 연월  예) 2015.06  (없으면 비워둬)"
@@ -510,12 +486,22 @@ export default function MoraIntro({ onEnter }) {
                 let digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 6)
                 let v = digits.length > 4 ? digits.slice(0, 4) + "." + digits.slice(4) : digits
                 up("foundRaw", v)
+                if (digits.length === 6) nameRef.current?.focus()  // 창립일 채우면 이름으로
               }}
               maxLength={7}
-              style={{ ...iStyle(false), marginTop: 10 }}
+              style={iStyle(false)}
             />
+            <select
+              className="mora-select"
+              value={form.industry}
+              onChange={e => up("industry", e.target.value)}
+              style={{ ...sStyle(false), marginTop: 10 }}
+            >
+              <option value="">회사 업종 선택 (선택 안 함)</option>
+              {INDUSTRY.map(it => <option key={it.label} value={it.label}>{it.label}</option>)}
+            </select>
             <div style={{ fontSize: 12, color: C.fog, fontFamily: "sans-serif", margin: "4px 2px 0" }}>
-              업종은 회사의 기운을, 창립 연월은 회사의 나이를 봐서 나와의 궁합을 맞춰볼게.
+              업종은 내가 하는 일이나 만드는 결과물을 기준으로 골라줘. 창립 연월은 회사의 나이를, 업종은 회사의 기운을 봐서 나와의 궁합을 맞춰볼게.
             </div>
           </div>
 
