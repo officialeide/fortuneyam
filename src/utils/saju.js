@@ -1,4 +1,5 @@
 // utils/saju.js
+import { deriveIching64 } from '../data/iching64.js';
 import { GL, JL, GH, JH, OHK, GWAN_O, ILGAN_TITLE, ILGAN_PHILOSOPHY,
   SAMHAP, YUKHAP, CHUNG, calcHapChungHyeong, TRIGRAM, TOJUNG_SAJA, SIBSONG_ROLE,
   BASE, JASI_START, JASI_END, toJDN, idxToGJ, calcIlju, calcBnd, yearToGJ, mToGJ,
@@ -501,12 +502,12 @@ function buildSajuData(input){
     const stage = getStage(ilgan,ji);
     return {ji,byeolseong:bs.name,kw:bs.kw||"",stage,stageDesc:STAGE_DESC[stage]||"",palace,desc:bs.desc};
   });
-  // 주역 본명괘
-  const KOR_TO_HANJA={목:"木",화:"火",토:"土",금:"金",수:"水"};
-  const relO_kor = GWAN_O[OHK[ilO]] || "목";
-  const relO = KOR_TO_HANJA[relO_kor] || "木";
-  const domO_kor = OHK[domOForIching] || "목";
-  const ichingData = getIching(domOForIching, relO);
+  // 주역 본명괘 — 매화역수 시간괘식(4지지)으로 64괘 전체 도달
+  const _ich64 = deriveIching64(yeonju.ji.ko, wolju.ji.ko, ilju.ji.ko, siJi);
+  const ichingData = _ich64;
+  const domO_kor = _ich64.upNat || "";
+  const relO_kor = _ich64.lowNat || "";
+  const relO = _ich64.lowO;
 
   // 낮과 밤 텍스트
   const dn_day = ilganDB.day || {impression:"분석 중",mask:"분석 중"};
@@ -577,8 +578,8 @@ function buildSajuData(input){
   });
   const ichingYearFlow=yrs5.map(yr=>{
     const sc=calcSeunScore(yr,0,scoreMetaSaju);
-    const yg=yearToGJ(yr),yO=normO(GAN_OE[yg.gan.ko]);
-    const yi=getIching(yO,relO);
+    const yg=yearToGJ(yr);
+    const yi=deriveIching64(yg.ji.ko,wolju.ji.ko,ilju.ji.ko,siJi);
     return{year:yr,score:sc,gae:yi.name,desc:`${yi.nature}의 기운이 흐르는 해야.`};
   });
   const dansajuYearFlow=yrs5.map(yr=>{
@@ -648,7 +649,7 @@ function buildSajuData(input){
     sinsal,sinsal12,unseong12,sibsongAnalysis:analyzeSibsong(pillars,noTime),noTime,hap:hapChungHyeong.hap,hyeong:hapChungHyeong.hyeong,chung:hapChungHyeong.chung,
     daeun,daeunStart:startAge,daeunDir:forward?"순행(順行)":"역행(逆行)",
     dansaju:{pillars:dansajuPillars,overall:dansajuOverall,yearFlow:dansajuYearFlow},
-    iching:{bonmyeonggae:ichingData.name,gaeSymbol:ichingData.symbol||"☯",gaeNum:ichingData.num||0,gaeUpper:`${TRIGRAM[domO_kor]||""}·${domO_kor}`,gaeLower:`${TRIGRAM[relO_kor]||""}·${relO_kor}(관성)`,gaeUpperO:domOForIching,gaeLowerO:relO,gaeDesc:ichingData.desc,gaeNature:ichingData.nature,currentGae:ichingData.currentGae||"분석 중",currentYear:`${CY}년`,currentDesc:ichingData.currentDesc||"",strategy:ichingData.strategy||[],yearFlow:ichingYearFlow},
+    iching:{bonmyeonggae:ichingData.name,gaeSymbol:_ich64.symbol||"☯",gaeNum:ichingData.num||0,gaeUpper:`${_ich64.upT}·${_ich64.upNat}`,gaeLower:`${_ich64.lowT}·${_ich64.lowNat}`,gaeUpperO:_ich64.upO,gaeLowerO:_ich64.lowO,gaeDesc:ichingData.desc,gaeNature:ichingData.nature,currentGae:ichingData.currentGae||"",currentYear:`${CY}년`,currentDesc:ichingData.currentDesc||"",strategy:ichingData.strategy||[],yearFlow:ichingYearFlow,donghyo:_ich64.donghyo},
     tojung:{sang,jung,ha,saja:sajaDB.saja,sajaDesc:sajaDB.desc,bonun:sajaDB.saja,bonunDesc:sajaDB.desc,yearFlow:tojungYearFlow,month2026:tojungMonth2026},
     tarot:{lifePath:lp,isMaster:[11,22,33].includes(lp),lifePathCard,lifePathCardNum:String(lp),lifePathDesc,soulCard:LP_CARDS[lp]||"분석 중",achieveCard:LP_CARDS[(lp+1)>9?1:lp+1]||"분석 중",soulDesc:soulDesc_val,achieveDesc:"성취 에너지 분석 중이야.",calc,yearCards},
     daynight:{overview:`${stripLead(ilganDB.core)} ${singang==="신강(身强)"?"강한 에너지를 가진 만큼, 그것을 흘려보내는 방법을 찾는 것이 중요해.":"내면의 에너지를 충전하는 루틴이 필요해."}`,
