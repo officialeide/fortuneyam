@@ -104,6 +104,7 @@ export default function MoraIntro({ onEnter }) {
   })
   const [err, setErr] = useState({})
   const timeRef = useRef(null)
+  const nameRef = useRef(null)
 
   const isLast = msgIndex === MESSAGES.length - 1
 
@@ -195,10 +196,11 @@ export default function MoraIntro({ onEnter }) {
       isSolo: form.loveStatus !== "연애중",
       noTime: form.noTime === true,
       joinDate: (() => {
-        const m = (form.joinRaw || "").match(/(\d{4})\.?(\d{1,2})?/)
+        const m = (form.joinRaw || "").match(/(\d{2})\.?(\d{1,2})?/)
         if (!m) return null
-        const jy = parseInt(m[1]); const jmo = m[2] ? parseInt(m[2]) : 1
-        if (jy < 1950 || jy > 2035) return null
+        const yy = parseInt(m[1]); const jmo = m[2] ? parseInt(m[2]) : 1
+        const jy = yy <= 40 ? 2000 + yy : 1900 + yy  // 40 이하는 20xx, 그 위는 19xx
+        if (jy < 1950 || jy > 2035 || jmo < 1 || jmo > 12) return null
         return { year: jy, month: jmo }
       })(),
     })
@@ -450,14 +452,15 @@ export default function MoraIntro({ onEnter }) {
             <input
               className="mora-input"
               type="text" inputMode="numeric"
-              placeholder="입사 연월  예) 2021.03  (없으면 비워둬)"
+              placeholder="입사 연월  예) 21.03  (없으면 비워둬)"
               value={form.joinRaw || ""}
               onChange={e => {
-                let v = e.target.value.replace(/[^0-9]/g, "").slice(0, 6)
-                if (v.length > 4) v = v.slice(0, 4) + "." + v.slice(4)
+                let digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 4)
+                let v = digits.length > 2 ? digits.slice(0, 2) + "." + digits.slice(2) : digits
                 up("joinRaw", v)
+                if (digits.length === 4) nameRef.current?.focus()  // yymm 다 채우면 이름칸으로
               }}
-              maxLength={7}
+              maxLength={5}
               style={iStyle(false)}
             />
             <div style={{ fontSize: 12, color: C.fog, fontFamily: "sans-serif", margin: "4px 2px 0" }}>
@@ -471,6 +474,7 @@ export default function MoraIntro({ onEnter }) {
               이 우주에서 선물받은 이름,{"\n"}나한테도 알려줄 수 있어?
             </div>
             <input
+              ref={nameRef}
               className="mora-input"
               type="text"
               placeholder="이름"

@@ -618,7 +618,38 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   const tarotSoulText = mug(t.soulDesc || "")
   const tarotCardName = (t.lifePathCard || "본명 카드").replace(/\([^)]*\)/g, "").trim()
   // 동서양 종합 결론 (다섯 관점 통합)
-  const fiveViewText = `사주는 ${dominant ? OHK_KR[dominant] : ""} 기운의 사람이라 말하고, 당사주와 토정비결도 비슷한 결을 짚어. 서양 별자리는 태양 ${sunSign || "별자리"}로 같은 기질을 다른 언어로 그려내고, 타로 생명경로수는 ${tarotCardName}(으)로 그 삶의 방향을 다시 확인해. 동양은 기운으로, 서양은 별과 상징으로 읽었지만, 다섯 관점이 가리키는 건 결국 한 사람이야. 서로 다른 지도가 같은 목적지를 가리킬 때, 그게 진짜라는 증거야. 어느 하나에 매이지 말고, 다섯이 겹쳐 말하는 큰 방향을 믿고 가.`
+  const fiveViewText = `사주는 ${dominant ? OHK_KR[dominant] : ""} 기운의 사람이라 말하고, 당사주와 토정비결도 비슷한 결을 짚어. 서양 별자리는 태양 ${sunSign || "별자리"}로 같은 기질을 다른 언어로 그려내고, 타로 생명경로수는 ${tarotCardName} 카드로 그 삶의 방향을 다시 확인해. 동양은 기운으로, 서양은 별과 상징으로 읽었지만, 다섯 관점이 가리키는 건 결국 한 사람이야. 서로 다른 지도가 같은 목적지를 가리킬 때, 그게 진짜라는 증거야. 어느 하나에 매이지 말고, 다섯이 겹쳐 말하는 큰 방향을 믿고 가.`
+
+  // 동서양 종합 4 — 다섯 관점이 "엇갈리는" 지점 (수렴이 아니라 긴장·입체감)
+  const _SUN_ELEM = {
+    양자리: "불", 사자자리: "불", 사수자리: "불",
+    황소자리: "흙", 처녀자리: "흙", 염소자리: "흙",
+    쌍둥이자리: "공기", 천칭자리: "공기", 물병자리: "공기",
+    게자리: "물", 전갈자리: "물", 물고기자리: "물",
+  }
+  const fiveViewTensionText = (() => {
+    // 사주(오행) 성향: 안정형 vs 확장형 vs 사색형
+    const sajuStable = ["토", "금"].includes(dominant)
+    const sajuLabel = sajuStable ? "기반을 다지고 지키는 안정" : dominant === "수" ? "깊이 사색하고 유연하게 흐르는" : "새로 벌이고 밀어붙이는 확장"
+    // 별자리(원소) 성향
+    const elem = sunSign ? _SUN_ELEM[sunSign] : null
+    const astroOutward = elem === "불" || elem === "공기"
+    const astroLabel = !elem ? null : astroOutward ? "밖으로 뻗고 변화를 좇는" : "안으로 다지고 안정을 찾는"
+    // 타로 생명경로수 성향
+    const lp = parseInt(t.lifePath || "0")
+    const tarotDrive = [1, 3, 5].includes(lp) ? "개척" : [2, 4, 6, 8].includes(lp) ? "안정" : lp ? "성찰" : null
+    // 사주 vs 별자리 긴장
+    const clash = astroLabel && (sajuStable === !astroOutward ? false : true)
+    let body
+    if (!elem) {
+      body = `이 사주는 ${sajuLabel} 기운이 중심이야. 다만 태어난 시간이 없어 별자리까지 겹쳐 볼 수는 없으니, 동양의 결 안에서도 서로 밀고 당기는 두 힘을 함께 봐. 안정을 원하면서 동시에 더 뻗고 싶은 마음, 그 사이의 진폭이 이 사람의 입체감이야.`
+    } else if (clash) {
+      body = `사주는 ${sajuLabel}을 말하는데, 별자리는 ${astroLabel} 기질을 가리켜. 방향이 정반대로 엇갈리지. 근데 이 어긋남이 결함이 아니야. 한쪽으로만 쏠린 사람은 납작한데, 이 사주는 두 힘이 팽팽하게 당겨서 입체가 생겨. ${tarotDrive ? `타로 생명경로수는 ${tarotDrive}의 결이라 여기에 또 다른 각도를 얹어. ` : ""}겉으로 안정을 지키면서 속으로는 딴 세상을 꿈꾸는 사람, 그 낙차가 매력이자 평생의 숙제야. 하지만 이 간극을 억지로 하나로 누르지 마. 두 힘을 다 쓰는 법을 익히는 게 이번 생의 과제야.`
+    } else {
+      body = `사주도 별자리도 ${sajuLabel} 쪽으로 결이 비슷하게 모여. 드물게 안팎이 한 방향인 구조라, 흔들려도 결국 제자리를 찾아와. ${tarotDrive ? `타로 생명경로수의 ${tarotDrive} 기운만 살짝 다른 각을 주는데, ` : ""}그 작은 어긋남이 지루함을 깨는 변주야. 하지만 방향이 뚜렷한 만큼 한번 어긋난 길로 가면 스스로도 못 견뎌. 큰 방향을 믿고 가되, 가끔은 딴길의 신호도 무시하지 마.`
+    }
+    return body
+  })()
 
   // 성격 요약 (후킹용 보편화 · 무당체)
   const strengths = (d.mbti?.strengths || []).map(mug).filter(Boolean).slice(0, 2)
@@ -651,7 +682,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   const reomulYongsin = yongsinA ? `살길은 ${yongsinA} 기운이야. 이 방향으로 가야 돈이 따라와. 거슬러 가면 아무리 열심히 해도 제자리야.` : ""
   const _gd = GISIN_DETAIL[gisinA] || GISIN_DETAIL[gisinA?.split("·")[0]] || {}
   const reomulGisin = gisinA
-    ? `${gisinA} 기운은 돈을 새게 만들어. 이쪽으로 가면 힘만 빼는 거야.\n\n피해야 할 업종은 ${_gd["업종"] || gisinA + " 방향의 분야"} 쪽이야. 아무리 조건이 좋아도 이 방향은 에너지가 새.\n\n하지 말아야 할 건 ${_gd["행동"] || "이 기운의 방향으로 무리하게 가는 거야."}\n\n조심해야 할 사람은 ${_gd["사람"] || gisinA + " 기운이 강한 사람"}이야. 가까이 둘수록 재물이 막혀.`
+    ? `${gisinA} 기운은 돈을 새게 만들어. 이쪽으로 가면 힘만 빼는 거야.\n피해야 할 업종은 ${_gd["업종"] || gisinA + " 방향의 분야"} 쪽이야. 아무리 조건이 좋아도 이 방향은 에너지가 새.\n하지 말아야 할 건 ${_gd["행동"] || "이 기운의 방향으로 무리하게 가는 거야."}\n조심해야 할 사람은 ${_gd["사람"] || gisinA + " 기운이 강한 사람"}이야. 가까이 둘수록 재물이 막혀.`
     : ""
   const reomulYear = jaemuScore ? `올해 재물 흐름 ${jaemuScore}점이야. ${mug(thisYear.summary || "")}` : ""
   const reomulBest = bestYear && bestYear.year !== thisYear.year
@@ -721,6 +752,18 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     ? ` 대신 ${missingOh.map(k => OHK_KR[k]).join(", ")} 기운이 아예 없어. ${_josaIga(_missTraits.join(", "))} 비어있는 구조라, 이 부분을 의식적으로 채워야 균형이 잡혀.`
     : " 오행이 크게 치우치지 않고 고르게 갖춰진 편이라, 상황에 맞게 여러 기운을 꺼내 쓸 수 있는 구조야."
   const ohaengFull = `${_josaEunNeun(OHK_KR[dominant] || dominant)} ${_domCnt}개로 이 사주에서 가장 강한 기운이야. ${_domTrait}${_missPart}`
+  // 임의의 명식(경계 mid 포함)에 대해 오행 분석 풀버전을 동일 포맷으로 생성 — 첫째/둘째 해석 길이 일관성
+  const mkOhaengFull = (ohMap, dom) => {
+    if (!ohMap) return ohaengFull
+    const missing = ["목", "화", "토", "금", "수"].filter(k => !ohMap[k])
+    const domCnt = ohMap[dom] || 0
+    const domTrait = OHK_STRONG_TRAIT[dom] || OHK_DESC[dom] || ""
+    const missTraits = missing.map(k => OHK_MISSING_TRAIT[k]).filter(Boolean)
+    const missPart = missing.length
+      ? ` 대신 ${missing.map(k => OHK_KR[k]).join(", ")} 기운이 아예 없어. ${_josaIga(missTraits.join(", "))} 비어있는 구조라, 이 부분을 의식적으로 채워야 균형이 잡혀.`
+      : " 오행이 크게 치우치지 않고 고르게 갖춰진 편이라, 상황에 맞게 여러 기운을 꺼내 쓸 수 있는 구조야."
+    return `${_josaEunNeun(OHK_KR[dom] || dom)} ${domCnt}개로 이 명식에서 가장 강한 기운이야. ${domTrait}${missPart}`
+  }
 
   // 월별 세운 (X-2)
   const monthForecast = d.summary?.monthForecast || []
@@ -736,7 +779,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   const healthYearText = `${thisYear.year || new Date().getFullYear()}년 건강 ${healthYearScore}점이야. ${gisinA ? `${gisinA} 기운이 강해지는 시기엔 ${OHK_ORGAN[gisinA?.split("·")[0]] || "몸"}에 부담이 갈 수 있어.` : ""} 잘 때 잘 자는 게 제일 중요해. 수면이 무너지면 다 무너지는 구조야.`
   const healthExercise = OHK_EXERCISE[yongsinA] || OHK_EXERCISE[yongsinA?.split("·")[0]] || "규칙적인 유산소와 스트레칭"
   const healthExerciseText = `달이 ${moonSign || "감정의 별자리"}에 있는 만큼, 규칙적인 생활 리듬이 건강의 핵심이야. ${healthExercise}${_hasJong(healthExercise) ? "이" : "가"} 맞아. 강도보다 꾸준함이 훨씬 중요해.`
-  const healthSeasonText = healthWeakOh.map(k => OHK_SEASON_WARN[k]).filter(Boolean).join("\n\n") || "특별히 취약한 계절 없이 사계절 무난하게 지나가는 구조야."
+  const healthSeasonText = healthWeakOh.map(k => OHK_SEASON_WARN[k]).filter(Boolean).join("\n") || "특별히 취약한 계절 없이 사계절 무난하게 지나가는 구조야."
   const healthFoodText = `${yongsinA || ""} 기운을 올려주는 음식이 맞아. ${OHK_FOOD[yongsinA] || OHK_FOOD[yongsinA?.split("·")[0]] || "제철 음식"}. 따뜻하게 먹는 것이 중요해. 커피는 하루 한 잔 이하로 줄이는 게 좋고, 과음은 이 사주에서 건강을 제일 빠르게 망가뜨려.`
   const healthMentalText = isSingang
     ? "에너지가 밖으로 향하는 구조라, 쉬지 않고 계속 움직이려는 경향이 있어. 의식적으로 멈추는 연습이 정신 건강 관리야. 몸을 쉬게 하는 것도 능력이야."
@@ -822,7 +865,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   }
   const _midOhaeng = isBnd ? calcOhaengFromPillars(d.pillarsB) : null
   const _midDominant = _midOhaeng ? Object.entries(_midOhaeng).sort((a,b)=>b[1]-a[1])[0][0] : dominant
-  const _midOhaengFull = _midOhaeng ? `${_josaEunNeun(OHK_KR[_midDominant]||_midDominant)} ${_midOhaeng[_midDominant]}개로 이 명식에서 가장 강한 기운이야. ${(OHK_STRONG_TRAIT[_midDominant]||"").split(".")[0]}.` : ohaengFull
+  const _midOhaengFull = _midOhaeng ? mkOhaengFull(_midOhaeng, _midDominant) : ohaengFull
 
   const bndChapters = isBnd ? [
     {
@@ -971,22 +1014,32 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   const daeunGoldenText = _peakDaeun
     ? `인생 전체 대운을 펼쳐 보면, ${_peakDaeun.label} 대운(${_peakDaeun.startYear ? _peakDaeun.startYear + "년~ " : ""}${_peakDaeun.period})이 가장 크게 열리는 황금기야. 이 구간에 인생의 승부를 걸어. 여기서 벌인 일이 평생을 먹여 살려. 지금이 그 전이라면 이 시기를 위해 실탄을 모으고, 이미 지났다면 그때 쌓은 걸 어떻게 굴릴지가 관건이야.`
     : ""
-  const _lifePhaseText = (() => {
-    // 초년/중년/말년 대운 오행 기반
-    const early = daeun.slice(0, 2)
-    const mid = daeun.slice(2, 5)
-    const late = daeun.slice(5, 8)
-    const phase = (arr) => {
-      if (!arr.length) return ""
-      const avg = arr.reduce((s, dv) => s + _daeunScore(dv), 0) / arr.length
-      return avg >= 75 ? "크게 열려 순풍이 부는" : avg >= 58 ? "무난하게 흐르는" : "버티고 다지며 힘을 쌓는"
-    }
-    return { early: phase(early), mid: phase(mid), late: phase(late) }
-  })()
-  const lifeEarlyText = `초년운(만 0~23세 무렵)은 ${_lifePhaseText.early} 흐름이야. ${_lifePhaseText.early.includes("버티") ? "일찍부터 고생하며 뿌리를 내리는 시기라, 이때 배운 게 평생 자산이 돼." : "받쳐주는 기운 속에서 자라나는 시기야. 이때의 경험이 방향을 잡아줘."}`
-  const lifeMidText = `중년운(만 24~53세 무렵)은 ${_lifePhaseText.mid} 흐름이야. 인생에서 가장 치열하게 움직이는 구간이라, ${_lifePhaseText.mid.includes("크게 열려") ? "이 시기를 놓치지 마. 여기서 다 승부 봐야 해." : _lifePhaseText.mid.includes("버티") ? "조급함을 버리고 실력을 갈아야 다음이 열려." : "꾸준히 밀고 나가면 착실하게 성과가 쌓여."}`
-  const lifeLateText = `말년운(만 54세~)은 ${_lifePhaseText.late} 흐름이야. ${_lifePhaseText.late.includes("크게 열려") ? "늦게 피는 꽃이야. 후반이 오히려 화려해." : _lifePhaseText.late.includes("버티") ? "욕심을 내려놓고 지키는 데 집중할 시기야." : "안정 속에서 그동안의 결실을 누리는 때야."}`
-  // 대운별 인생 테마 (각 대운을 키워드로) — 초중말년과 합쳐 서사로
+  // 인생 4구간 (나이 고정 · 12운성처럼 4단계) — 계절 비유 없이 나이순이라 순서가 절대 안 바뀜
+  const _lifeStages = [
+    { name: "초년", label: "만 0~19세", min: 0, max: 19 },
+    { name: "청년", label: "만 20~39세", min: 20, max: 39 },
+    { name: "중년", label: "만 40~59세", min: 40, max: 59 },
+    { name: "말년", label: "만 60세~", min: 60, max: 200 },
+  ]
+  const _stageAvgPhase = (min, max) => {
+    const arr = daeun.filter((dv, i) => {
+      const sy = daeunLifeMap[i]?.startYear
+      const age = sy && _birthYear ? sy - _birthYear : null
+      return age != null && age >= min && age <= max
+    })
+    if (!arr.length) return ""
+    const avg = arr.reduce((s, dv) => s + _daeunScore(dv), 0) / arr.length
+    return avg >= 75 ? "크게 열려 순풍이 부는" : avg >= 58 ? "무난하게 흐르는" : "버티고 다지며 힘을 쌓는"
+  }
+  const _phaseEarly = _stageAvgPhase(0, 19)
+  const _phaseYoung = _stageAvgPhase(20, 39)
+  const _phaseMid = _stageAvgPhase(40, 59)
+  const _phaseLate = _stageAvgPhase(60, 200)
+  const lifeEarlyText = _phaseEarly ? `초년(만 0~19세)은 ${_phaseEarly} 흐름이야. ${_phaseEarly.includes("버티") ? "일찍부터 크고 작은 고생을 겪으며 뿌리를 내리는 시기라, 이때 몸으로 배운 게 평생 밑천이 돼." : "받쳐주는 기운 속에서 자라나는 시기라, 이때의 경험이 삶의 방향을 잡아줘."} 하지만 이 시절의 결핍이든 사랑이든, 그게 지금의 나를 만든 원형이라는 걸 기억해.` : ""
+  const lifeYoungText = _phaseYoung ? `청년(만 20~39세)은 ${_phaseYoung} 흐름이야. 세상에 나가 부딪히며 자기 자리를 찾는 구간이라, ${_phaseYoung.includes("크게 열려") ? "치고 나갈 힘이 실려. 겁내지 말고 판을 벌여." : _phaseYoung.includes("버티") ? "당장 결과가 안 나와도 실력을 쌓아두는 시기야." : "꾸준히 밀면 착실하게 기반이 잡혀."} 하지만 조급하게 남과 비교하다 방향을 잃기 쉬우니, 내 속도를 지키는 게 관건이야.` : ""
+  const lifeMidText = _phaseMid ? `중년(만 40~59세)은 ${_phaseMid} 흐름이야. 그동안 쌓은 걸 거둬들이는 결실의 구간이라, ${_phaseMid.includes("크게 열려") ? "인생의 정점이 여기 있어. 이 시기를 절대 놓치지 마." : _phaseMid.includes("버티") ? "무리한 확장보다 지킬 걸 지키는 게 이득이야." : "쌓아온 만큼 안정적으로 성과가 돌아와."} 하지만 여기서 방심하면 후반이 흔들리니, 몸과 관계를 함께 챙겨야 해.` : ""
+  const lifeLateText = _phaseLate ? `말년(만 60세~)은 ${_phaseLate} 흐름이야. ${_phaseLate.includes("크게 열려") ? "늦게 피는 꽃이라, 오히려 후반이 화려해." : _phaseLate.includes("버티") ? "욕심을 내려놓고 지키는 데 집중할 시기야." : "안정 속에서 그동안의 결실을 누리는 때야."} 하지만 이 시기의 평안은 앞선 세 구간을 어떻게 살아왔느냐가 결정해.` : ""
+  // 대운별 인생 테마 — 4구간으로 묶어 줄바꿈 (같은 어미 반복 나열 제거)
   const _daeunTheme = (dv) => {
     const o = _HANJA2KR_D[dv.ohaeng] || dv.ohaeng
     const map = {
@@ -996,12 +1049,21 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     }
     return map[o] || "흐름을 다지는 시기"
   }
-  const daeunThemeText = daeunLifeMap.length
-    ? daeunLifeMap.map((dv, i) => {
-        const age = dv.startYear && _birthYear ? `만 ${dv.startYear - _birthYear}세부터` : ""
-        return `${dv.label} 대운(${age})은 ${_daeunTheme(daeun[i] || {})}야.`
-      }).slice(0, 8).join(" ")
-    : ""
+  const daeunThemeText = (() => {
+    if (!daeunLifeMap.length) return ""
+    const out = []
+    for (const st of _lifeStages) {
+      const items = daeunLifeMap
+        .map((dv, i) => ({ dv, i, age: dv.startYear && _birthYear ? dv.startYear - _birthYear : null }))
+        .filter(({ age }) => age != null && age >= st.min && age <= st.max)
+      if (!items.length) continue
+      out.push(`${st.name} (${st.label})`)
+      for (const { dv, i, age } of items) {
+        out.push(`${dv.label} 대운(만 ${age}세~) ${_daeunTheme(daeun[i] || {})}`)
+      }
+    }
+    return out.join("\n")
+  })()
   // 대운 전환기 대비 (전환점마다 무슨 일 / 뭘 준비)
   const daeunTransitionText = (() => {
     if (!daeun.length) return ""
@@ -1033,6 +1095,64 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     return `앞으로 몇 년은 대운과 세운이 크게 겹치는 초강세 구간은 뚜렷하지 않아. 대신 이런 시기엔 무리한 승부보다 실력과 기반을 다지는 게 정답이야. 조용히 힘을 모아두면 다음 황금기에 크게 터뜨릴 수 있어.`
   })()
 
+  // 올해 세운 (연간지 → 일간 기준 십성) — "그래서 올해는?"을 십성으로 풀어줌
+  const _GAN_ARR = ["갑", "을", "병", "정", "무", "기", "경", "신", "임", "계"]
+  const _JI_ARR = ["자", "축", "인", "묘", "진", "사", "오", "미", "신", "유", "술", "해"]
+  const _GAN_OH = { 갑: "목", 을: "목", 병: "화", 정: "화", 무: "토", 기: "토", 경: "금", 신: "금", 임: "수", 계: "수" }
+  const _GAN_YANG = { 갑: 1, 병: 1, 무: 1, 경: 1, 임: 1, 을: 0, 정: 0, 기: 0, 신: 0, 계: 0 }
+  const _SAENG = { 목: "화", 화: "토", 토: "금", 금: "수", 수: "목" }
+  const _GEUK = { 목: "토", 토: "수", 수: "화", 화: "금", 금: "목" }
+  const _sibsongOf = (ilKo, tgtKo) => {
+    const io = _GAN_OH[ilKo], to = _GAN_OH[tgtKo]
+    if (!io || !to) return ""
+    const same = _GAN_YANG[ilKo] === _GAN_YANG[tgtKo]
+    if (io === to) return same ? "비견" : "겁재"
+    if (_SAENG[io] === to) return same ? "식신" : "상관"
+    if (_GEUK[io] === to) return same ? "편재" : "정재"
+    if (_GEUK[to] === io) return same ? "편관" : "정관"
+    if (_SAENG[to] === io) return same ? "편인" : "정인"
+    return ""
+  }
+  const _thisYearNum = thisYear.year || new Date().getFullYear()
+  const _yGan = _GAN_ARR[((_thisYearNum - 4) % 10 + 10) % 10]
+  const _yJi = _JI_ARR[((_thisYearNum - 4) % 12 + 12) % 12]
+  const _ilganKo = d.pillars?.[2]?.gan?.ko || dominant
+  const _saeunSibsong = _sibsongOf(_ilganKo, _yGan)
+  const _SAEUN_CAT = { 비견: "비겁", 겁재: "비겁", 식신: "식상", 상관: "식상", 편재: "재성", 정재: "재성", 편관: "관성", 정관: "관성", 편인: "인성", 정인: "인성" }
+  const _SAEUN_MSG = {
+    비겁: "경쟁과 독립의 기운이 강해. 남한테 기대기보다 내 힘으로 밀어붙일 때 결과가 나는 해야. 하지만 동업이나 돈거래는 한 번 더 조심해",
+    식상: "표현하고 만들어내는 기운이 열려. 새 프로젝트, 창작, 자기표현이 잘 풀리는 해야. 하지만 말이 많아지는 만큼 구설도 조심해",
+    재성: "돈과 기회가 실제로 움직이는 해야. 실속 있게 벌 문이 열리니 재테크와 거래에 적극적으로 나서. 하지만 과욕은 오히려 화를 불러",
+    관성: "책임과 압박이 커지지만 그만큼 자리와 인정이 따라오는 해야. 승진, 이직, 시험 같은 관문운이 열려. 하지만 몸은 무리하지 마",
+    인성: "공부, 자격, 문서운이 강한 해야. 배우고 도장 찍는 일이 잘 풀려. 하지만 결정을 미루거나 안주하기 쉬우니 실행을 챙겨",
+  }
+  const _saeunCat = _SAEUN_CAT[_saeunSibsong]
+  const saeunYearText = _saeunSibsong
+    ? `올해는 ${_thisYearNum}년, ${_yGan}${_yJi}년이야. 이 사주 일간(${_ilganKo}) 기준으로 보면 ${_saeunSibsong}(${_saeunCat})이 들어오는 해라, ${_SAEUN_MSG[_saeunCat]}. ${thisYear.score ? `종합 흐름으로는 ${thisYear.score}점 정도야. ` : ""}세운은 열두 달 안에서도 결이 갈리니, 아래 달별 흐름에서 점수 높은 달을 골라 승부를 걸어.`
+    : `올해는 ${_thisYearNum}년, ${_yGan}${_yJi}년이야. 아래 달별 흐름에서 점수 높은 달을 골라 중요한 결정을 몰아.`
+
+  // 육친과 나 — 가족 배치를 "나에 대한 이해"로 되돌림 (#13)
+  const _famScores = {
+    재성: (_sc["정재"] || 0) + (_sc["편재"] || 0),
+    관성: _gwanCnt,
+    인성: _inCnt,
+    식상: (_sc["식신"] || 0) + (_sc["상관"] || 0),
+    비겁: (_sc["비견"] || 0) + (_sc["겁재"] || 0),
+  }
+  const _famPattern = {
+    재성: "가족을 부양하고 통제 안에 두려는 책임감이 몸에 배어 있어. 챙기는 게 곧 사랑이라 믿어서, 정작 마음을 나누는 건 서툴 때가 있어.",
+    관성: "규율과 기대 속에서 자라 스스로에게 엄격한 패턴이 남았어. 인정받아야 안심하는 마음이, 어른이 된 지금도 일과 관계에 그대로 따라와.",
+    인성: "보살핌을 넉넉히 받은 만큼 안정과 의존의 욕구가 커. 기대는 게 익숙한 만큼, 홀로 서는 걸 자꾸 미루게 되는 약점도 함께 있어.",
+    식상: "표현하고 돌보는 기운이 강해서, 관계에서 늘 먼저 베푸는 쪽이야. 주는 건 잘하는데 받는 법은 안 배워서 혼자 소진되기 쉬워.",
+    비겁: "형제나 또래 기운이 강해 일찍 독립심을 키웠어. 스스로 해결하는 힘이 강한 대신, 기대면 지는 것 같은 마음이 관계를 외롭게 만들기도 해.",
+  }
+  const _famTop = Object.entries(_famScores).sort((a, b) => b[1] - a[1])[0]
+  const _famLack = Object.entries(_famScores).filter(([, v]) => !v).map(([k]) => k)
+  const yukchinSelfText = `사주를 보는 건 결국 나를 이해하는 일이야. 가족이라는 자리도 그래. 이 명식에서 ${_famTop && _famTop[1] ? _famTop[0] : "육친"} 기운이 가장 도드라지는데, 그게 어떤 가족 안에서 컸는지를 넘어 지금의 나를 이렇게 만들었어. ${_famTop && _famTop[1] ? _famPattern[_famTop[0]] : "육친이 특정 자리에 쏠리지 않고 고르게 퍼져 있어, 한 패턴에 갇히지 않고 관계마다 다른 얼굴을 꺼내 쓰는 편이야."}${_famLack.length ? ` 반대로 ${_famLack.join(", ")} 자리가 비어서, 그 결핍을 채워줄 사람에게 유독 끌리고 또 유독 상처받아. 하지만 그 자리를 남이 아니라 스스로 채우는 게 이번 생의 관계 숙제야.` : " 큰 결핍 없이 갖춰진 편이라, 관계에서 균형을 잡는 힘은 타고났어."}`
+  const yukchinLoopText = isSingang
+    ? "관계에서 내가 주도하고 책임지려는 패턴을 반복해. 부모 자리에서 익힌 '내가 중심을 잡아야 한다'는 각본이 연애와 직장에도 그대로 재생돼. 하지만 그 각본을 알아차리는 순간, 처음으로 기대고 나눌 여지가 생겨."
+    : "관계에서 상대를 먼저 맞추고 내 욕구는 뒤로 미루는 패턴을 반복해. 가족 안에서 익힌 '조용히 맞춰야 편하다'는 각본이 어른이 된 지금도 따라와. 하지만 그 각본을 알아차리는 순간, 비로소 내 몫을 요구할 수 있게 돼."
+
   // 인간관계 상세
   const relGuardian = yongsinA ? `${yongsinA} 기운을 가진 사람이 귀인이야. 이 에너지가 나를 살려. 직관적으로 편한 사람, 같이 있으면 뭔가 잘 풀리는 사람이 그 타입이야.` : ""
   // 귀인/독을 구체적 분위기·성격으로 (오행 이름 대신 사람 묘사)
@@ -1060,10 +1180,10 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     : "유독 나랑 기운이 안 맞아서 같이 있으면 지치는 사람이 있어. 나쁜 사람이 아니라 결이 안 맞는 거야. 적당한 거리를 둬."
   const relPoison = gisinA ? `${gisinA} 기운이 강한 사람과 가까이 있으면 이유 없이 지쳐. 나쁜 사람이 아닐 수 있어. 그냥 에너지가 안 맞는 거야. 가까이 할수록 손해야.` : ""
   // 직장(공적)과 친구(사적) 모습 — 서로 다른 각도로
-  const relWorkFace = `${dayImp || "처음엔 다가가기 어려운 인상을 줘."}${dayMask ? " " + dayMask : ""} 공적인 자리에서는 감정을 잘 드러내지 않고, 맡은 몫을 확실히 해내는 사람으로 보여.`
+  const relWorkFace = `${dayMask || dayImp || "처음엔 다가가기 어려운 인상을 줘."} 공적인 자리에서는 감정을 잘 드러내지 않고, 맡은 몫을 확실히 해내는 사람으로 보여.`
   const relFriendFace = isSingang
-    ? "편한 사람들 앞에서는 완전히 다른 사람이 돼. 공적인 자리에서 눌러뒀던 장난기랑 에너지가 그대로 터져나와서, 분위기를 주도하고 판을 이끄는 쪽이야. 좋아하는 사람한테는 표현도 확실하고, 챙길 땐 화끈하게 챙겨. 손해 보는 걸 알면서도 내 사람이다 싶으면 아낌없이 퍼줘. 대신 한번 선을 넘거나 신뢰를 깨는 사람한테는 냉정하게 등을 돌려. 겉으로 보이는 차분함만 아는 사람은 이 반전을 상상도 못 해. 직장에서의 나와 친구 앞에서의 내가 이렇게까지 다른데, 이 두 얼굴을 다 아는 사람이 진짜 내 편이야."
-    : "가까운 사이에서는 경계를 완전히 풀어. 밖에서는 무던하고 조용해 보여도, 편한 사람 앞에서는 은근히 응석도 부리고 어리광도 나와. 말수는 적어도 곁을 오래 지키는 타입이라, 친구들 사이에서 '있는 듯 없는 듯 늘 그 자리에 있는 사람'으로 통해. 한번 마음을 준 사람한테는 깊고 오래가고, 티 안 나게 챙기는 세심함이 있어. 대신 상처받으면 표현 안 하고 혼자 삭이다가 조용히 멀어지는 게 약점이야. 겉의 무던함만 보는 사람은 속에 이렇게 섬세한 결이 있는 줄 몰라. 이 온도 차를 아는 사람만 진짜 나를 본 거야."
+    ? "편한 사람들 앞에서는 완전히 다른 사람이 돼. 공적인 자리에서 눌러뒀던 장난기랑 에너지가 그대로 터져나와서, 분위기를 주도하고 판을 이끄는 쪽이야. 좋아하는 사람한테는 표현도 확실하고, 챙길 땐 화끈하게 챙겨. 손해 보는 걸 알면서도 내 사람이다 싶으면 아낌없이 퍼줘. 하지만 한번 선을 넘거나 신뢰를 깨는 사람한테는 냉정하게 등을 돌려. 겉으로 보이는 차분함만 아는 사람은 이 반전을 상상도 못 해. 직장에서의 나와 친구 앞에서의 내가 이렇게까지 다른데, 이 두 얼굴을 다 아는 사람이 진짜 내 편이야."
+    : "가까운 사이에서는 경계를 완전히 풀어. 밖에서는 무던하고 조용해 보여도, 편한 사람 앞에서는 은근히 응석도 부리고 어리광도 나와. 말수는 적어도 곁을 오래 지키는 타입이라, 친구들 사이에서 '있는 듯 없는 듯 늘 그 자리에 있는 사람'으로 통해. 한번 마음을 준 사람한테는 깊고 오래가고, 티 안 나게 챙기는 세심함이 있어. 하지만 상처받으면 표현 안 하고 혼자 삭이다가 조용히 멀어지는 게 약점이야. 겉의 무던함만 보는 사람은 속에 이렇게 섬세한 결이 있는 줄 몰라. 이 온도 차를 아는 사람만 진짜 나를 본 거야."
 
   const yearDetail = yearForecast.slice(0, 5).map(y => {
     const score = y.score || 0
@@ -1106,22 +1226,23 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       label: "동서양 종합 1", accent: C.iris,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "동양이 읽는\n나의 결.",
-      subtitle: "사주 · 당사주 · 토정비결",
+      subtitle: "사주 · 당사주 · 토정비결 · 주역",
       blocks: [
         dansajuText ? { h: "당사주", text: dansajuText, accent: C.iris } : null,
         { h: "토정비결", kw: tojungKw || null, text: tojungDesc, accent: C.iris },
+        { h: "주역", kw: ichingKw || null, text: ichingBodyText, accent: C.iris },
       ].filter(Boolean),
     },
     {
       label: "동서양 종합 2", accent: C.iris,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "주역과 별자리가\n가리키는 방향.",
-      subtitle: "주역 · 태양 달 상승 별자리",
+      title: "별자리가\n비추는 나.",
+      subtitle: "태양 · 달 · 상승 별자리",
       blocks: [
-        { h: "주역", kw: ichingKw ? `${ichingKw} 괘` : null, text: ichingBodyText, accent: C.iris },
         sunSign ? { h: `태양 ${sunSign}`, text: astroSunText, accent: C.iris } : null,
         moonSign ? { h: `달 ${moonSign}`, text: astroMoonText, accent: C.iris } : null,
         ascSign ? { h: `상승 ${ascSign}`, text: astroAscText, accent: C.iris } : null,
+        (!sunSign && !moonSign) ? { h: "별자리", text: "태어난 시간 정보가 없어 별자리는 생략했어. 동양 명식만으로도 충분히 결이 읽혀.", accent: C.iris } : null,
       ].filter(Boolean),
     },
     {
@@ -1132,6 +1253,15 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       blocks: [
         { h: `생명경로수 ${t.lifePath || ""} · ${tarotCardName}`, text: `${tarotLifeText || ""}\n\n${tarotSoulText || ""}`.trim() || "분석 중이야.", accent: C.iris },
         { h: "다섯 관점의 결론", text: fiveViewText, accent: C.iris },
+      ].filter(Boolean),
+    },
+    {
+      label: "동서양 종합 4", accent: C.iris,
+      tag: "유료", tagColor: C.plum, tagText: C.lavender,
+      title: "다섯 관점이\n엇갈리는 지점.",
+      subtitle: "충돌 · 긴장 · 입체감",
+      blocks: [
+        { h: "서로 다른 지도가 어긋날 때", text: fiveViewTensionText, accent: C.iris },
       ].filter(Boolean),
     },
     // III. 재물운 3블록
@@ -1341,22 +1471,24 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     {
       label: "가족운 1", accent: C.sand,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "부모와의 인연과\n자라온 뿌리.",
-      subtitle: "부모운 · 유년기",
+      title: "부모와 형제, 배우자,\n네 기둥이 품은 가족.",
+      subtitle: "부모 · 유년기 · 형제 자녀 · 배우자궁",
       blocks: [
         { h: "부모와의 관계", text: parentText, accent: C.sand },
         { h: "자라온 가정 분위기", text: childhoodText, accent: C.sand },
-      ],
-    },
-    {
-      label: "가족운 2", accent: C.sand,
-      tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "형제, 자녀,\n그리고 배우자.",
-      subtitle: "형제 · 자녀 · 배우자궁",
-      blocks: [
         { h: "형제와 자녀", text: siblingText, accent: C.sand },
         { h: "배우자 자리", text: spousePalaceText, accent: C.sand },
       ],
+    },
+    {
+      label: "육친과 나", accent: C.sand,
+      tag: "유료", tagColor: C.plum, tagText: C.lavender,
+      title: "가족이라는 자리가\n나를 만든 방식.",
+      subtitle: "육친 십성 · 나에 대한 이해",
+      blocks: [
+        { h: "네 기둥이 만든 나", text: yukchinSelfText, accent: C.sand },
+        { h: "반복하는 관계 각본", text: yukchinLoopText, accent: C.sand },
+      ].filter(Boolean),
     },
     {
       label: "가족운 3", accent: C.sand,
@@ -1383,33 +1515,36 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     {
       label: "대운 인생 테마", accent: C.iris,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "10년마다 바뀌는\n인생의 장면들.",
-      subtitle: "대운별 테마 · 초년 중년 말년",
+      title: "인생 네 구간으로 보는\n대운의 장면들.",
+      subtitle: "초년 · 청년 · 중년 · 말년",
       blocks: [
-        { h: "대운마다의 인생 테마", text: daeunThemeText, accent: C.iris },
-        { h: "초년운", text: lifeEarlyText, accent: C.iris },
-        { h: "중년운", text: lifeMidText, accent: C.iris },
-        { h: "말년운", text: lifeLateText, accent: C.iris },
+        { h: "구간별 대운 흐름", text: daeunThemeText, accent: C.iris },
+        lifeEarlyText ? { h: "초년 (만 0~19세)", text: lifeEarlyText, accent: C.iris } : null,
+        lifeYoungText ? { h: "청년 (만 20~39세)", text: lifeYoungText, accent: C.iris } : null,
+        lifeMidText ? { h: "중년 (만 40~59세)", text: lifeMidText, accent: C.iris } : null,
+        lifeLateText ? { h: "말년 (만 60세~)", text: lifeLateText, accent: C.iris } : null,
       ].filter(Boolean),
     },
     {
-      label: "지금 대운", accent: C.iris,
+      label: "지금 대운과 전환기", accent: C.iris,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "지금 이 10년,\n어떻게 써야 하는지.",
-      subtitle: "현재 대운 · 다음 전환점",
+      title: "지금 이 10년과\n다가올 전환점.",
+      subtitle: "현재 대운 · 전환기 대비",
       blocks: [
         { h: "지금 대운", text: daeunCurText, accent: C.iris },
         { h: "다음 전환점", text: daeunNextText || `대운이 바뀌는 시점이 곧 온다는 것만 알아도 지금 준비하는 방식이 달라져.`, accent: C.iris },
+        { h: "대운이 바뀌는 환절기", text: daeunTransitionText, accent: C.iris },
+        { h: "전환기를 준비하는 법", text: "대운의 전환기엔 억지로 큰일을 벌이기보다, 몸과 마음을 정비하고 다음 흐름에 올라탈 준비를 하는 게 핵심이야. 하지만 변화를 두려워만 하면 기회도 같이 지나가니, 흐름을 읽고 미리 방향을 틀어두면 전환기가 오히려 도약의 발판이 돼.", accent: C.iris },
       ].filter(Boolean),
     },
     {
-      label: "대운 전환기 대비", accent: C.iris,
+      label: "올해 세운", accent: C.iris,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "대운이 바뀔 때\n무슨 일이 생기는지.",
-      subtitle: "전환기 · 미리 준비할 것",
+      title: "올해가\n무슨 해인지.",
+      subtitle: "올해 세운 · 십성 흐름",
       blocks: [
-        { h: "대운이 바뀌는 환절기", text: daeunTransitionText, accent: C.iris },
-        { h: "이 시기를 준비하는 법", text: "대운의 전환기엔 억지로 큰일을 벌이기보다, 몸과 마음을 정비하고 다음 흐름에 올라탈 준비를 하는 게 핵심이야. 환경이 바뀌는 걸 두려워 말고, 흐름을 읽고 미리 방향을 틀어두면 전환기가 오히려 도약의 발판이 돼.", accent: C.iris },
+        { h: `${_thisYearNum}년 · ${_yGan}${_yJi}년`, text: saeunYearText, accent: C.iris },
+        { h: "올해 종합 흐름", jsxContent: <CategoryScore months={monthForecast} category="종합" thisYearScore={thisYear?.score || 0} label="종합운" />, accent: C.iris },
       ].filter(Boolean),
     },
     {
@@ -1419,7 +1554,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       subtitle: "대운 × 세운 교차 · 승부의 해",
       blocks: [
         { h: "대운과 세운이 겹치는 해", text: daeunSaeunPeakText, accent: C.iris },
-        { h: "올해 종합 흐름", jsxContent: <CategoryScore months={monthForecast} category="종합" thisYearScore={thisYear?.score || 0} label="종합운" />, accent: C.iris },
       ].filter(Boolean),
     },
   ]
