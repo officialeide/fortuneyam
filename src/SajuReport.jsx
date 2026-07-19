@@ -190,9 +190,9 @@ JSON만 응답: {"sevenInsight":"..."}`;
         }catch(e){console.warn("inner API:", e);}
       };
 
-      // API 실행: astro/tarot/inner 병렬, 완료 후 seven (별자리 반영 위해 직렬)
-      await Promise.all([fetchAstro(), fetchTarot(), fetchInner()]);
-      await fetchSeven(); // astroResult 완성 후 실행해야 별자리 반영됨
+      // AI 호출 제거: 리포트(MoraReport)는 전부 로컬 계산(d.astro/d.tarot/d.daynight/d.mbti)만 사용하므로
+      // astro/tarot/inner/seven API는 화면에 반영되지 않아 대기시간만 발생시켰음. sessionStorage 캐시가 있으면 그대로 사용.
+      void fetchAstro; void fetchTarot; void fetchInner; void fetchSeven;
 
       // 4. API 결과를 reportData에 합쳐서 저장
       // 앞 2문장만 추출
