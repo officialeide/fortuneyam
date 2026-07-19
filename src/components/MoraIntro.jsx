@@ -19,14 +19,14 @@ const C = {
 }
 
 const REGIONS = {
-  "서울특별시":["강남구","강동구","강북구","강서구","관악구","광진구","구로구","금천구","노원구","도봉구","동대문구","동작구","마포구","서대문구","서초구","성동구","성북구","송파구","양천구","영등포구","용산구","은평구","종로구","중구","중랑구"],
-  "부산광역시":["강서구","금정구","기장군","남구","동구","동래구","부산진구","북구","사상구","사하구","서구","수영구","연제구","영도구","중구","해운대구"],
-  "대구광역시":["군위군","남구","달서구","달성군","동구","북구","서구","수성구","중구"],
-  "인천광역시":["강화군","계양구","남동구","동구","미추홀구","부평구","서구","연수구","옹진군","중구"],
-  "광주광역시":["광산구","남구","동구","북구","서구"],
-  "대전광역시":["대덕구","동구","서구","유성구","중구"],
-  "울산광역시":["남구","동구","북구","울주군","중구"],
-  "세종특별자치시":["세종시"],
+  "서울특별시":[],
+  "부산광역시":[],
+  "대구광역시":[],
+  "인천광역시":[],
+  "광주광역시":[],
+  "대전광역시":[],
+  "울산광역시":[],
+  "세종특별자치시":[],
   "경기도":["가평군","고양시","과천시","광명시","광주시","구리시","군포시","김포시","남양주시","동두천시","부천시","성남시","수원시","시흥시","안산시","안성시","안양시","양주시","양평군","여주시","연천군","오산시","용인시","의왕시","의정부시","이천시","파주시","평택시","포천시","하남시","화성시"],
   "강원특별자치도":["강릉시","고성군","동해시","삼척시","속초시","양구군","양양군","영월군","원주시","인제군","정선군","철원군","춘천시","태백시","평창군","홍천군","화천군","횡성군"],
   "충청북도":["괴산군","단양군","보은군","영동군","옥천군","음성군","제천시","증평군","진천군","청주시","충주시"],
@@ -45,6 +45,20 @@ const CITY_MAP = {
   "전북특별자치도":"전북","전라남도":"전남","경상북도":"경북","경상남도":"경남",
   "제주특별자치도":"제주",
 }
+
+// 업종 → 회사 오행(목적 기준). "" = 미지정
+const INDUSTRY = [
+  { label: "의료·제약·바이오", oh: "금" },
+  { label: "미용·뷰티·에스테틱", oh: "화" },
+  { label: "IT·전자·게임", oh: "화" },
+  { label: "금융·법률·회계", oh: "금" },
+  { label: "교육·출판·연구", oh: "목" },
+  { label: "건설·부동산", oh: "토" },
+  { label: "유통·무역·여행", oh: "수" },
+  { label: "제조·기계·중공업", oh: "금" },
+  { label: "농업·식품·환경", oh: "토" },
+  { label: "서비스·컨설팅·기타", oh: "" },
+]
 
 const MESSAGES = [
   "뭔가 항상 한 박자 어긋나.",
@@ -100,7 +114,7 @@ export default function MoraIntro({ onEnter }) {
   const [isLeap, setIsLeap] = useState(false)
   const [form, setForm] = useState({
     name: "", birthRaw: "", year: "", month: "", day: "",
-    hour: "12", minute: "00", gender: "여", sido: "", sigungu: "", loveStatus: "솔로", noTime: false, noPlace: false, joinRaw: "",
+    hour: "12", minute: "00", gender: "여", sido: "", sigungu: "", loveStatus: "솔로", noTime: false, noPlace: false, joinRaw: "", industry: "", foundRaw: "",
   })
   const [err, setErr] = useState({})
   const timeRef = useRef(null)
@@ -154,7 +168,7 @@ export default function MoraIntro({ onEnter }) {
     if (!form.year || !form.birthRaw || y < 1931 || y > 2030) e.birth = "생년월일 6자리를 입력해줘"
     if (!form.noPlace) {
       if (!form.sido) e.sido = "태어난 곳을 알려줘"
-      if (!form.sigungu) e.sigungu = "시군구를 선택해줘"
+      else if ((REGIONS[form.sido] || []).length > 0 && !form.sigungu) e.sigungu = "시·군을 선택해줘"
     }
     if (!Object.keys(e).length && calType === "lunar") {
       const converted = lunarToSolar(y, m, d, isLeap)
@@ -179,9 +193,9 @@ export default function MoraIntro({ onEnter }) {
       const sido = form.sido
       const sigungu = form.sigungu
       const cityShort = CITY_MAP[sido] || sido.slice(0, 2)
-      city = sigungu === sido.replace(/특별시|광역시|특별자치시|특별자치도|도/, "").trim()
+      city = (REGIONS[sido] || []).length === 0 || !sigungu
         ? cityShort
-        : `${cityShort} ${sigungu}`
+        : `${cityShort} ${sigungu.replace(/시$|군$/, "")}`
     }
 
     onEnter({
@@ -196,12 +210,19 @@ export default function MoraIntro({ onEnter }) {
       isSolo: form.loveStatus !== "연애중",
       noTime: form.noTime === true,
       joinDate: (() => {
-        const m = (form.joinRaw || "").match(/(\d{2})\.?(\d{1,2})?/)
+        const m = (form.joinRaw || "").match(/(\d{4})\.?(\d{1,2})?/)
         if (!m) return null
-        const yy = parseInt(m[1]); const jmo = m[2] ? parseInt(m[2]) : 1
-        const jy = yy <= 40 ? 2000 + yy : 1900 + yy  // 40 이하는 20xx, 그 위는 19xx
-        if (jy < 1950 || jy > 2035 || jmo < 1 || jmo > 12) return null
+        const jy = parseInt(m[1]); const jmo = m[2] ? parseInt(m[2]) : 1
+        if (jy < 1900 || jy > 2035 || jmo < 1 || jmo > 12) return null
         return { year: jy, month: jmo }
+      })(),
+      companyElement: (INDUSTRY.find(it => it.label === form.industry)?.oh) || "",
+      foundDate: (() => {
+        const fm = (form.foundRaw || "").match(/(\d{4})\.?(\d{1,2})?/)
+        if (!fm) return null
+        const fy = parseInt(fm[1]); const fmo = fm[2] ? parseInt(fm[2]) : 1
+        if (fy < 1900 || fy > 2035 || fmo < 1 || fmo > 12) return null
+        return { year: fy, month: fmo }
       })(),
     })
   }
@@ -374,14 +395,14 @@ export default function MoraIntro({ onEnter }) {
               </select>
               {err.sido && <div style={errStyle}>{err.sido}</div>}
 
-              {form.sido && !form.noPlace && (
+              {form.sido && !form.noPlace && sigunguList.length > 0 && (
                 <select
                   className="mora-select"
                   value={form.sigungu}
                   onChange={e => up("sigungu", e.target.value)}
                   style={sStyle(!!err.sigungu)}
                 >
-                  <option value="" disabled>시군구 선택</option>
+                  <option value="" disabled>시·군 선택</option>
                   {sigunguList.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               )}
@@ -452,19 +473,49 @@ export default function MoraIntro({ onEnter }) {
             <input
               className="mora-input"
               type="text" inputMode="numeric"
-              placeholder="입사 연월  예) 21.03  (없으면 비워둬)"
+              placeholder="입사 연월  예) 2021.03  (없으면 비워둬)"
               value={form.joinRaw || ""}
               onChange={e => {
-                let digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 4)
-                let v = digits.length > 2 ? digits.slice(0, 2) + "." + digits.slice(2) : digits
+                let digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 6)
+                let v = digits.length > 4 ? digits.slice(0, 4) + "." + digits.slice(4) : digits
                 up("joinRaw", v)
-                if (digits.length === 4) nameRef.current?.focus()  // yymm 다 채우면 이름칸으로
+                if (digits.length === 6) nameRef.current?.focus()  // yyyymm 다 채우면 이름칸으로
               }}
-              maxLength={5}
+              maxLength={7}
               style={iStyle(false)}
             />
             <div style={{ fontSize: 12, color: C.fog, fontFamily: "sans-serif", margin: "4px 2px 0" }}>
               입사일을 넣으면 지금 회사와의 궁합을, 비워두면 취업운을 봐줄게.
+            </div>
+          </div>
+
+          {/* 회사 업종·창립일 (선택) */}
+          <div style={{ marginBottom: 36 }}>
+            <div style={qStyle}>회사 업종과 창립 연월도{"\n"}알면 궁합이 더 정확해져. (선택)</div>
+            <select
+              className="mora-select"
+              value={form.industry}
+              onChange={e => up("industry", e.target.value)}
+              style={sStyle(false)}
+            >
+              <option value="">회사 업종 선택 (선택 안 함)</option>
+              {INDUSTRY.map(it => <option key={it.label} value={it.label}>{it.label}</option>)}
+            </select>
+            <input
+              className="mora-input"
+              type="text" inputMode="numeric"
+              placeholder="창립 연월  예) 2015.06  (없으면 비워둬)"
+              value={form.foundRaw || ""}
+              onChange={e => {
+                let digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 6)
+                let v = digits.length > 4 ? digits.slice(0, 4) + "." + digits.slice(4) : digits
+                up("foundRaw", v)
+              }}
+              maxLength={7}
+              style={{ ...iStyle(false), marginTop: 10 }}
+            />
+            <div style={{ fontSize: 12, color: C.fog, fontFamily: "sans-serif", margin: "4px 2px 0" }}>
+              업종은 회사의 기운을, 창립 연월은 회사의 나이를 봐서 나와의 궁합을 맞춰볼게.
             </div>
           </div>
 
