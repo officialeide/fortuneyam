@@ -234,7 +234,7 @@ export default function MoraIntro({ onEnter }) {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      padding: "24px 20px",
+      padding: "18px 20px",
       fontFamily: "'Georgia', serif",
       color: C.parchment,
     }}>
@@ -268,7 +268,7 @@ export default function MoraIntro({ onEnter }) {
                 background: "transparent",
                 border: `1px solid ${C.walnut}`,
                 borderRadius: 8,
-                padding: "13px 40px",
+                padding: "10px 32px",
                 color: C.sand,
                 fontSize: 13,
                 cursor: "pointer",
@@ -296,7 +296,7 @@ export default function MoraIntro({ onEnter }) {
         }}>
           {/* Mora 로고 */}
           <div style={{
-            textAlign: "center", marginBottom: 36,
+            textAlign: "center", marginBottom: 24,
             fontSize: 11, letterSpacing: 5, color: C.iris,
             textTransform: "uppercase", fontFamily: "sans-serif",
           }}>
@@ -304,7 +304,7 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 이 우주가 너를 받아들인 순간 */}
-          <div style={{ marginBottom: 36 }}>
+          <div style={{ marginBottom: 26 }}>
             <div style={qStyle}>이 우주가 너를 받아들인 순간이 언제야?</div>
 
             {/* 양력/음력 */}
@@ -408,14 +408,14 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 성별 */}
-          <div style={{ marginBottom: 36 }}>
+          <div style={{ marginBottom: 26 }}>
             <div style={qStyle}>어떤 성별로 태어났어?</div>
             <div style={{ display: "flex", gap: 10 }}>
               {["여", "남"].map(g => (
                 <button key={g}
                   onClick={() => up("gender", g)}
                   style={{
-                    flex: 1, padding: "13px", borderRadius: 8,
+                    flex: 1, padding: "10px", borderRadius: 8,
                     border: `1px solid ${form.gender === g ? C.caramel : C.fog}`,
                     background: form.gender === g ? C.mahogany : "transparent",
                     color: form.gender === g ? C.sand : C.fog,
@@ -430,14 +430,14 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 연애 상태 */}
-          <div style={{ marginBottom: 36 }}>
+          <div style={{ marginBottom: 26 }}>
             <div style={qStyle}>지금 연애 중이야, 혼자야?</div>
             <div style={{ display: "flex", gap: 10 }}>
               {["솔로", "연애중"].map(s => (
                 <button key={s}
                   onClick={() => up("loveStatus", s)}
                   style={{
-                    flex: 1, padding: "13px", borderRadius: 8,
+                    flex: 1, padding: "10px", borderRadius: 8,
                     border: `1px solid ${form.loveStatus === s ? C.caramel : C.fog}`,
                     background: form.loveStatus === s ? C.mahogany : "transparent",
                     color: form.loveStatus === s ? C.sand : C.fog,
@@ -452,7 +452,7 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 입사일 (선택) */}
-          <div style={{ marginBottom: 36 }}>
+          <div style={{ marginBottom: 26 }}>
             <div style={qStyle}>지금 다니는 회사 입사일{"\n"}알려줄 수 있어? (선택)</div>
             <input
               className="mora-input"
@@ -474,7 +474,7 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 회사 창립일·업종 (선택) */}
-          <div style={{ marginBottom: 36 }}>
+          <div style={{ marginBottom: 26 }}>
             <div style={qStyle}>회사 창립 연월과 업종도{"\n"}알면 궁합이 더 정확해져. (선택)</div>
             <input
               ref={foundRef}
@@ -505,7 +505,7 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 이름 */}
-          <div style={{ marginBottom: 48 }}>
+          <div style={{ marginBottom: 32 }}>
             <div style={qStyle}>
               이 우주에서 선물받은 이름,{"\n"}나한테도 알려줄 수 있어?
             </div>
@@ -528,9 +528,9 @@ export default function MoraIntro({ onEnter }) {
               background: C.walnut,
               border: `1px solid ${C.caramel}`,
               borderRadius: 10,
-              padding: "16px",
+              padding: "12px",
               color: C.parchment,
-              fontSize: 14,
+              fontSize: 13,
               cursor: "pointer",
               fontFamily: "sans-serif",
               letterSpacing: 2,
@@ -546,14 +546,14 @@ export default function MoraIntro({ onEnter }) {
 }
 
 const qStyle = {
-  fontSize: 16, color: "#F0E8DC", marginBottom: 16,
-  lineHeight: 1.8, letterSpacing: 0.3, whiteSpace: "pre-line",
+  fontSize: 15, color: "#F0E8DC", marginBottom: 12,
+  lineHeight: 1.6, letterSpacing: 0.3, whiteSpace: "pre-line",
 }
 
 const iStyle = (hasErr) => ({
   width: "100%", background: "#1A1220",
   border: `1px solid ${hasErr ? "#7B4FA6" : "#3D2016"}`,
-  borderRadius: 8, padding: "14px 16px",
+  borderRadius: 8, padding: "11px 14px",
   color: "#F0E8DC", fontSize: 14, fontFamily: "sans-serif",
   outline: "none", boxSizing: "border-box", letterSpacing: 0.3,
   transition: "border-color 0.2s",
