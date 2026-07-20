@@ -738,7 +738,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   const reomulStructure = isSingang
     ? `에너지가 집중된 구조야. 돈 잡으면 오래 쥐고 있어. 근데 욕심이 화근이야. 한 번에 다 가지려다 날리는 패턴, 이미 경험했지?`
     : `에너지가 분산된 구조야. 돈이 들어와도 손에 안 남아. 구조가 그래. 잘못이 아닌데 이 패턴 모르면 평생 반복돼.`
-<<<<<<< HEAD
   const wealthPatternText = pick5({
     비겁: "능력은 있어. 근데 혼자 다 하려다 힘이 분산돼. 사람과 나누고 판을 키울 때 오히려 돈이 붙는데, 동업이나 돈거래에선 뺏기기 쉬우니 선은 분명히 그어.",
     식상: "능력은 있어. 근데 만들기만 하고 파는 걸 놓쳐. 아이디어를 돈으로 바꾸는 마지막 한 걸음을 남에게 미루면 제자리야. 표현하고 내다 파는 데까지 가야 돈이 돼.",
@@ -746,9 +745,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     관성: "능력은 있어. 인정도 받아. 근데 자리·직책이 서야 돈이 따라오는 구조야. 눈앞의 벌이보다 나를 인정해줄 판에 올라타는 게 먼저야.",
     인성: "능력은 있어. 근데 배우고 준비만 하다 실전 타이밍을 놓쳐. 전문성이 돈으로 연결되려면, 완벽히 준비되기 전에 한 발 먼저 내미는 용기가 필요해.",
   }) + " 지금까지 에너지가 살아났던 일과 지쳤던 일을 돌아봐. 살아난 쪽이 용신 방향이야."
-=======
-  const reomulYongsin = yongsinA ? `살길은 ${yongsinD} 기운이야. 이 방향으로 가야 돈이 따라와. 거슬러 가면 아무리 열심히 해도 제자리야.` : ""
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
   const _gd = GISIN_DETAIL[gisinA] || GISIN_DETAIL[gisinA?.split("·")[0]] || {}
   const reomulGisin = gisinA
     ? `${gisinD} 기운은 돈을 새게 만들어. 이쪽으로 가면 힘만 빼는 거야.\n피해야 할 업종은 ${_gd["업종"] || gisinD + " 방향의 분야"} 쪽이야. 아무리 조건이 좋아도 이 방향은 에너지가 새.\n하지 말아야 할 건 ${_gd["행동"] || "이 기운의 방향으로 무리하게 가는 거야."}\n조심해야 할 사람은 ${_gd["사람"] || gisinD + " 기운이 강한 사람"}이야. 가까이 둘수록 재물이 막혀.`
@@ -850,7 +846,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   const healthExerciseText = `달이 ${moonSign || "감정의 별자리"}에 있는 만큼, 규칙적인 생활 리듬이 건강의 핵심이야. ${healthExercise}${_hasJong(healthExercise) ? "이" : "가"} 맞아. 강도보다 꾸준함이 훨씬 중요해.`
   const healthSeasonText = healthWeakOh.map(k => OHK_SEASON_WARN[k]).filter(Boolean).join("\n") || "특별히 취약한 계절 없이 사계절 무난하게 지나가는 구조야."
   const healthFoodText = `${yongsinD || ""} 기운을 올려주는 음식이 맞아. ${OHK_FOOD[yongsinA] || OHK_FOOD[yongsinA?.split("·")[0]] || "제철 음식"}. 따뜻하게 먹는 것이 중요해. 커피는 하루 한 잔 이하로 줄이는 게 좋고, 과음은 이 사주에서 건강을 제일 빠르게 망가뜨려.`
-<<<<<<< HEAD
   const healthMentalText = pick5({
     관성: "책임과 압박을 스스로 짊어지다 긴장이 몸으로 오는 구조야. 어깨·목 결림이나 불면으로 나오기 쉬우니, 다 짊어지려는 마음을 내려놓는 게 정신 건강 관리야.",
     인성: "혼자 생각을 곱씹고 담아두는 게 많은 구조야. 표현하지 않으면 몸으로 나오니, 글쓰기나 가까운 사람한테 털어놓기, 혼자만의 회복 시간이 약이야.",
@@ -858,11 +853,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     비겁: "쉬지 않고 움직이려는 기질이라 몸을 혹사하기 쉬워. 멈추는 걸 못 견디는 게 함정이니, 강제로라도 쉬는 시간을 넣는 게 정신 건강의 열쇠야.",
     재성: "여러 일을 동시에 붙들다 과부하가 오는 구조야. 다 챙기려다 신경이 곤두서기 쉬우니, 우선순위를 정해 덜어내는 게 마음을 지키는 법이야.",
   })
-=======
-  const healthMentalText = isSingang
-    ? "에너지가 밖으로 향하는 구조라, 쉬지 않고 계속 움직이려는 경향이 있어. 의식적으로 멈추는 연습이 정신 건강 관리야. 몸을 쉬게 하는 것도 능력이야."
-    : "혼자 담아두는 것이 많은 구조야. 표현하지 않으면 몸으로 나와. 글쓰기, 일기, 가까운 사람한테 털어놓기가 정신 건강 관리야. 의식적으로 혼자만의 회복 시간이 필요해."
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
 
   // 가족운 + 전생업보 (IX)
   const yeonSibsong = d.pillars?.[0]?.gan?.sibsong || ""
@@ -930,7 +920,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     ? "역마살이 있어서 이동하고 변화하는 환경에서 인연을 만나. 여행, 이직, 이사 같이 뭔가 바뀌는 시점이야. 앱이나 소개팅보다 일 관련 자리, 스터디, 전문직 모임에서 자연스럽게 만나는 인연이 오래가."
     : "일상적인 관계 속에서 인연이 자라나는 구조야. 급하게 새로운 사람을 만나려 하기보다, 이미 아는 사람들 사이에서 뜻밖의 인연이 시작될 가능성이 커."
   const soloTypeText = idealType || (yongsinA ? `${yongsinD} 기운이 강한 사람이 인연이야. 따뜻한 인상, 믿음직한 분위기, 화려하지 않아도 존재감이 있는 사람. 처음엔 밋밋해 보여도 알수록 깊어지는 사람이 진짜 인연이야.` : "말보다 행동으로 보여주는 사람이 인연이야.")
-<<<<<<< HEAD
   const soloApproachText = ({
     나무: "서두르지 말고 천천히 신뢰를 쌓아. 급하게 밀어붙이면 바로 닫혀. 곁에서 함께 자라듯 꾸준히 있어주는 사람한테 마음이 열려.",
     불: "밝고 솔직하게 다가가는 게 통해. 단, 너무 뜨겁게 몰아붙이면 부담스러워하니 상대 속도를 봐가며 열기를 조절하는 게 관건이야.",
@@ -938,9 +927,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     금: "선을 지키며 예의 있게 다가가. 가볍게 굴면 신뢰를 안 주는 상대라, 진중하고 분명한 태도가 오히려 매력으로 먹혀.",
     물: "천천히 스며들 듯 다가가. 몰아붙이면 도망가니, 편안한 대화와 여백을 주면서 자연스럽게 거리를 좁히는 게 유일하게 통해.",
   })[_domOhKr] || "처음엔 절대 티 내지 마. 천천히 신뢰를 쌓아야 해. 빠르게 밀어붙이면 바로 닫혀. 말보다 행동으로, 꾸준하게, 부담 없이 곁에 있어주는 방식이 유일하게 먹혀."
-=======
-  const soloApproachText = "처음엔 절대 티 내지 마. 천천히 신뢰를 쌓아야 해. 빠르게 밀어붙이면 바로 닫혀. 말보다 행동으로, 꾸준하게, 부담 없이 곁에 있어주는 방식이 유일하게 먹혀."
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
 
   // 업무운 2 - 수성 교차, 회사 궁합
   const mercurySign = a.mercury && a.mercury !== "분석 중" ? zodiacFix(a.mercury) : null
@@ -950,7 +936,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     : ""
 
   // 관계운 2 - 소진 패턴, 그림자
-<<<<<<< HEAD
   const drainPatternText = pick5({
     관성: "남의 기대에 부응하려 무리하게 떠안다 기가 빠져. '거절하면 실망시킨다'는 부담이 나를 갉으니, 못 하는 건 못 한다고 말하는 게 기를 지키는 법이야.",
     인성: "주변의 감정을 쉽게 흡수하는 구조야. 힘든 사람 곁에 있으면 나도 같이 가라앉으니, 받는 것 없이 주기만 하는 관계는 일찍 정리해야 해.",
@@ -958,11 +943,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     비겁: "남의 부탁을 거절 못 하고 내 몫 아닌 것까지 짊어지다 지쳐. 다 떠안는 패턴을 알아채고 선을 긋는 게 먼저야.",
     재성: "여러 사람·여러 일을 다 관리하려다 진이 빠져. 손 안의 걸 다 붙들려는 마음을 놓고, 놓아도 되는 건 놓는 연습이 기를 지켜.",
   })
-=======
-  const drainPatternText = isSingang
-    ? "에너지가 밖으로 향하는 구조라, 남의 부탁을 거절 못 하고 계속 떠안다가 소진돼. 내 몫이 아닌 것까지 짊어지는 패턴을 알아채는 게 먼저야."
-    : "주변의 감정을 쉽게 흡수하는 구조야. 감정적으로 힘든 사람 곁에 있으면 나도 모르게 같이 힘들어져. 받는 것 없이 주기만 하는 관계는 일찍 정리해야 해."
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
   const shadowText = challenges.length
     ? `기신 구간에 들어서면 평소 약점이 유독 크게 도드라져. 스트레스가 쌓일수록 예민해지고 시야가 좁아지니, 이럴 때일수록 의식적으로 힘을 빼고 유연함을 연습하는 게 이 시기를 무사히 넘기는 법이야.`
     : "본인은 원칙을 지킨다고 생각하는데 타인 눈에는 고집스럽게 보이는 경우가 있어. 의식적으로 유연함을 연습해야 해."
@@ -1049,7 +1029,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   const yongsinJob = yongsinJobMap[yongsinA] || yongsinJobMap[yongsinA?.split("·")[0]] || ""
 
   // 재물 상세
-<<<<<<< HEAD
   const reomulType = _jaeStruct === "편재"
     ? `큰돈이 오가는 구조야. 벌 때 시원하게 벌고 나갈 때도 크게 나가서 통장이 롤러코스터지. 한 방을 보는 감각은 좋은데, 들어올 때 일부를 딱 묶어두는 습관이 없으면 손에 안 남아. 흐름을 타되 안전판을 만드는 게 이 사주가 돈을 쥐는 법이야.`
     : _jaeStruct === "정재"
@@ -1061,11 +1040,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     : isSingang
     ? `에너지가 집중된 구조야. 방향만 잡히면 돈을 오래 쥐고 있어. 근데 욕심이 화근이라, 더 크게 더 빨리 가지려다 한 번에 날리는 패턴이 함정이야. 크게 버는 것보다 잃지 않는 구조를 먼저 만들어.`
     : `에너지가 분산된 구조야. 열심히 하는데 왜 안 쌓이나 싶었지? 여러 가지를 동시에 하면 전부 흩어지는 구조라, 하나를 깊게 파는 게 돈을 쌓는 유일한 방법이야. 선택과 집중, 이게 답이야.`
-=======
-  const reomulType = isSingang
-    ? `에너지가 집중된 구조야. 일단 방향이 잡히면 돈을 잡고 오래 쥐고 있어. 근데 그게 양날의 검이야. 한번 욕심이 생기면 멈추질 못해. 더 크게, 더 빨리 가지려다 한 번에 날리는 패턴이 이 구조의 함정이야. 이미 경험해봤지? 문제는 그게 한 번으로 안 끝난다는 거야. 모르면 계속 반복돼. 지금 당장 크게 버는 것보다 잃지 않는 구조를 만드는 게 먼저야. 욕심의 크기를 조절하는 것이 이 사주의 핵심 과제야.`
-    : `에너지가 분산된 구조야. 돈이 들어오는 경로가 여러 개인 것 같은데, 정작 어디서 들어오고 어디서 나가는지 파악이 안 돼. 열심히 하는데 왜 안 쌓이나 싶었지? 구조가 그래. 잘못이 아니야. 근데 이 구조를 모르면 평생 이 패턴이 반복돼. 에너지를 한 곳에 모아야 해. 여러 가지를 동시에 하면 전부 흩어져. 하나를 깊게 파는 것이 이 사주에서 돈을 쌓는 유일한 방법이야. 선택과 집중, 이게 돈의 답이야.`
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
   const _yd = YONGSIN_DETAIL[yongsinA] || YONGSIN_DETAIL[yongsinA?.split("·")[0]] || {}
   const reomulSurvive = yongsinA
     ? `${yongsinD} 기운이 이 사주를 살려. 이 방향으로 가야 돈이 따라오고, 에너지가 살아나. 거슬러 가면 아무리 열심히 해도 제자리야. 지금 하는 일이 이 방향인지 한번 봐. 맞으면 계속 가고, 아니면 방향을 틀어야 해.\n맞는 업종은 ${(_yd["업종"] || yongsinJobMap[yongsinA] || yongsinD + " 방향의 분야")} 쪽이야. 이런 분야에서 열심히 한 만큼 결과가 나와. 일상에서는 ${_yd["행동"] || "용신 방향의 활동을 늘리면 좋아."} 취미도 ${_yd["취미"] || "이 기운을 살리는 활동"}으로 채워. ${yongsinD} 기운이 필요하니까, 작은 것부터 이 기운을 늘려가는 게 재물을 쌓는 가장 빠른 길이야. 반대로 조심할 건 ${_yd["피해야할것"] || "이 기운을 거스르는 방향으로 가는 거야."}`
@@ -1158,7 +1132,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     ? `재성이 ${_jaeCnt}개로 두둑해. 연봉 협상이나 성과급에서 제 몫을 챙기는 감각이 있어. 돈 얘기 앞에서 물러서지 마라. 요구할 줄 아는 게 이 사주의 무기야.`
     : `재성이 ${_jaeCnt}개야. 연봉은 크게 욕심내기보다 안정적으로 쌓는 흐름이야. 한 방보다 꾸준한 상승을 노리는 게 맞아.`
   const jikjangYearText = `올해 직장운을 십성으로 보면, ${_gwanCnt >= 1 ? "관성이 자리를 받쳐줘서 인정받고 올라설 여지가 있어." : "관성이 약해서 자리보다 실력을 다지는 해야."} ${_inCnt >= 1 ? "인성도 들어와 문서, 합격 운이 같이 열려." : "문서운은 잔잔하니 큰 계약은 때를 봐."} ${yeonbongText}`
-<<<<<<< HEAD
   const promoText = `${_gwanCnt >= 1 ? "관성이 받쳐줘서 조직에서 치고 올라갈 힘이 있어. " : "관성이 약해 승진 정공법보다 실력으로 존재감을 만드는 게 빨라. "}${nextDaeun ? "대운이 바뀌는 전환기 즈음에 자리와 직책이 크게 움직이니, 그때를 노려 성과를 몰아쳐." : "지금 대운 안에서도 세운 점수가 높은 해에 인정과 승진이 몰리니, 아래 흐름에서 좋은 해에 승부를 걸어."} 조용히 쌓은 게 한 번에 인정받는 흐름이라, 티 나게 밀기보다 결과로 증명하는 게 이 사주의 승진법이야.`
   const burnoutText = `${isSingang ? "혼자 다 짊어지다 어느 순간 방전되는 게 번아웃 신호야. 다 잘하려 말고 맡길 건 맡겨." : "거절 못 하고 떠안다가 속으로 곪는 게 슬럼프의 시작이야. 내 한계를 인정하고 선을 긋는 연습이 필요해."} ${gisinA ? `특히 ${gisinD} 기운이 강해지는 시기엔 유독 지치고 판단이 흐려지니, 이때는 새 일을 벌이기보다 몸과 마음을 정비해.` : "무리가 겹치는 시기엔 성과보다 회복을 우선해."} 쉬는 것도 실력이야. 방전되기 전에 미리 숨 고르는 게 오래 일하는 비결이야.`
   // 이직운 (관성 + 역마 + 대운)
@@ -1169,9 +1142,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     비겁: "대운 전환기엔 혼자 다 짊어지려 말고 힘을 아껴. 변화를 두려워만 하면 기회도 지나가니, 믿을 사람과 손잡고 흐름을 함께 넘는 게 나아.",
     재성: "대운 전환기엔 벌인 판을 슬림하게 정리하고 다음 기회를 노려. 흐름을 읽고 미리 방향을 틀어두면 전환기가 오히려 크게 버는 발판이 돼.",
   })
-=======
-  // 이직운 (관성 + 역마 + 대운)
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
   const jikjangRole = careerWeak + (recovery ? " " + mug(recovery) : "")
   // 회사운 / 취업운 (입사일 유무 분기)
   const hasJoin = !!d.joinDate
@@ -1180,7 +1150,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   const _foundYear = d.foundDate?.year
   const hasCompanyInfo = hasJoin || !!_compEl || !!_foundYear
   const companyFitText2 = (() => {
-<<<<<<< HEAD
     if (!hasCompanyInfo) return ""
     const elFit = _compEl ? (_yongList.includes(_compEl) ? "good" : _giList.includes(_compEl) ? "bad" : "neutral") : null
     const joinFit = hasJoin ? (_gwanCnt >= 1 ? "good" : "weak") : null
@@ -1205,23 +1174,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       ageTail = ` 참고로 ${_foundYear}년생 회사라 ${age < 5 ? "아직 어린 조직이야. 함께 자리를 잡아가는 재미가 있는 대신 안정성은 덜해." : age < 15 ? "한창 성장하는 조직이라 체계와 기회가 함께 있어." : "충분히 자리 잡은 조직이라 안정과 체계는 있지만 변화 속도는 느릴 수 있어."}`
     }
     return (verdict + ageTail + " 큰 결정을 내리기 전엔 대운 흐름을 먼저 보는 게 좋아.").trim()
-=======
-    const parts = []
-    if (hasJoin) parts.push(`${_joinYear}년에 들어간 회사야. 입사한 해의 기운과 이 사주를 맞춰 보면, ${_gwanCnt >= 1 ? "관성이 살아 있어서 이 조직에서 자리를 잡고 인정받을 수 있는 궁합이야. 버티면 열매가 있어." : "조직과 딱 맞물리는 궁합은 아니야. 여기서 다 채우려 하기보다, 실력을 쌓는 발판으로 삼는 게 현명해."}`)
-    if (_compEl) {
-      const k = _ohKr(_compEl)
-      if (_yongList.includes(_compEl)) parts.push(`업종을 보면 이 회사는 ${k} 기운이라 내 용신과 맞물려. 기운을 살려주는 결이라, 오래 다닐수록 이 자리가 나를 키워주는 궁합이야.`)
-      else if (_giList.includes(_compEl)) parts.push(`업종을 보면 이 회사는 ${k} 기운이라 내 기신에 걸려. 조건이 좋아 보여도 은근히 기운이 새는 자리니, 오래 머물 곳인지 신중히 봐.`)
-      else parts.push(`업종을 보면 이 회사는 ${k} 기운인데, 나와 상생도 상극도 아닌 중립이야. 궁합보다는 실무 조건과 사람을 보고 판단하면 돼.`)
-    }
-    if (_foundYear) {
-      const age = (new Date().getFullYear()) - _foundYear
-      parts.push(`${_foundYear}년에 세워진 회사라, ${age < 5 ? "아직 어린 조직이야. 함께 자리를 잡아가는 재미가 있는 대신 안정성은 덜하니, 변화를 즐기는 시기에 잘 맞아." : age < 15 ? "한창 성장하는 조직이야. 체계와 기회가 함께 있는 편이라 실력을 키우기 좋아." : "충분히 자리 잡은 조직이야. 안정과 체계는 있지만 변화 속도는 느릴 수 있어."}`)
-    }
-    if (!parts.length) return ""
-    parts.push("큰 결정을 내리기 전엔 대운 흐름을 먼저 보는 게 좋아.")
-    return parts.join(" ")
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
   })()
   const chwiupText = `${hasJoin ? "지금 회사와 별개로 취업·이직운을 보면," : "아직 다니는 회사가 없거나 입사일을 안 넣었으니 취업운으로 봐줄게."} ${_gwanCnt >= 1 ? "관성이 있어서 조직에 붙는 힘은 있어. 자기소개서나 면접에서 '책임감 있고 신뢰 가는 사람'으로 밀면 먹혀." : "관성이 약해서 대형 조직에 정공법으로 붙기보다, 전문성이나 실무 능력을 앞세우는 게 유리해. 작은 조직이나 실력 중심의 자리가 더 잘 맞아."} 합격운은 인성이 좌우하는데, ${_inCnt >= 1 ? "인성이 받쳐줘서 준비한 만큼 결실이 나와. 시험, 서류 운이 나쁘지 않아." : "인성이 약하니 붙을 때까지 두드리는 끈기가 필요해."} 아래 12개월 흐름에서 점수 높은 달에 원서를 넣어.`
   // ── 취업운 확장 (조직유형 / 면접·전략 / 이직·상사·방해) ──
@@ -1230,7 +1182,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     : _gwanCnt === 0
     ? "관성이 약해서 규칙에 꽉 매인 대형 조직보다, 자율성이 큰 작은 조직이나 실력으로 승부하는 곳이 잘 맞아. 스타트업, 전문직, 프리랜서처럼 내 재량이 넓은 자리에서 빛나. 위계가 강한 곳에 억지로 들어가면 금세 답답해져."
     : "관성이 적당해서 너무 경직된 곳도, 너무 느슨한 곳도 아닌 중간 규모 조직이 잘 맞아. 체계는 있되 개인 재량도 어느 정도 인정되는 데가 최적이야."
-<<<<<<< HEAD
   const interviewText = pick5({
     관성: "면접에선 '책임감 있고 신뢰 가는 사람' 이미지가 먹혀. 튀는 개성보다 안정감과 성실함을 앞세워. 하나를 끝까지 해낸 완수 경험을 강조하면 유리해.",
     식상: "면접에선 말솜씨와 순발력이 무기야. 짜인 답보다 상황에 맞게 풀어내는 힘이 강점이라, 대화형 면접이나 발표에서 빛나. 창의성과 표현력을 보여줘.",
@@ -1238,13 +1189,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     재성: "면접에선 실전 감각과 성과로 승부해. 추상적인 포부보다 '무엇을 얼마나 만들어냈는가'를 숫자와 결과로 보여줄 때, 실무형이라는 인상이 강하게 박혀.",
     비겁: "면접에선 뚝심과 주도성이 강점이야. 주눅 들지 않는 태도와 '맡겨만 주면 해낸다'는 자신감이 먹히니, 위축되지 말고 당당하게 밀어붙여.",
   })
-=======
-  const interviewText = _gwanCnt >= 2
-    ? "면접에서는 '책임감 있고 신뢰 가는 사람' 이미지가 먹혀. 튀는 개성보다 안정감과 성실함을 앞세워. 서류도 화려한 스펙 나열보다 하나를 끝까지 해낸 완수 경험을 강조하는 게 유리해."
-    : (d.sibsongAnalysis?.counts?.["식신"] || 0) + (d.sibsongAnalysis?.counts?.["상관"] || 0) >= 2
-    ? "면접에서는 말솜씨와 순발력이 무기야. 짜인 답보다 상황에 맞게 풀어내는 힘이 강점이라, 대화형 면접이나 발표에서 빛나. 창의성과 표현력을 보여주는 자리를 노려."
-    : "면접에서는 차분함과 준비된 태도가 강점이야. 즉흥 대응보다 미리 탄탄히 준비했을 때 실력이 나오니, 예상 질문을 충분히 연습하고 들어가면 합격률이 확 올라가."
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
   const jobStrategyText = _inCnt >= 1
     ? "인성이 받쳐줘서 자격증, 공채, 시험처럼 준비한 만큼 결과가 나오는 정공법이 잘 맞아. 스펙을 차곡차곡 쌓아 서류에서 승부 보는 전략이 유리해."
     : _jaeCnt >= 2
@@ -1257,7 +1201,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     : "특별히 취업을 크게 막는 기운은 없어. 다만 조급함이 제일 큰 방해라, 초조하게 아무 데나 넣기보다 흐름이 좋은 시기를 기다렸다 움직이는 게 이득이야."
 
   // ── 관계운 3페이지용 추가 ──
-<<<<<<< HEAD
   const relSocialStyle = pick5({
     관성: "관계에서 책임지고 조율하는 쪽이야. 모임에서 총대 메고 챙기는 역할을 맡는데, 그 부담을 혼자 지다 지쳐. 다 감당하려 말고 나눌 줄도 알아야 해.",
     인성: "관계에서 받는 걸 어려워하는 쪽이야. 남 챙기는 건 잘하는데 정작 내 얘기는 잘 안 꺼내. 깊은 관계는 소수랑만 맺고, 그 소수한테는 뭐든 내주는 사람이야.",
@@ -1275,17 +1218,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     비겁: "몸을 계속 쓰려 드는 기질이라 젊을 땐 체력으로 버텨. 근데 그게 독이야. 누적된 피로가 삼사십대에 터지기 쉬우니, 멈출 줄 아는 게 장수 비결이야.",
     재성: "여러 일을 벌이며 몸을 과하게 굴리는 편이야. 바쁠수록 끼니와 잠이 무너지기 쉬우니, 기본 리듬을 지키는 게 가장 큰 재테크이자 건강법이야.",
   })
-=======
-  const relSocialStyle = isSingang
-    ? "관계에서 주는 쪽이야. 먼저 다가가고, 챙기고, 판을 벌이는 역할을 맡아. 사람이 모이는 중심에 서지만, 정작 힘들 때 기댈 사람은 적은 게 함정이야. 다 퍼주고 정작 나는 못 채우는 구조라, 받는 연습도 필요해."
-    : "관계에서 받는 걸 어려워하는 쪽이야. 남 챙기는 건 잘하는데 정작 내 얘기는 잘 안 꺼내. 깊은 관계는 소수랑만 맺고, 넓게 얕게는 잘 안 돼. 그 소수한테는 뭐든 내주는 사람이야."
-  const relConflictStyle = "부딪힐 땐 정면으로 싸우기보다 조용히 거리를 둬. 겉으론 아무렇지 않은 척하지만 속으로 이미 정리에 들어간 거야. 이 방식이 편하긴 한데, 오해를 키우기도 해. 진짜 아끼는 관계라면 닫기 전에 한 번은 말로 풀어."
-
-  // ── 건강운 3페이지용 추가 ──
-  const healthLifeText = isSingang
-    ? "몸을 계속 쓰려 드는 기질이라, 젊을 땐 체력으로 버텨. 근데 그게 독이야. 삼사십대에 누적된 피로가 한 번에 터지기 쉬우니, 지금부터 쉬는 습관을 들여. 멈출 줄 아는 게 이 사주의 장수 비결이야."
-    : "타고난 체력이 넘치는 편은 아니야. 대신 무리만 안 하면 잔병 없이 오래 가는 구조야. 몸이 보내는 신호에 예민한 게 강점이니, 초기에 잡으면 큰 병으로 안 커져. 규칙적인 생활이 곧 보약이야."
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
   const healthMindLifeText = "몸보다 마음이 먼저 지치는 사주야. 스트레스가 몸으로 내려오기 전에 마음을 비우는 루틴을 만들어. 명상이든 산책이든 혼자만의 회복 시간이 약보다 중요해."
 
   // ── 대운 인생지도용 ──
@@ -1460,7 +1392,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   const _famTop = Object.entries(_famScores).sort((a, b) => b[1] - a[1])[0]
   const _famLack = Object.entries(_famScores).filter(([, v]) => !v).map(([k]) => k)
   const yukchinSelfText = `사주를 보는 건 결국 나를 이해하는 일이야. 가족이라는 자리도 그래. 이 명식에서 ${_famTop && _famTop[1] ? _famTop[0] : "육친"} 기운이 가장 도드라지는데, 그게 어떤 가족 안에서 컸는지를 넘어 지금의 나를 이렇게 만들었어. ${_famTop && _famTop[1] ? _famPattern[_famTop[0]] : "육친이 특정 자리에 쏠리지 않고 고르게 퍼져 있어, 한 패턴에 갇히지 않고 관계마다 다른 얼굴을 꺼내 쓰는 편이야."}${_famLack.length ? ` 반대로 ${_famLack.join(", ")} 자리가 비어서, 그 결핍을 채워줄 사람에게 유독 끌리고 또 유독 상처받아. 하지만 그 자리를 남이 아니라 스스로 채우는 게 이번 생의 관계 숙제야.` : " 큰 결핍 없이 갖춰진 편이라, 관계에서 균형을 잡는 힘은 타고났어."}`
-<<<<<<< HEAD
   const yukchinLoopText = pick5({
     관성: "관계에서 상대의 기대와 규칙에 나를 맞추는 패턴을 반복해. 가족 안에서 '잘해야 사랑받는다'고 익힌 각본이 어른이 된 지금도 따라와. 그 각본을 알아차리는 순간, 조건 없이도 사랑받을 자격이 있다는 걸 알게 돼.",
     인성: "관계에서 받기보다 먼저 주고 희생하는 패턴을 반복해. 가족 안에서 '내가 챙겨야 한다'고 익힌 각본이 지금도 따라와. 그 각본을 알아차리는 순간, 나도 기대고 받아도 된다는 걸 배우게 돼.",
@@ -1468,11 +1399,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     비겁: "관계에서 지지 않으려 하고 주도권을 두고 힘겨루기하는 패턴을 반복해. 가족 안에서 '내 몫은 내가 지킨다'고 익힌 각본이 지금도 따라와. 그 각본을 알아차리는 순간, 이겨야만 하는 게 아니란 걸 알게 돼.",
     재성: "관계에서 상대를 챙기고 은근히 통제하려는 패턴을 반복해. 가족 안에서 '내가 관리해야 안심된다'고 익힌 각본이 지금도 따라와. 그 각본을 알아차리는 순간, 놓아줘도 관계가 무너지지 않는다는 걸 알게 돼.",
   })
-=======
-  const yukchinLoopText = isSingang
-    ? "관계에서 내가 주도하고 책임지려는 패턴을 반복해. 부모 자리에서 익힌 '내가 중심을 잡아야 한다'는 각본이 연애와 직장에도 그대로 재생돼. 하지만 그 각본을 알아차리는 순간, 처음으로 기대고 나눌 여지가 생겨."
-    : "관계에서 상대를 먼저 맞추고 내 욕구는 뒤로 미루는 패턴을 반복해. 가족 안에서 익힌 '조용히 맞춰야 편하다'는 각본이 어른이 된 지금도 따라와. 하지만 그 각본을 알아차리는 순간, 비로소 내 몫을 요구할 수 있게 돼."
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
 
   // 인간관계 상세
   const relGuardian = yongsinA ? `${yongsinD} 기운을 가진 사람이 귀인이야. 이 에너지가 나를 살려. 직관적으로 편한 사람, 같이 있으면 뭔가 잘 풀리는 사람이 그 타입이야.` : ""
@@ -1594,11 +1520,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       subtitle: "재물 구조 진단",
       blocks: [
         { h: "돈의 구조", text: reomulType, accent: C.sand },
-<<<<<<< HEAD
         { h: "반복된 패턴", text: wealthPatternText, accent: C.sand },
-=======
-        { h: "반복된 패턴", text: "능력은 있어. 인정도 받아. 근데 돈으로 연결이 안 돼. 방향이 맞으면 돈이 따라오는데, 방향이 틀리면 아무리 열심히 해도 제자리야. 지금까지 에너지가 살아났던 일과 지쳤던 일을 돌아봐. 살아난 쪽이 용신 방향이야.", accent: C.sand },
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
       ],
     },
     {
@@ -1633,11 +1555,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
         blocks: [
           { h: "연애할 때 나", text: desire ? desire + (desire2 ? "\n\n" + desire2 : "") : `겉으로는 별로 안 원하는 척해. 근데 속은 달라. 진심으로 알아봐 주는 사람을 원해. 말 안 해도 알아채고, 기대 없이 챙겨주는 사람. 그런 사람한테 한번 마음 열면 끝까지 열어.`, accent: C.lavender },
           { h: "끌리는 순간", text: attraction || "말보다 행동으로 보여주는 사람한테 흔들려. 요란한 고백보다 조용히 곁을 지키는 쪽에 마음이 가.", accent: C.lavender },
-<<<<<<< HEAD
           { h: "마음이 열리는 순간", text: triggers.length ? triggers.join(" ") : `오래 지켜봐 온 사람이 구체적으로 알아봐 줄 때. 피상적인 칭찬 말고 진짜로 봤다는 느낌. 그 순간 완전히 무너져.`, accent: C.lavender },
-=======
-          { h: "무너지는 지점", text: triggers.length ? triggers.join(" ") : `오래 지켜봐 온 사람이 구체적으로 알아봐 줄 때. 피상적인 칭찬 말고 진짜로 봤다는 느낌. 그 순간 완전히 무너져.`, accent: C.lavender },
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
         ].filter(Boolean),
       },
       {
@@ -1672,10 +1590,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
         blocks: [
           { h: "지금 관계에서의 나", text: coupleSelfText, accent: C.lavender },
           { h: "부딪히는 순간", text: loveConflictHow, accent: C.lavender },
-<<<<<<< HEAD
-=======
-          { h: "관계가 깊어지는 결", text: loveTiming, accent: C.lavender },
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
         ].filter(Boolean),
       },
       {
@@ -1684,11 +1598,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
         title: "이 관계를\n더 깊게 만드는 법.",
         subtitle: "관계 심화 · 상대 이해",
         blocks: [
-<<<<<<< HEAD
           { h: "관계가 깊어지는 순간", text: coupleOpenText, accent: C.lavender },
-=======
-          { h: "마음이 열리는 순간", text: coupleOpenText, accent: C.lavender },
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
           { h: "더 깊어지는 법", text: coupleDeepenText, accent: C.lavender },
           { h: "이번 생 연애 과제", text: loveWarn || "표현하는 법을 배우는 거야. 속에서 많은 게 일어나도 겉으론 안 보여. 먼저 말하지 않으면 혼자 지치고 닫히는 패턴이 반복돼.", accent: C.lavender },
         ].filter(Boolean),
@@ -1720,7 +1630,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     {
       label: "업무운 2", accent: C.caramel,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
-<<<<<<< HEAD
       title: "직장운과 문서운,\n지금 회사 궁합.",
       subtitle: "관성 · 인성 · 궁합",
       blocks: [
@@ -1753,30 +1662,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     {
       label: "취업운 2", accent: C.caramel,
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
-=======
-      title: "직장운과 문서운,\n올해 흐름.",
-      subtitle: "관성 · 인성 · 연봉",
-      blocks: [
-        { h: "직장운과 인정운", text: jikjangText, accent: C.caramel },
-        { h: "문서운", text: munseoText, accent: C.caramel },
-        { h: "올해 직장 흐름", text: jikjangYearText, accent: C.caramel },
-      ].filter(Boolean),
-    },
-    {
-      label: "취업운 1", accent: C.caramel,
-      tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "언제 어디로\n취업이 열리는지.",
-      subtitle: "합격 성향 · 맞는 조직",
-      blocks: [
-        hasCompanyInfo ? { h: "지금 회사 궁합", text: companyFitText2, accent: C.caramel } : null,
-        { h: "취업 기본운", text: chwiupText, accent: C.caramel },
-        { h: "잘 맞는 조직 유형·규모", text: orgFitText, accent: C.caramel },
-      ].filter(Boolean),
-    },
-    {
-      label: "취업운 2", accent: C.caramel,
-      tag: "유료", tagColor: C.plum, tagText: C.lavender,
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
       title: "붙는 사람은\n이렇게 준비해.",
       subtitle: "면접 강점 · 준비 전략",
       blocks: [
@@ -1929,11 +1814,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
         { h: "지금 대운", text: daeunCurText, accent: C.iris },
         { h: "다음 전환점", text: daeunNextText || `대운이 바뀌는 시점이 곧 온다는 것만 알아도 지금 준비하는 방식이 달라져.`, accent: C.iris },
         { h: "대운이 바뀌는 환절기", text: daeunTransitionText, accent: C.iris },
-<<<<<<< HEAD
         { h: "전환기를 준비하는 법", text: transitionPrepText, accent: C.iris },
-=======
-        { h: "전환기를 준비하는 법", text: "대운의 전환기엔 억지로 큰일을 벌이기보다, 몸과 마음을 정비하고 다음 흐름에 올라탈 준비를 하는 게 핵심이야. 하지만 변화를 두려워만 하면 기회도 같이 지나가니, 흐름을 읽고 미리 방향을 틀어두면 전환기가 오히려 도약의 발판이 돼.", accent: C.iris },
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
       ].filter(Boolean),
     },
     {
