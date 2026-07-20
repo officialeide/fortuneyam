@@ -1,38 +1,35 @@
 // components/SajuReportPreview.jsx
-import React, { useState } from 'react';
-import { S } from './ui.jsx';
-import TabSummary from './TabSummary.jsx';
-import TabSaju from './TabSaju.jsx';
-import TabInner from './TabInner.jsx';
-import TabTojung from './TabTojung.jsx';
-import TabAstro from './TabAstro.jsx';
-import TabMBTI from './TabMBTI.jsx';
+import React from 'react';
+import MoraReport from './MoraReport.jsx';
+import { SajuReport_PreviewLegacy } from './SajuReportPreviewLegacy.jsx';
 
+// MoraReport 전환 시점(2026-07-15) 이전 저장 리포트는 예전 탭 UI로,
+// 이후 저장 리포트는 라이브와 동일한 MoraReport로 렌더
+const MORA_CUTOFF = new Date("2026-07-15T10:37:20+09:00").getTime();
 
-function SajuReport_Preview({data}){
-  const [tab,setTab]=useState("요약");
-  // Preview 전용 local state — 부모 SajuReport의 state와 무관
-  const [previewAstroAI,setPreviewAstroAI]=useState(data?._astroAI||null);
-  const [previewTarotAI,setPreviewTarotAI]=useState(data?._tarotAI||null);
-  const [previewInnerAI,setPreviewInnerAI]=useState(data?._innerAI||null);
-  const TABS=["요약","사주","토정·주역","별자리·타로수비학","MBTI","내면 해부"];
-  if(!data) return <div style={{padding:20,color:"#aaa"}}>데이터 없음</div>;
-  return(
-    <div style={{maxWidth:480,margin:"0 auto"}}>
-      <div style={{padding:"10px 16px",background:"#fff3e0",fontSize:11,color:"#e65100",textAlign:"center",fontWeight:700}}>
-        관리자 미리보기: {data.name} ({data.birth})
+function SajuReport_Preview({ data, createdAt, onBack }) {
+  if (!data) return <div style={{ padding: 20, color: "#aaa" }}>데이터 없음</div>;
+
+  const ts = createdAt ? new Date(createdAt).getTime() : null;
+  const isLegacy = ts !== null && !Number.isNaN(ts) && ts < MORA_CUTOFF;
+
+  if (isLegacy) return <SajuReport_PreviewLegacy data={data} />;
+
+  return (
+    <div style={{ maxWidth: 480, margin: "0 auto" }}>
+      <div style={{ padding: "10px 16px", background: "#fff3e0", fontSize: 11, color: "#e65100", textAlign: "center", fontWeight: 700 }}>
+        관리자 미리보기 (읽기 전용)
       </div>
-      <div style={{...S.tabBar,overflowX:"auto"}}>
-        {TABS.map(t=><button key={t} onClick={()=>setTab(t)} style={{...S.tab,whiteSpace:"nowrap",...(tab===t?S.tabA:{})}}>{t}</button>)}
-      </div>
-      <div style={S.content}>
-        {tab==="요약"        && <TabSummary d={data} changeTab={setTab}/>}
-        {tab==="사주"        && <TabSaju d={data} reportData={data}/>}
-        {tab==="내면 해부"   && <TabInner d={data} parentInnerAI={previewInnerAI} setParentInnerAI={setPreviewInnerAI}/>}
-        {tab==="토정·주역"   && <TabTojung d={data}/>}
-        {tab==="별자리·타로수비학" && <TabAstro d={data} parentAstroAI={previewAstroAI} setParentAstroAI={setPreviewAstroAI} parentTarotAI={previewTarotAI} setParentTarotAI={setPreviewTarotAI}/>}
-        {tab==="MBTI"        && <TabMBTI d={data}/>}
-      </div>
+      <MoraReport
+        d={data}
+        onHome={onBack}
+        onSavePDF={null}
+        pdfLoading={false}
+        parentAstroAI={data?._astroAI || null}
+        setParentAstroAI={() => {}}
+        parentTarotAI={data?._tarotAI || null}
+        setParentTarotAI={() => {}}
+      />
     </div>
   );
 }

@@ -60,7 +60,7 @@ function AdminPage({onClose}){
         <button onClick={()=>setSel(null)} style={{background:"none",border:"none",fontSize:22,cursor:"pointer",color:"#333"}}>‹</button>
         <div style={{fontSize:13,fontWeight:700}}>관리자: {sel.users?.name}</div>
       </div>
-      <SajuReport_Preview data={sel.full_data_json}/>
+      <SajuReport_Preview data={sel.full_data_json} createdAt={sel.created_at} onBack={()=>setSel(null)}/>
     </div>
   );
 
