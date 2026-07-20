@@ -469,7 +469,25 @@ function Block({ h, text, kw, jsxContent, accent, last }) {
   )
 }
 
-function ChapterCard({ label, tag, tagColor, tagText, accent, title, subtitle, blocks, extra, flipping, flipDir }) {
+// 카테고리별 잠금 화면 후킹 문구 — 무료에서 보여준 결과의 "이유"를 안 풀고 끊는 방식
+const HOOK_TEXT = {
+  "사주 심화": "겉만 본 거야. 사주가 진짜로 하는 말은 여기부터야.",
+  "재물운": "돈이 안 새는 이유, 따로 있어. 그거 모르고 저축법만 바꾸면 계속 제자리야.",
+  "연애운": "인연 오는 자리랑 시기, 이미 정해져 있어. 이번에 놓치면 다음 문 열릴 때까지 한참 걸려.",
+  "애정운": "왜 자꾸 같은 지점에서 부딪히는지 원인이 다 나와 있어. 여기서 안 풀면 계속 그 자리야.",
+  "직장운": "지금 자리에서 왜 힘든지, 언제 풀리는지 다 나와 있어.",
+  "취업운": "언제 어디로 열리는지 다 나와 있어. 감으로 아무 데나 넣지 말고 흐름 보고 움직여.",
+  "관계운": "곁에 둘 사람과 밀어낼 사람, 갈라놓고 봐야 해.",
+  "건강운": "몸이 미리 보내는 신호가 있어. 늦기 전에 봐둬.",
+  "가족운": "집안에서 내려오는 결이 있어. 그게 지금 나한테도 흐르고 있어.",
+  "평생운": "인생 전체 지도랑 진짜 승부처가 언제인지, 여기 다 있어.",
+}
+const HOOK_DEFAULT = "여긴 겉만 본 거야. 진짜 이유는 안 풀었어."
+
+function ChapterCard({ label, tag, tagColor, tagText, accent, title, subtitle, blocks, extra, flipping, flipDir, locked, category, onUnlock }) {
+  const visibleBlocks = blocks.filter(Boolean)
+  const teaserBlock = locked ? visibleBlocks[0] : null
+  const restCount = locked ? Math.max(visibleBlocks.length - 1, 0) : 0
   return (
     <div style={{
       background: C.dusk, border: `1px solid ${C.mahogany}`, borderRadius: 16, overflow: "hidden",
@@ -489,9 +507,29 @@ function ChapterCard({ label, tag, tagColor, tagText, accent, title, subtitle, b
       </div>
       <div style={{ padding: "20px 24px 24px" }}>
         {extra}
-        {blocks.filter(Boolean).map((b, i) => (
-          <Block key={i} {...b} last={i === blocks.filter(Boolean).length - 1} />
+        {!locked && visibleBlocks.map((b, i) => (
+          <Block key={i} {...b} last={i === visibleBlocks.length - 1} />
         ))}
+        {locked && teaserBlock && <Block {...teaserBlock} last={false} />}
+        {locked && (
+          <div style={{ position: "relative", marginTop: 14 }}>
+            <div aria-hidden="true" style={{ filter: "blur(6px)", opacity: 0.5, pointerEvents: "none", userSelect: "none" }}>
+              {restCount > 0 && <Block {...visibleBlocks[1]} last={true} />}
+            </div>
+            <div style={{
+              position: "absolute", inset: 0, display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center", textAlign: "center",
+              background: `linear-gradient(180deg, ${C.dusk}00 0%, ${C.dusk}f0 30%)`,
+              padding: "24px 12px 8px", gap: 10,
+            }}>
+              <div style={{ fontSize: 13, color: C.parchment, lineHeight: 1.6, fontFamily: FONT, maxWidth: 320 }}>{HOOK_TEXT[category] || HOOK_DEFAULT}</div>
+              <button onClick={() => onUnlock && onUnlock(category)} style={{
+                background: C.plum, border: "none", borderRadius: 20, padding: "10px 22px",
+                color: C.lavender, fontSize: 13, fontFamily: FONT_SANS, fontWeight: 600, cursor: "pointer",
+              }}>🔒 {category} 전체보기 · 구매하기</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -499,6 +537,12 @@ function ChapterCard({ label, tag, tagColor, tagText, accent, title, subtitle, b
 
 export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, parentAstroAI, setParentAstroAI, parentTarotAI, setParentTarotAI }) {
   const [current, setCurrent] = useState(0)
+  const [unlockedCategories, setUnlockedCategories] = useState(d?.unlockedCategories || [])
+  const handleUnlock = (category) => {
+    if (!category || unlockedCategories.includes(category)) return
+    setUnlockedCategories(prev => [...prev, category])
+    // TODO: PG 연동 시 여기서 결제 플로우 실행 후 성공 콜백에서 unlock + Supabase 저장으로 교체
+  }
   const [flipping, setFlipping] = useState(false)
   const [flipDir, setFlipDir] = useState(null)
   const [astroAI, setAstroAI] = useState(parentAstroAI || null) // _astroAI 캐시 무시 항상 새로 계산
@@ -1448,6 +1492,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     // ★ 동양이 읽는 나의 결 (심화 도입 · 순수 동양 리딩)
     {
       label: "동서양 종합 1", accent: C.iris,
+      category: "사주 심화",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "동양이 읽는\n나의 결.",
       subtitle: "사주 · 당사주 · 토정비결 · 주역",
@@ -1460,6 +1505,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     // ★ 십성 · 12신살 · 12운성 (사주 구성 심화)
     {
       label: "십성 분석", accent: C.plum,
+      category: "사주 심화",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "타고난 재능과\n기질의 뿌리.",
       subtitle: "사주 십성 분석",
@@ -1469,6 +1515,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "12신살", accent: C.plum,
+      category: "사주 심화",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "사주 네 기둥에 박힌\n열두 신살의 자리.",
       subtitle: "연지 기준 12신살",
@@ -1478,6 +1525,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "12운성", accent: C.plum,
+      category: "사주 심화",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "태어나 자라고 스러지는\n열두 단계의 기질.",
       subtitle: "일간 기준 12운성",
@@ -1488,6 +1536,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     // II. 동서양 종합 (별자리 · 종합 · 다섯 관점)
     {
       label: "동서양 종합 2", accent: C.iris,
+      category: "사주 심화",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "별자리가\n비추는 나.",
       subtitle: "태양 · 달 · 상승 별자리",
@@ -1500,6 +1549,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "동서양 종합 3", accent: C.iris,
+      category: "사주 심화",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "타로와 다섯 관점이\n하나로 모이는 곳.",
       subtitle: "타로 · 종합 결론",
@@ -1510,6 +1560,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "동서양 종합 4", accent: C.iris,
+      category: "사주 심화",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "다섯 관점이\n엇갈리는 지점.",
       subtitle: "충돌 · 긴장 · 입체감",
@@ -1520,6 +1571,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     // III. 재물운 3블록
     {
       label: "재물운 1", accent: C.sand,
+      category: "재물운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "돈이 안 쌓이는\n진짜 이유.",
       subtitle: "재물 구조 진단",
@@ -1530,6 +1582,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "재물운 2", accent: C.sand,
+      category: "재물운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "살길과\n피해야 할 길.",
       subtitle: "용신 기신 방향 분석",
@@ -1540,6 +1593,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "재물운 3", accent: C.sand,
+      category: "재물운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "투자 체질과\n재물을 강화하는 법.",
       subtitle: "투자 체질 · 재물 강화 · 향후 흐름",
@@ -1554,6 +1608,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     ...[
       {
         label: "연애운 1", accent: C.lavender,
+        category: "연애운",
         tag: "유료", tagColor: C.plum, tagText: C.lavender,
         title: "혼자인 지금,\n다가오는 인연.",
         subtitle: "솔로 · 인연의 결",
@@ -1565,6 +1620,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       },
       {
         label: "연애운 2", accent: C.lavender,
+        category: "연애운",
         tag: "유료", tagColor: C.plum, tagText: C.lavender,
         title: "인연의 자리와\n맞는 사람.",
         subtitle: "인연의 장소 · 상대",
@@ -1576,6 +1632,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       },
       {
         label: "연애운 3", accent: C.lavender,
+        category: "연애운",
         tag: "유료", tagColor: C.plum, tagText: C.lavender,
         title: "다가가는 법과\n인연이 열리는 때.",
         subtitle: "접근법 · 인연 시기 · 점수",
@@ -1589,6 +1646,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     ...[
       {
         label: "애정운 1", accent: C.lavender,
+        category: "애정운",
         tag: "유료", tagColor: C.plum, tagText: C.lavender,
         title: "지금 만나는 사람과\n나의 관계 구조.",
         subtitle: "연애 중 · 관계 진단",
@@ -1599,6 +1657,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       },
       {
         label: "애정운 2", accent: C.lavender,
+        category: "애정운",
         tag: "유료", tagColor: C.plum, tagText: C.lavender,
         title: "이 관계를\n더 깊게 만드는 법.",
         subtitle: "관계 심화 · 상대 이해",
@@ -1610,6 +1669,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       },
       {
         label: "애정운 3", accent: C.lavender,
+        category: "애정운",
         tag: "유료", tagColor: C.plum, tagText: C.lavender,
         title: "관계가 무르익는\n결정적인 시기.",
         subtitle: "결혼 시기 · 점수",
@@ -1623,6 +1683,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     // V. 업무운 3블록 (직장운/문서운/역할 + 취업·회사운)
     {
       label: "업무운 1", accent: C.caramel,
+      category: "직장운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "실력이 빛나는\n나의 무대.",
       subtitle: "타고난 직업 강점",
@@ -1634,6 +1695,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "업무운 2", accent: C.caramel,
+      category: "직장운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "직장운과 문서운,\n지금 회사 궁합.",
       subtitle: "관성 · 인성 · 궁합",
@@ -1645,6 +1707,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "업무운 3", accent: C.caramel,
+      category: "직장운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "치고 올라갈 때와\n지칠 때.",
       subtitle: "승진 타이밍 · 번아웃 · 흐름",
@@ -1656,6 +1719,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "취업운 1", accent: C.caramel,
+      category: "취업운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "언제 어디로\n취업이 열리는지.",
       subtitle: "합격 성향 · 맞는 조직",
@@ -1666,6 +1730,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "취업운 2", accent: C.caramel,
+      category: "취업운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "붙는 사람은\n이렇게 준비해.",
       subtitle: "면접 강점 · 준비 전략",
@@ -1676,6 +1741,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "취업운 3", accent: C.caramel,
+      category: "취업운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "옮길 때와\n나를 알아줄 자리.",
       subtitle: "이직 타이밍 · 상사 · 점수",
@@ -1689,6 +1755,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     // VI. 관계운 3블록
     {
       label: "관계운 1", accent: C.iris,
+      category: "관계운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "직장에서와 친구 앞에서,\n다른 두 얼굴.",
       subtitle: "겉모습과 속모습",
@@ -1699,6 +1766,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "관계운 2", accent: C.iris,
+      category: "관계운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "귀인과 독,\n곁에 둘 사람 밀어낼 사람.",
       subtitle: "귀인 · 조심할 관계",
@@ -1709,6 +1777,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "관계운 3", accent: C.iris,
+      category: "관계운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "관계 속 나의 자리와\n소진되는 패턴.",
       subtitle: "관계 스타일 · 그림자 · 점수",
@@ -1722,6 +1791,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     // VII. 건강운 3블록
     {
       label: "건강운 1", accent: C.iris,
+      category: "건강운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "타고나게 약한 곳과\n몸이 보내는 신호.",
       subtitle: "약한 장기 · 취약 계절",
@@ -1732,6 +1802,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "건강운 2", accent: C.iris,
+      category: "건강운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "맞는 운동과 식이,\n정신 건강.",
       subtitle: "생활 관리",
@@ -1743,6 +1814,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "건강운 3", accent: C.iris,
+      category: "건강운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "평생 건강 관리와\n올해 흐름.",
       subtitle: "생애 건강 · 점수",
@@ -1755,6 +1827,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     // VIII. 가족운 3블록
     {
       label: "가족운 1", accent: C.sand,
+      category: "가족운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "부모와 형제, 배우자,\n네 기둥이 품은 가족.",
       subtitle: "부모 · 유년기 · 형제 자녀 · 배우자궁",
@@ -1768,6 +1841,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "가족운 2", accent: C.sand,
+      category: "가족운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "가족이라는 자리가\n나를 만든 방식.",
       subtitle: "육친 십성 · 나에 대한 이해",
@@ -1778,6 +1852,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "가족운 3", accent: C.sand,
+      category: "가족운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "집안 내림과\n이번 생의 과제.",
       subtitle: "집안 패턴 · 전생 업보",
@@ -1790,6 +1865,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     // IX. 대운세운 5블록 = 인생 내비게이션
     {
       label: "대운 1", accent: C.iris,
+      category: "평생운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "내 인생 전체 지도와\n황금기의 자리.",
       subtitle: "대운 흐름 · 전성기",
@@ -1800,6 +1876,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "대운 2", accent: C.iris,
+      category: "평생운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "인생 네 구간으로 보는\n대운의 장면들.",
       subtitle: "초년 · 청년 · 중년 · 말년",
@@ -1812,6 +1889,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "대운 3", accent: C.iris,
+      category: "평생운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "지금 이 10년과\n다가올 전환점.",
       subtitle: "현재 대운 · 전환기 대비",
@@ -1824,6 +1902,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "세운 1", accent: C.iris,
+      category: "평생운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "올해라는\n해의 정체.",
       subtitle: "올해 세운 · 십성 흐름",
@@ -1834,6 +1913,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
     {
       label: "세운 2", accent: C.iris,
+      category: "평생운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
       title: "진짜 크게 터지는\n결정적인 해.",
       subtitle: "대운 × 세운 교차 · 승부의 해",
@@ -1859,7 +1939,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
             <div style={{ fontSize: 10, color: i >= freeCount ? C.plum : C.fog, fontFamily: FONT_SANS, marginBottom: 4 }}>
               {i + 1} / {chapters.length} · {c.label}{i >= freeCount ? " · 유료" : ""}
             </div>
-            <ChapterCard {...c} flipping={false} flipDir={null} />
+            <ChapterCard {...c} flipping={false} flipDir={null} locked={c.tag === "유료" && !unlockedCategories.includes(c.category)} onUnlock={null} />
           </div>
         ))}
         <div style={{ textAlign: "center", color: C.fog, fontSize: 10, padding: "12px 0", fontFamily: FONT_SANS }}>
@@ -1893,7 +1973,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       </div>
 
       <div style={{ width: "100%", maxWidth: 480, perspective: 1200, flex: 1 }}>
-        <ChapterCard {...ch} flipping={flipping} flipDir={flipDir} />
+        <ChapterCard {...ch} flipping={flipping} flipDir={flipDir} locked={ch.tag === "유료" && !unlockedCategories.includes(ch.category)} onUnlock={handleUnlock} />
       </div>
 
       <div style={{ width: "100%", maxWidth: 480, display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20 }}>
