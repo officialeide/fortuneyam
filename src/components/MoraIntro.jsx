@@ -486,6 +486,10 @@ export default function MoraIntro({ onEnter }) {
                 let digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 6)
                 let v = digits.length > 4 ? digits.slice(0, 4) + "." + digits.slice(4) : digits
                 up("foundRaw", v)
+<<<<<<< HEAD
+=======
+                if (digits.length === 6) nameRef.current?.focus()  // 창립일 채우면 이름으로
+>>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
               }}
               maxLength={7}
               style={iStyle(false)}
@@ -500,7 +504,11 @@ export default function MoraIntro({ onEnter }) {
               {INDUSTRY.map(it => <option key={it.label} value={it.label}>{it.label}</option>)}
             </select>
             <div style={{ fontSize: 12, color: C.fog, fontFamily: "sans-serif", margin: "4px 2px 0" }}>
+<<<<<<< HEAD
               업종은 직함 말고 회사가 무슨 목적의 결과물을 만드는지로 골라줘. 예를 들어 필러·미용기기·에스테틱 연구는 '미용·뷰티', 병 고치고 사람 살리는 쪽이면 '의료·제약'처럼.
+=======
+              업종은 내가 하는 일이나 만드는 결과물을 기준으로 골라줘. 창립 연월은 회사의 나이를, 업종은 회사의 기운을 봐서 나와의 궁합을 맞춰볼게.
+>>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
             </div>
           </div>
 

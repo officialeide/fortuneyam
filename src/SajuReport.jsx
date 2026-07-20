@@ -85,7 +85,7 @@ export default function SajuReport(){
         console.error("buildSajuData 오류:", e);
         setPhase("intro");
         setOpacity(1);
-        alert("분석 중 오류가 발생했어요. 입력값을 확인해주세요.");
+        alert("분석 중 오류가 발생했어. 입력값을 확인해줘.");
         return;
       }
       setReportData(data);
@@ -164,7 +164,7 @@ MBTI: ${sys[6]?.key||""} / ${sys[6]?.desc||""}
 이 7가지 체계를 깊이 교차 분석해서 ${data.name}님의 본질을 운세 에세이처럼 써줘.
 
 [규칙 — 반드시 지킬 것]
-1. 반드시 ~이에요, ~해요 체(언니체)로 작성
+1. 반드시 ~이야, ~해, ~야 체로만 작성해. ~에요, ~아요, ~해요, 세요 절대 금지. 콜론(:)·대시(-) 사용 절대 금지.
 2. 총 400자 내외. 첫 문단(성격·성향 130자): 7체계 공통 메시지를 하나의 인물 서사로 녹여서 서술. "ENTJ와 무술 일주와 당사주의…" 같은 단순 나열 절대 금지. ${data.name}님이 어떤 사람인지를 한 편의 글처럼 자연스럽게 써줘. "당신" 대신 반드시 "${data.name}님"으로 지칭해줘.
 3. 둘째 문단(운세 흐름 270자): 올해부터 가장 빛나는 해까지의 흐름을 연결된 서사로 써줘. 연도를 나열하지 말고, 지금 어떤 시기인지 → 어떻게 변화하는지 → 언제 정점을 맞는지를 흐름으로 표현해줘. 구체적인 조언 1개 포함. "당신" 대신 반드시 "${data.name}님"으로 지칭해줘.
 4. 두 문단 사이에 빈 줄 하나
@@ -190,9 +190,9 @@ JSON만 응답: {"sevenInsight":"..."}`;
         }catch(e){console.warn("inner API:", e);}
       };
 
-      // API 실행: astro/tarot/inner 병렬, 완료 후 seven (별자리 반영 위해 직렬)
-      await Promise.all([fetchAstro(), fetchTarot(), fetchInner()]);
-      await fetchSeven(); // astroResult 완성 후 실행해야 별자리 반영됨
+      // AI 호출 제거: 리포트(MoraReport)는 전부 로컬 계산(d.astro/d.tarot/d.daynight/d.mbti)만 사용하므로
+      // astro/tarot/inner/seven API는 화면에 반영되지 않아 대기시간만 발생시켰음. sessionStorage 캐시가 있으면 그대로 사용.
+      void fetchAstro; void fetchTarot; void fetchInner; void fetchSeven;
 
       // 4. API 결과를 reportData에 합쳐서 저장
       // 앞 2문장만 추출
@@ -269,44 +269,46 @@ JSON만 응답: {"sevenInsight":"..."}`;
       await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
 
       const container=document.createElement("div");
-      container.style.cssText="position:fixed;left:-9999px;top:0;width:480px;background:#0D0A0F;font-family:'Noto Sans KR',sans-serif;padding:16px;box-sizing:border-box;";
+      container.style.cssText="position:fixed;left:-9999px;top:0;width:480px;background:#0D0A0F;font-family:'Noto Sans KR',sans-serif;box-sizing:border-box;";
       document.body.appendChild(container);
 
       const {createRoot}=await import("react-dom/client");
       const ce=React.createElement;
-      const AllTabs=()=>ce("div",{style:{background:"#0D0A0F",display:"flex",flexDirection:"column",gap:16}},
-        ce("div",{style:{textAlign:"center",color:"#C8956C",fontSize:11,letterSpacing:4,padding:"12px 0",fontFamily:"sans-serif"}},`MORA · ${d.name}님의 운명 분석`),
-        ce(TabSummary,{d,changeTab:()=>{}}),
-        ce(TabSaju,{d,reportData}),
-        ce(TabTojung,{d}),
-        ce(TabAstro,{d,parentAstroAI,setParentAstroAI:()=>{},parentTarotAI,setParentTarotAI:()=>{}}),
-        ce(TabMBTI,{d}),
-        ce(TabInner,{d,parentInnerAI,setParentInnerAI:()=>{}}),
-        ce("div",{style:{textAlign:"center",color:"#5C5158",fontSize:10,padding:"12px 0",fontFamily:"sans-serif"}},"✦ Mora · fortuneyam.netlify.app")
-      );
       const root=createRoot(container);
-      await new Promise(res=>{root.render(ce(AllTabs,null));setTimeout(res,1500);});
-
-      const canvas=await window.html2canvas(container,{
-        scale:2,useCORS:true,allowTaint:true,
-        backgroundColor:"#0D0A0F",width:480,windowWidth:480,
-      });
-      root.unmount();
-      document.body.removeChild(container);
+      await new Promise(res=>{root.render(ce(MoraReport,{d,onHome:()=>{},onSavePDF:null,pdfLoading:false,pdfMode:true,parentAstroAI,parentTarotAI}));setTimeout(res,1800);});
 
       const {jsPDF}=window.jspdf;
       const pdf=new jsPDF({orientation:"portrait",unit:"px",format:"a4"});
       const pageW=pdf.internal.pageSize.getWidth();
       const pageH=pdf.internal.pageSize.getHeight();
-      const imgW=pageW;
-      const imgH=(canvas.height*pageW)/canvas.width;
-      const imgData=canvas.toDataURL("image/jpeg",0.92);
-      let y=0;
-      while(y<imgH){if(y>0)pdf.addPage();pdf.addImage(imgData,"JPEG",0,-y,imgW,imgH);y+=pageH;}
+      const margin=16;
+
+      // 각 챕터 = 1페이지. 가로폭은 (페이지폭 - 여백)에 고정해서 모든 장의 가로 스케일을 동일하게.
+      // 내용이 짧으면 위쪽 정렬 + 아래는 배경색으로 채움. 아주 긴 챕터만 예외적으로 세로에 맞춰 축소.
+      const chapterEls=container.querySelectorAll("[data-pdf-chapter]");
+      const availW=pageW-margin*2;
+      const availH=pageH-margin*2;
+      let first=true;
+      for(const el of chapterEls){
+        const canvas=await window.html2canvas(el,{scale:2,useCORS:true,allowTaint:true,backgroundColor:"#0D0A0F"});
+        let imgW=availW;
+        let imgH=(canvas.height*imgW)/canvas.width;
+        // 페이지보다 길면 세로 기준으로 축소 (가로 중앙정렬)
+        if(imgH>availH){ imgH=availH; imgW=(canvas.width*imgH)/canvas.height; }
+        const x=(pageW-imgW)/2;
+        if(!first) pdf.addPage();
+        first=false;
+        // 배경색으로 페이지 전체를 먼저 채움 (짧은 페이지 빈 공간 처리)
+        pdf.setFillColor(13,10,15);
+        pdf.rect(0,0,pageW,pageH,"F");
+        pdf.addImage(canvas.toDataURL("image/jpeg",0.92),"JPEG",x,margin,imgW,imgH);
+      }
+      root.unmount();
+      document.body.removeChild(container);
       pdf.save(`${d.name}_운세종합.pdf`);
     }catch(e){
       console.error("PDF 오류:",e);
-      alert("PDF 저장 중 오류가 발생했어요.");
+      alert("PDF 저장 중 오류가 발생했어.");
     }finally{
       setPdfLoading(false);
     }
