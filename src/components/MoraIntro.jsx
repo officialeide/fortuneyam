@@ -296,7 +296,7 @@ export default function MoraIntro({ onEnter }) {
         }}>
           {/* Mora 로고 */}
           <div style={{
-            textAlign: "center", marginBottom: 24,
+            textAlign: "center", marginBottom: 16,
             fontSize: 11, letterSpacing: 5, color: C.iris,
             textTransform: "uppercase", fontFamily: "sans-serif",
           }}>
@@ -304,7 +304,7 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 이 우주가 너를 받아들인 순간 */}
-          <div style={{ marginBottom: 26 }}>
+          <div style={{ marginBottom: 18 }}>
             <div style={qStyle}>이 우주가 너를 받아들인 순간이 언제야?</div>
 
             {/* 양력/음력 */}
@@ -408,7 +408,7 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 성별 */}
-          <div style={{ marginBottom: 26 }}>
+          <div style={{ marginBottom: 18 }}>
             <div style={qStyle}>어떤 성별로 태어났어?</div>
             <div style={{ display: "flex", gap: 10 }}>
               {["여", "남"].map(g => (
@@ -430,7 +430,7 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 연애 상태 */}
-          <div style={{ marginBottom: 26 }}>
+          <div style={{ marginBottom: 18 }}>
             <div style={qStyle}>지금 연애 중이야, 혼자야?</div>
             <div style={{ display: "flex", gap: 10 }}>
               {["솔로", "연애중"].map(s => (
@@ -452,7 +452,7 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 입사일 (선택) */}
-          <div style={{ marginBottom: 26 }}>
+          <div style={{ marginBottom: 18 }}>
             <div style={qStyle}>지금 다니는 회사 입사일{"\n"}알려줄 수 있어? (선택)</div>
             <input
               className="mora-input"
@@ -474,7 +474,7 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 회사 창립일·업종 (선택) */}
-          <div style={{ marginBottom: 26 }}>
+          <div style={{ marginBottom: 18 }}>
             <div style={qStyle}>회사 창립 연월과 업종도{"\n"}알면 궁합이 더 정확해져. (선택)</div>
             <input
               ref={foundRef}
@@ -505,7 +505,7 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 이름 */}
-          <div style={{ marginBottom: 32 }}>
+          <div style={{ marginBottom: 22 }}>
             <div style={qStyle}>
               이 우주에서 선물받은 이름,{"\n"}나한테도 알려줄 수 있어?
             </div>
@@ -546,7 +546,7 @@ export default function MoraIntro({ onEnter }) {
 }
 
 const qStyle = {
-  fontSize: 15, color: "#F0E8DC", marginBottom: 12,
+  fontSize: 15, color: "#F0E8DC", marginBottom: 8,
   lineHeight: 1.6, letterSpacing: 0.3, whiteSpace: "pre-line",
 }
 
