@@ -486,10 +486,6 @@ export default function MoraIntro({ onEnter }) {
                 let digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 6)
                 let v = digits.length > 4 ? digits.slice(0, 4) + "." + digits.slice(4) : digits
                 up("foundRaw", v)
-<<<<<<< HEAD
-=======
-                if (digits.length === 6) nameRef.current?.focus()  // 창립일 채우면 이름으로
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
               }}
               maxLength={7}
               style={iStyle(false)}
