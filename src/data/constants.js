@@ -471,11 +471,11 @@ const ILGAN_DESC = {
 
 // ━━ 오행별 신강/신약 용신 희신 기신 ━━
 const YONGSIN_TABLE = {
-  木: { strong: { yongsin:"금과 화", huisin:"수", gisin:"목와 토" }, weak: { yongsin:"수와 목", huisin:"화", gisin:"금과 토" } },
-  火: { strong: { yongsin:"수와 토", huisin:"금", gisin:"화와 목" }, weak: { yongsin:"목와 화", huisin:"토", gisin:"수와 금" } },
-  土: { strong: { yongsin:"목와 수", huisin:"금", gisin:"토와 화" }, weak: { yongsin:"화와 토", huisin:"목", gisin:"수와 금" } },
-  金: { strong: { yongsin:"화와 수", huisin:"목", gisin:"금과 토" }, weak: { yongsin:"토와 금", huisin:"화", gisin:"목와 수" } },
-  水: { strong: { yongsin:"토와 목", huisin:"금", gisin:"수와 금" }, weak: { yongsin:"금과 수", huisin:"토", gisin:"목와 화" } }
+  木: { strong: { yongsin:"금·화", huisin:"수", gisin:"목·토" }, weak: { yongsin:"수·목", huisin:"화", gisin:"금·토" } },
+  火: { strong: { yongsin:"수·토", huisin:"금", gisin:"화·목" }, weak: { yongsin:"목·화", huisin:"토", gisin:"수·금" } },
+  土: { strong: { yongsin:"목·수", huisin:"금", gisin:"토·화" }, weak: { yongsin:"화·토", huisin:"목", gisin:"수·금" } },
+  金: { strong: { yongsin:"화·수", huisin:"목", gisin:"금·토" }, weak: { yongsin:"토·금", huisin:"화", gisin:"목·수" } },
+  水: { strong: { yongsin:"토·목", huisin:"금", gisin:"수·금" }, weak: { yongsin:"금·수", huisin:"토", gisin:"목·화" } }
 };
 
 // ━━ 일주 60갑자 특성 ━━
