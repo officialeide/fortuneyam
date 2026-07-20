@@ -697,7 +697,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     }
     return Object.entries(groups).sort((a, b) => b[1] - a[1])[0][0]
   })()
-<<<<<<< HEAD
   // ── 세분화 공용 axis ──
   const _scA = d.sibsongAnalysis?.counts || {}
   const _bijG = (_scA["비견"] || 0) + (_scA["겁재"] || 0)
@@ -722,19 +721,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   const _persoCore = isSingang
     ? `겉으론 강해 보여도 속은 안 그래. 다 괜찮은 척, 알아서 잘하는 척하지만 책임감에 혼자 짊어지다 안에서 곪는 사람이야. 맞지?`
     : `겉은 무던하고 유순해 보여도 속은 훨씬 복잡해. 남들 그냥 넘기는 걸 혼자 곱씹고, 상처받으면 표현 없이 조용히 마음을 닫지. 맞지?`
-=======
-  const _punch = {
-    비겁: "무리에 섞여 있다가도 끝내 자기 두 발로 서고 마는 사람. 그 꺾이지 않는 심지가 이 사주의 척추야.",
-    식상: "머릿속에선 이미 열 걸음 앞서 그림을 그리고 있어. 그 상상력이 남들 눈엔 재능으로 보이는 사람이야.",
-    재성: "원하는 건 기어이 손에 쥐고야 마는 현실력이 있어. 순해 보여도 속은 훨씬 야무지고 독한 사람이야.",
-    관성: "무너질 것 같은 순간에 오히려 더 반듯해지는 사람. 그 무게가 곁의 사람들까지 붙잡아 주는 힘이야.",
-    인성: "혼자 삭이는 그 깊이가, 결국 남들이 못 보는 걸 먼저 읽어내는 눈이 돼. 그게 이 사주의 진짜 무기야.",
-  }[_topSibsong] || "남들이 못 보는 자기만의 결을 끝내 찾아내고야 마는 사람이야."
-  const _persoCore = isSingang
-    ? `겉으론 강해 보여도 속은 안 그래. 남들 앞에선 다 괜찮은 척, 알아서 잘하는 척하지만 정작 속마음은 아무한테도 안 보여주지. 책임감 때문에 혼자 다 짊어지고, 힘들어도 티 안 내다가 안에서 곪아. 맞지? 싫은 소리 못 하고 끌어안다가 정작 자기를 놓치는 순간이 많아.`
-    : `겉은 무던하고 유순해 보여도 속은 훨씬 복잡해. 생각이 많고, 남들은 그냥 넘기는 걸 혼자 곱씹고 담아두지. 정 주면 끝까지 주는데, 상처받으면 표현 없이 조용히 마음을 닫아. 맞지? 남 눈치는 빠르면서 정작 자기 마음은 스스로도 잘 모를 때가 많아.`
->>>>>>> ddc7dce3e43571082fedf0d58ebd795fbff4306a
-  const personaHook = `${_persoCore} ${_punch}`
+ const personaHook = `${_persoCore} ${_punch}`
   const personaYear = (() => {
     const ty = yearForecast[0]
     if (!ty) return "올해는 흐름을 다지는 해야. 급하게 결과를 좇기보다 뿌리를 내리는 시기라고 봐."
