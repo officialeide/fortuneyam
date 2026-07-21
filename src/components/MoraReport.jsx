@@ -484,6 +484,41 @@ const HOOK_TEXT = {
 }
 const HOOK_DEFAULT = "여긴 겉만 본 거야. 진짜 이유는 안 풀었어."
 
+// 유료 카테고리 목록 페이지 (4페이지 뒤 신설)
+const CATEGORY_ICONS = {
+  "사주 심화": "☯", "재물운": "❖", "연애운": "♡", "애정운": "❥", "직장운": "▤",
+  "취업운": "◎", "관계운": "◍", "건강운": "✚", "가족운": "⌂", "평생운": "✦",
+}
+function CategoryListPage({ categories, unlockedCategories, onSelect }) {
+  return (
+    <div style={{ background: C.dusk, border: `1px solid ${C.mahogany}`, borderRadius: 16, overflow: "hidden", minHeight: 480, boxShadow: `0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px ${C.ember}` }}>
+      <div style={{ background: `linear-gradient(135deg, ${C.mahogany} 0%, ${C.abyss} 100%)`, padding: "24px 24px 20px", borderBottom: `1px solid ${C.ember}` }}>
+        <div style={{ fontSize: 9, letterSpacing: 4, color: C.plum, textTransform: "uppercase", fontFamily: FONT_SANS, marginBottom: 14 }}>더 깊은 리딩</div>
+        <div style={{ fontSize: 15, color: C.parchment, lineHeight: 1.6, fontFamily: FONT, fontWeight: 400 }}>여긴 겉만 본 거야.{"\n"}진짜 이유는 아직 안 풀었어.</div>
+      </div>
+      <div style={{ padding: "16px" }}>
+        {categories.map((cat) => {
+          const unlocked = unlockedCategories.includes(cat.name)
+          return (
+            <div key={cat.name} onClick={() => !unlocked && onSelect(cat)} style={{
+              display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", marginBottom: 8,
+              background: C.void, border: `1px solid ${unlocked ? C.walnut : C.ember}`, borderRadius: 12,
+              cursor: unlocked ? "default" : "pointer",
+            }}>
+              <div style={{ width: 34, height: 34, borderRadius: "50%", background: C.abyss, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: C.lavender }}>{CATEGORY_ICONS[cat.name] || "✦"}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 14, color: C.parchment, fontWeight: 400, fontFamily: FONT }}>{cat.name}</div>
+                <div style={{ fontSize: 11, color: unlocked ? C.caramel : C.ash, marginTop: 2, fontFamily: FONT_SANS, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{unlocked ? "구매 완료 · 눌러서 이동" : (HOOK_TEXT[cat.name] || "")}</div>
+              </div>
+              <div style={{ flexShrink: 0, fontSize: 13, color: unlocked ? C.caramel : C.fog, fontFamily: FONT_SANS }}>{unlocked ? "열림" : "🔒"}</div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function ChapterCard({ label, tag, tagColor, tagText, accent, title, subtitle, blocks, extra, flipping, flipDir, locked, category, onUnlock }) {
   const visibleBlocks = blocks.filter(Boolean)
   const teaserBlock = locked ? visibleBlocks[0] : null
@@ -555,6 +590,12 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     if (next < 0 || next >= chapters.length) return
     setFlipDir(dir); setFlipping(true)
     setTimeout(() => { setCurrent(next); setFlipping(false); setFlipDir(null) }, 400)
+  }
+  const jumpTo = (idx) => {
+    if (flipping || idx < 0 || idx >= chapters.length || idx === current) return
+    const dir = idx > current ? 1 : -1
+    setFlipDir(dir); setFlipping(true)
+    setTimeout(() => { setCurrent(idx); setFlipping(false); setFlipDir(null) }, 400)
   }
 
   // 별자리는 로컬 계산(d.astro)을 쓰므로 AI 호출 없음
@@ -1923,8 +1964,22 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     },
   ]
 
-  const chapters = [...freeChapters, ...lockedChapters]
-  const freeCount = freeChapters.length
+  // 유료 카테고리 순서 (등장 순서 유지, 중복 제거)
+  const categoryOrder = []
+  lockedChapters.forEach(c => { if (c.category && !categoryOrder.includes(c.category)) categoryOrder.push(c.category) })
+
+  // 카테고리 목록 페이지 (4페이지=무료 마지막 뒤에 신설)
+  const categoryListChapter = { _categoryList: true }
+  const chapters = [...freeChapters, categoryListChapter, ...lockedChapters]
+  const freeCount = freeChapters.length // 목록 페이지 인덱스 = freeCount (무료 바로 다음)
+
+  // 카테고리명 → 해당 카테고리 첫 챕터의 chapters 내 인덱스
+  const categoryFirstIndex = {}
+  chapters.forEach((c, i) => {
+    if (c.category && !(c.category in categoryFirstIndex)) categoryFirstIndex[c.category] = i
+  })
+  const categoryList = categoryOrder.map(name => ({ name }))
+
   const ch = chapters[current]
 
   // PDF 모드: 전체 챕터를 세로로 쌓아서 렌더
@@ -1934,10 +1989,10 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
         <div style={{ textAlign: "center", color: C.caramel, fontSize: 11, letterSpacing: 4, padding: "8px 0 16px", fontFamily: FONT_SANS }}>
           MORA · {d.name}님의 운명 분석
         </div>
-        {chapters.map((c, i) => (
+        {chapters.filter(c => !c._categoryList).map((c, i) => (
           <div key={i} data-pdf-chapter="1" style={{ marginBottom: 20, breakInside: "avoid", background: C.void, padding: "4px 0" }}>
-            <div style={{ fontSize: 10, color: i >= freeCount ? C.plum : C.fog, fontFamily: FONT_SANS, marginBottom: 4 }}>
-              {i + 1} / {chapters.length} · {c.label}{i >= freeCount ? " · 유료" : ""}
+            <div style={{ fontSize: 10, color: c.tag === "유료" ? C.plum : C.fog, fontFamily: FONT_SANS, marginBottom: 4 }}>
+              {c.label}{c.tag === "유료" ? " · 유료" : ""}
             </div>
             <ChapterCard {...c} flipping={false} flipDir={null} locked={c.tag === "유료" && !unlockedCategories.includes(c.category)} onUnlock={null} />
           </div>
@@ -1966,20 +2021,32 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       <div style={{ width: "100%", maxWidth: 480, display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
         <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
           {chapters.map((_, i) => (
-            <div key={i} style={{ width: i === current ? 18 : 5, height: 4, borderRadius: 2, background: i >= freeCount ? C.plum : i === current ? C.caramel : C.ember, transition: "all 0.3s ease" }} />
+            <div key={i} style={{ width: i === current ? 18 : 5, height: 4, borderRadius: 2, background: i > freeCount ? C.plum : i === current ? C.caramel : C.ember, transition: "all 0.3s ease" }} />
           ))}
         </div>
         <div style={{ fontSize: 11, color: C.fog, fontFamily: FONT_SANS, fontWeight: 400 }}>{current + 1} / {chapters.length}</div>
       </div>
 
       <div style={{ width: "100%", maxWidth: 480, perspective: 1200, flex: 1 }}>
-        <ChapterCard {...ch} flipping={flipping} flipDir={flipDir} locked={ch.tag === "유료" && !unlockedCategories.includes(ch.category)} onUnlock={handleUnlock} />
+        {ch._categoryList ? (
+          <CategoryListPage
+            categories={categoryList}
+            unlockedCategories={unlockedCategories}
+            onSelect={(cat) => {
+              handleUnlock(cat.name)
+              const idx = categoryFirstIndex[cat.name]
+              if (idx != null) setTimeout(() => jumpTo(idx), 950)
+            }}
+          />
+        ) : (
+          <ChapterCard {...ch} flipping={flipping} flipDir={flipDir} locked={ch.tag === "유료" && !unlockedCategories.includes(ch.category)} onUnlock={handleUnlock} />
+        )}
       </div>
 
       <div style={{ width: "100%", maxWidth: 480, display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 20 }}>
         <button onClick={() => goTo(-1)} disabled={current === 0} style={{ background: current === 0 ? "transparent" : C.ember, border: `1px solid ${current === 0 ? C.fog : C.walnut}`, borderRadius: 10, padding: "11px 18px", color: current === 0 ? C.fog : C.sand, fontSize: 13, cursor: current === 0 ? "default" : "pointer", fontFamily: FONT_SANS, fontWeight: 400, transition: "all 0.2s" }}>이전</button>
         <div style={{ fontSize: 10, color: C.fog, fontFamily: FONT_SANS, textAlign: "center", fontWeight: 400 }}>
-          {ch.label}{current >= freeCount && <span style={{ color: C.plum }}> · 유료</span>}
+          {ch._categoryList ? "유료 콘텐츠 안내" : <>{ch.label}{current > freeCount && <span style={{ color: C.plum }}> · 유료</span>}</>}
         </div>
         <button onClick={() => goTo(1)} disabled={current === chapters.length - 1} style={{ background: current === chapters.length - 1 ? "transparent" : C.walnut, border: `1px solid ${current === chapters.length - 1 ? C.fog : C.caramel}`, borderRadius: 10, padding: "11px 18px", color: current === chapters.length - 1 ? C.fog : C.parchment, fontSize: 13, cursor: current === chapters.length - 1 ? "default" : "pointer", fontFamily: FONT_SANS, fontWeight: 400, transition: "all 0.2s" }}>다음</button>
       </div>
