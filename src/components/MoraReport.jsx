@@ -1,7 +1,5 @@
 // MoraReport.jsx v7.1 도넛차트, 카테고리 재편, 무당체 완전 통일
 import React, { useState, useEffect } from 'react'
-import { cleanText } from '../data/constants.js'
-import { buildAstroPrompt, buildTarotPrompt } from '../utils/prompts.js'
 import { callNetlify } from '../utils/callNetlify.js'
 
 const C = {
@@ -471,18 +469,18 @@ function Block({ h, text, kw, jsxContent, accent, last }) {
 
 // 카테고리별 잠금 화면 후킹 문구 — 무료에서 보여준 결과의 "이유"를 안 풀고 끊는 방식
 const HOOK_TEXT = {
-  "사주 심화": "겉만 본 거야. 사주가 진짜로 하는 말은 여기부터야.",
-  "재물운": "돈이 안 새는 이유, 따로 있어. 그거 모르고 저축법만 바꾸면 계속 제자리야.",
-  "연애운": "인연 오는 자리랑 시기, 이미 정해져 있어. 이번에 놓치면 다음 문 열릴 때까지 한참 걸려.",
-  "애정운": "왜 자꾸 같은 지점에서 부딪히는지 원인이 다 나와 있어. 여기서 안 풀면 계속 그 자리야.",
-  "직장운": "지금 자리에서 왜 힘든지, 언제 풀리는지 다 나와 있어.",
-  "취업운": "언제 어디로 열리는지 다 나와 있어. 감으로 아무 데나 넣지 말고 흐름 보고 움직여.",
-  "관계운": "곁에 둘 사람과 밀어낼 사람, 갈라놓고 봐야 해.",
-  "건강운": "몸이 미리 보내는 신호가 있어. 늦기 전에 봐둬.",
-  "가족운": "집안에서 내려오는 결이 있어. 그게 지금 나한테도 흐르고 있어.",
-  "평생운": "인생 전체 지도랑 진짜 승부처가 언제인지, 여기 다 있어.",
+  "사주 심화": "지금까지 본 건 기본 풀이야. 진짜 사주 풀이는 여기 있는데, 이거 모르고 넘어가면 반만 알고 사는 거야.",
+  "재물운": "지금 눈앞에 돈 들어올 구멍 하나 열려있어. 근데 이거 아무 때나 열려있는 거 아니야. 언제, 어디서 들어오는지 궁금하지 않아?",
+  "연애운": "지금 스쳐 지나가는 그 사람, 인연 맞아. 근데 이번에 놓치면 다음 인연은 몇 년 뒤야.",
+  "애정운": "연애할 때마다 똑같은 이유로 헤어지는 거, 알고 있었어? 이번에도 모르고 들어가면 또 똑같이 끝나.",
+  "직장운": "지금 이 회사, 더 있어도 될 자리 맞아? 이거 헷갈려서 1~2년 잘못 쓰는 사람 진짜 많아. 답은 이미 나와있어.",
+  "취업운": "합격 문 열리는 시기, 따로 있어. 같은 이력서도 타이밍만 맞으면 결과 완전히 달라져. 그 시기가 언제인지 궁금하지 않아?",
+  "관계운": "곁에 있는 사람 중에, 기운 갉아먹는 사람 하나 있어. 근데 아직 못 알아챘을 수도 있어.",
+  "건강운": "별거 아니라고 넘기는 그 신호, 사주에선 이미 잡혀. 이거 놓치면 나중에 제대로 발목 잡혀.",
+  "가족운": "반복되는 그 갈등 패턴, 우연 아니야. 뿌리를 모르고 넘어가면 다음 세대까지 그대로 물려줘.",
+  "평생운": "인생 전체를 관통하는 흐름, 딱 하나야. 이거 모르고 사는 사람이랑 알고 사는 사람, 10년 뒤 차이 크게 벌어져.",
 }
-const HOOK_DEFAULT = "여긴 겉만 본 거야. 진짜 이유는 안 풀었어."
+const HOOK_DEFAULT = "지금까지 본 건 기본 풀이야. 진짜 이유는 아직 안 풀었어."
 
 // 유료 카테고리 목록 페이지 (4페이지 뒤 신설)
 const CATEGORY_ICONS = {
@@ -494,7 +492,7 @@ function CategoryListPage({ categories, unlockedCategories, onSelect }) {
     <div style={{ background: C.dusk, border: `1px solid ${C.mahogany}`, borderRadius: 16, overflow: "hidden", minHeight: 480, boxShadow: `0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px ${C.ember}` }}>
       <div style={{ background: `linear-gradient(135deg, ${C.mahogany} 0%, ${C.abyss} 100%)`, padding: "24px 24px 20px", borderBottom: `1px solid ${C.ember}` }}>
         <div style={{ fontSize: 9, letterSpacing: 4, color: C.plum, textTransform: "uppercase", fontFamily: FONT_SANS, marginBottom: 14 }}>더 깊은 리딩</div>
-        <div style={{ fontSize: 15, color: C.parchment, lineHeight: 1.6, fontFamily: FONT, fontWeight: 400 }}>여긴 겉만 본 거야.{"\n"}진짜 이유는 아직 안 풀었어.</div>
+        <div style={{ fontSize: 15, color: C.parchment, lineHeight: 1.6, fontFamily: FONT, fontWeight: 400 }}>지금까지 본 건 기본 풀이야.{"\n"}진짜 이유는 아직 안 풀었어.</div>
       </div>
       <div style={{ padding: "16px" }}>
         {categories.map((cat) => {
@@ -1078,18 +1076,21 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     mkSajuChapter({ label: "사주 분석", accent: C.caramel, tag: sajuTag, tagColor: C.mahogany, tagText: C.sand, title: `${sajuTag}.\n타고난 판이 이렇게 짜여 있어.`, pillars: d.pillars, iljuDesc: iljuDescStd }),
   ]
 
-  // I. 성격 요약 (무료 첫 페이지 · 후킹용 보편화)
+  // I. 성격 요약 (무료 첫 페이지 · 특별함/위로/해결방안 3문단 구성, 카테고리 세분화 없음)
+  const personaSpecial = `${personaHook || "분석 중이야."}${strengths.length ? " " + strengths.join(" ") : ""}`
+  const personaComfort = challenges.length
+    ? `${challenges.join(" ")} 의지가 약해서 그런 게 아니야. 태어날 때부터 그렇게 짜인 구조라, 지금까지 유독 힘들었던 것도 다 이유가 있었던 거야.`
+    : `요즘 뭘 해도 애매하게 안 풀린다는 느낌 들었을 수 있어. 능력이 없어서가 아니라 그냥 흐름 자체가 그런 시기였던 것뿐이야.`
   const personaChapter = {
     label: "성격 요약", accent: C.caramel,
     tag: "무료", tagColor: C.walnut, tagText: C.sand,
     title: "너라는 사람.",
     subtitle: "타고난 기질",
     blocks: [
-      { h: "타고난 기질", text: personaHook || "분석 중이야.", accent: C.caramel },
-      strengths.length ? { h: "숨은 강점", text: strengths.join(" "), accent: C.caramel } : null,
-      challenges.length ? { h: "발목 잡는 것", text: challenges.join(" "), accent: C.caramel } : null,
-      { h: "올해 흐름", text: personaYear || "올해 흐름을 읽는 중이야.", accent: C.caramel },
-    ].filter(Boolean),
+      { h: "특별함", text: personaSpecial, accent: C.caramel },
+      { h: "위로", text: personaComfort, accent: C.caramel },
+      { h: "해결방안", text: personaYear || "올해 흐름을 읽는 중이야.", accent: C.caramel },
+    ],
   }
 
   const freeChapters = [
