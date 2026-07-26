@@ -60,29 +60,16 @@ const INDUSTRY = [
   { label: "서비스·컨설팅·기타", oh: "" },
 ]
 
-const MESSAGES = [
-  "뭔가 항상 한 박자 어긋나.",
-  "분명히 열심히 했는데.",
-  "거슬러 왔던 거야, 처음부터.",
-  "네 잘못이 아니야.\n이제 알면 달라져.",
-  "내가 알려줄게.",
-]
+const INTRO_LINES = ["여전할 것인가,", "역전할 것인가."]
 
-const FloatText = ({ text, isLast, onDone }) => {
-  const [state, setState] = useState("in")
+const FloatText = () => {
+  const [shown, setShown] = useState([false, false])
 
   useEffect(() => {
-    const t1 = setTimeout(() => setState("hold"), 100)
-    const t2 = setTimeout(() => setState("out"), 1000)
-    const t3 = setTimeout(() => onDone(), 1800)
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+    const t1 = setTimeout(() => setShown([true, false]), 300)
+    const t2 = setTimeout(() => setShown([true, true]), 1100)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [])
-
-  const style = {
-    in:   { opacity: 1, transform: "translateY(8px) scale(1)", filter: "blur(20px)" },
-    hold: { opacity: 1, transform: "translateY(0px) scale(1)", filter: "blur(0px)" },
-    out:  { opacity: 0, transform: "translateY(6px) scale(1)", filter: "blur(20px)" },
-  }[state]
 
   return (
     <div style={{
@@ -90,23 +77,24 @@ const FloatText = ({ text, isLast, onDone }) => {
       color: C.parchment,
       textAlign: "center",
       lineHeight: 1.9,
-      whiteSpace: "pre-line",
       letterSpacing: 0.5,
-      ...style,
-      transition: state === "in"
-        ? "opacity 1.2s ease, transform 1.2s ease, filter 1.4s ease"
-        : state === "out"
-        ? "opacity 0.8s ease, transform 0.8s ease, filter 1s ease"
-        : "none",
     }}>
-      {text}
+      {INTRO_LINES.map((line, i) => (
+        <div key={i} style={{
+          opacity: shown[i] ? 1 : 0,
+          transform: shown[i] ? "translateY(0px) scale(1)" : "translateY(8px) scale(1)",
+          filter: shown[i] ? "blur(0px)" : "blur(20px)",
+          transition: "opacity 1.2s ease, transform 1.2s ease, filter 1.4s ease",
+        }}>
+          {line}
+        </div>
+      ))}
     </div>
   )
 }
 
 export default function MoraIntro({ onEnter }) {
   const [phase, setPhase] = useState("intro")
-  const [msgIndex, setMsgIndex] = useState(0)
   const [showBtn, setShowBtn] = useState(false)
 
   // 폼 상태
@@ -121,15 +109,10 @@ export default function MoraIntro({ onEnter }) {
   const nameRef = useRef(null)
   const foundRef = useRef(null)
 
-  const isLast = msgIndex === MESSAGES.length - 1
-
-  const handleDone = () => {
-    if (msgIndex >= MESSAGES.length - 1) {
-      setTimeout(() => setShowBtn(true), 400)
-    } else {
-      setMsgIndex(i => i + 1)
-    }
-  }
+  useEffect(() => {
+    const t = setTimeout(() => setShowBtn(true), 1900)
+    return () => clearTimeout(t)
+  }, [])
 
   const up = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
@@ -254,12 +237,7 @@ export default function MoraIntro({ onEnter }) {
           display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center", minHeight: "50vh",
         }}>
-          <FloatText
-            key={msgIndex}
-            text={MESSAGES[msgIndex]}
-            isLast={isLast}
-            onDone={handleDone}
-          />
+          <FloatText />
           {showBtn && (
             <button
               onClick={() => setPhase("form")}
@@ -281,7 +259,7 @@ export default function MoraIntro({ onEnter }) {
               onMouseEnter={e => e.currentTarget.style.background = C.ember}
               onMouseLeave={e => e.currentTarget.style.background = "transparent"}
             >
-              입장
+              시작하기
             </button>
           )}
         </div>

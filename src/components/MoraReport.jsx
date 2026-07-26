@@ -10,7 +10,7 @@ const C = {
   ash: "#9E8F8A", fog: "#5C5158",
 }
 
-const OHK_KR = { 목: "나무", 화: "불", 토: "흙", 금: "금", 수: "물" }
+const OHK_KR = { 목: "나무", 화: "불", 토: "흙", 금: "금속", 수: "물" }
 const OHK_COLOR = { 목: "#4CAF50", 화: "#FF5722", 토: "#8D6E63", 금: "#FFB300", 수: "#2196F3" }
 const OHK_DESC = {
   목: "성장을 향해 끊임없이 뻗어나가는 에너지야. 새로운 것을 시작하고 가능성을 여는 힘이 강해. 창의적이고 추진력이 넘치지만, 뿌리가 약하면 방향이 흔들리기 쉬워. 한번 꽂히면 빠르게 달려가는데, 그 속도가 주변을 앞질러버리는 경우가 많아. 시작은 잘하는데 마무리가 약한 게 이 기운의 함정이야.",
@@ -28,11 +28,11 @@ const _josaEul = (s) => s + (_hasJong(s) ? "을" : "를")
 
 // 오행이 과다할 때(dominant) 성향 — 강점과 그림자를 함께
 const OHK_STRONG_TRAIT = {
-  목: "새로운 걸 시작하고 밀어붙이는 추진력이 남달라. 자라나려는 본능이 강해서 한번 방향을 잡으면 거침없이 뻗어나가. 대신 이 기운이 넘치면 벌여놓기만 하고 마무리를 못 해. 속도가 주변을 앞질러버려서 혼자 지치는 게 약점이야.",
-  화: "표현력과 존재감이 강해서 어디 있든 눈에 띄어. 사람을 끌어당기는 열기가 있고 직관도 빨라. 근데 타오르는 만큼 식는 것도 빨라서 지속성이 문제야. 감정 기복이 크고, 이 기운이 넘치면 자기 자신을 태워버려.",
-  토: "어떤 상황에서도 흔들리지 않는 무게가 있어. 주변을 안정시키고 신뢰를 주는 힘이 강해. 대신 그 무게를 혼자 다 짊어지려는 게 문제야. 변화에 느리고, 한번 굳으면 안 바뀌어서 지나치면 정체가 돼.",
-  금: "원칙이 뚜렷하고 결단이 빨라. 불필요한 걸 잘라내고 핵심에 꽂히는 능력이 강해. 근데 날이 서있는 만큼 부딪히기 쉬워. 타협을 못 하는 게 강점이자 약점이라, 이 기운이 넘치면 차갑게 보여.",
-  수: "겉은 잔잔한데 속이 깊어. 직관이 예리하고 남들이 못 보는 걸 먼저 감지해. 어디에도 유연하게 스며들지만, 이 기운이 넘치면 생각만 깊어지고 행동이 느려져. 감정을 혼자 담아두다 무너지는 게 이 기운의 함정이야.",
+  목: "새로운 걸 시작하고 밀어붙이는 추진력이 남달라. 한번 방향을 잡으면 거침없이 뻗어나가. 대신 벌여놓기만 하고 마무리를 못 하는 게 이 기운의 함정이야.",
+  화: "표현력과 존재감이 강해서 어디 있든 눈에 띄어. 사람을 끌어당기는 열기가 있지만, 타오르는 만큼 식는 것도 빨라. 감정 기복이 크고, 이 기운이 넘치면 자기 자신을 태워버려.",
+  토: "어떤 상황에서도 흔들리지 않는 무게가 있어. 주변을 안정시키고 신뢰를 주는 힘이 강해. 대신 변화에 느리고, 그 무게를 혼자 다 짊어지려는 게 문제야.",
+  금: "원칙이 뚜렷하고 결단이 빨라. 불필요한 걸 잘라내고 핵심에 꽂히는 능력이 강해. 대신 날이 서있는 만큼 부딪히기 쉽고, 넘치면 차갑게 보여.",
+  수: "겉은 잔잔한데 속이 깊어. 직관이 예리하고 남들이 못 보는 걸 먼저 감지해. 대신 생각만 깊어지고 행동이 느려지는 게 이 기운의 함정이야.",
 }
 // 오행이 없을 때 부족한 부분
 const OHK_MISSING_TRAIT = {
@@ -187,17 +187,17 @@ function noColon(s) {
 }
 
 // 도넛 차트
-function MangseTable({ pillars, noTime, highlightIlju }) {
+function MangseTable({ pillars, noTime, highlightIlju, compact }) {
   if (!pillars || pillars.length < 4) return null
   // 궁성(가족) 라벨: [연, 월, 일, 시]
   const ganFam = ["조부", "부친", "자신", "아들"]
   const jiFam = ["조모", "모친", "배우자", "딸"]
   const colHead = ["연주", "월주", "일주", "시주"]
-  const cell = { flex: 1, textAlign: "center", padding: "6px 2px" }
-  const famStyle = { fontSize: 9, color: C.fog, fontFamily: FONT_SANS, marginTop: 2 }
-  const sibStyle = { fontSize: 9, color: C.ash, fontFamily: FONT_SANS }
-  const hanjaStyle = { fontSize: 16, color: C.parchment, fontFamily: FONT, lineHeight: 1.1 }
-  const koStyle = { fontSize: 10, color: C.sand, fontFamily: FONT_SANS }
+  const cell = { flex: 1, textAlign: "center", padding: compact ? "4px 1px" : "6px 2px" }
+  const famStyle = { fontSize: compact ? 8 : 9, color: C.fog, fontFamily: FONT_SANS, marginTop: 2 }
+  const sibStyle = { fontSize: compact ? 8 : 9, color: C.ash, fontFamily: FONT_SANS }
+  const hanjaStyle = { fontSize: compact ? 13 : 16, color: C.parchment, fontFamily: FONT, lineHeight: 1.1 }
+  const koStyle = { fontSize: compact ? 9 : 10, color: C.sand, fontFamily: FONT_SANS }
   const showTime = !noTime
   const cols = showTime ? [0, 1, 2, 3] : [0, 1, 2]
   // 일주(index 2) 글자색 강조 (배경 없음)
@@ -205,10 +205,10 @@ function MangseTable({ pillars, noTime, highlightIlju }) {
   const iljuHanja = (i) => (highlightIlju && i === 2) ? { ...hanjaStyle, color: C.caramel } : hanjaStyle
   const iljuKo = (i) => (highlightIlju && i === 2) ? { ...koStyle, color: C.caramel } : koStyle
   return (
-    <div style={{ marginBottom: 16, background: C.dusk, borderRadius: 12, padding: "12px 8px", border: `1px solid ${C.ember}` }}>
+    <div style={{ marginBottom: compact ? 0 : 16, background: C.dusk, borderRadius: 12, padding: compact ? "10px 4px" : "12px 8px", border: `1px solid ${C.ember}`, height: compact ? "100%" : "auto" }}>
       <div style={{ display: "flex" }}>
         {cols.map(i => (
-          <div key={"h" + i} style={{ ...cell, fontSize: 10, color: (highlightIlju && i === 2) ? C.caramel : C.fog, fontFamily: FONT_SANS, fontWeight: (highlightIlju && i === 2) ? 600 : 400 }}>{colHead[i]}</div>
+          <div key={"h" + i} style={{ ...cell, fontSize: compact ? 9 : 10, color: (highlightIlju && i === 2) ? C.caramel : C.fog, fontFamily: FONT_SANS, fontWeight: (highlightIlju && i === 2) ? 600 : 400 }}>{colHead[i]}</div>
         ))}
       </div>
       {/* 천간 */}
@@ -222,7 +222,7 @@ function MangseTable({ pillars, noTime, highlightIlju }) {
           </div>
         ))}
       </div>
-      <div style={{ height: 1, background: C.ember, margin: "8px 0" }} />
+      <div style={{ height: 1, background: C.ember, margin: compact ? "6px 0" : "8px 0" }} />
       {/* 지지 */}
       <div style={{ display: "flex", alignItems: "flex-start" }}>
         {cols.map(i => (
@@ -235,7 +235,7 @@ function MangseTable({ pillars, noTime, highlightIlju }) {
         ))}
       </div>
       {noTime && (
-        <div style={{ fontSize: 10, color: C.fog, fontFamily: FONT_SANS, textAlign: "center", marginTop: 8 }}>
+        <div style={{ fontSize: compact ? 9 : 10, color: C.fog, fontFamily: FONT_SANS, textAlign: "center", marginTop: 8 }}>
           태어난 시간을 몰라서 시주는 빼고 봤어.
         </div>
       )}
@@ -243,10 +243,10 @@ function MangseTable({ pillars, noTime, highlightIlju }) {
   )
 }
 
-function DonutChart({ ohaeng, dominant, hideDesc }) {
+function DonutChart({ ohaeng, dominant, hideDesc, hideIndex, compact }) {
   const total = Object.values(ohaeng).reduce((a, b) => a + b, 0)
   if (!total) return null
-  const size = 80; const r = 28; const cx = 40; const cy = 40; const stroke = 10
+  const size = compact ? 76 : 80; const r = compact ? 26 : 28; const cx = size/2; const cy = size/2; const stroke = compact ? 9 : 10
   let cumAngle = -90
   const slices = Object.entries(ohaeng).filter(([,v])=>v>0).map(([k,v])=>{
     const angle = (v/total)*360
@@ -257,37 +257,45 @@ function DonutChart({ ohaeng, dominant, hideDesc }) {
     const rad = (a*Math.PI)/180
     return [cx + r*Math.cos(rad), cy + r*Math.sin(rad)]
   }
+  const svg = (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
+      {slices.map(s => {
+        const [x1,y1] = polar(s.startA)
+        const [x2,y2] = polar(s.startA + s.angle)
+        const large = s.angle > 180 ? 1 : 0
+        if (s.angle >= 359.9) {
+          return <circle key={s.k} cx={cx} cy={cy} r={r} fill="none" stroke={s.color} strokeWidth={stroke}/>
+        }
+        return (
+          <path key={s.k}
+            d={`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`}
+            fill={s.color} stroke={C.dusk} strokeWidth={1}
+          />
+        )
+      })}
+      <circle cx={cx} cy={cy} r={r-stroke} fill={C.dusk}/>
+      <text x={cx} y={cy-3} textAnchor="middle" fill={OHK_COLOR[dominant]||C.sand} fontSize={compact ? 10 : 11} fontFamily={FONT_SANS} fontWeight="400">
+        {OHK_KR[dominant]||dominant}
+      </text>
+      <text x={cx} y={cy+11} textAnchor="middle" fill={C.ash} fontSize={compact ? 8 : 9} fontFamily={FONT_SANS}>
+        {ohaeng[dominant]||0}개
+      </text>
+    </svg>
+  )
+  if (hideIndex) {
+    // 만세력과 나란히 배치되는 레이아웃 전용: svg만, 인덱스는 OhaengIndexList가 별도로 담당
+    return <div style={{ display: "flex", justifyContent: "center", padding: compact ? "10px 0 4px" : "12px 0 6px" }}>{svg}</div>
+  }
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 10 }}>
-        <svg width={size} height={size} viewBox="0 0 80 80" style={{ flexShrink: 0 }}>
-          {slices.map(s => {
-            const [x1,y1] = polar(s.startA)
-            const [x2,y2] = polar(s.startA + s.angle)
-            const large = s.angle > 180 ? 1 : 0
-            if (s.angle >= 359.9) {
-              return <circle key={s.k} cx={cx} cy={cy} r={r} fill="none" stroke={s.color} strokeWidth={stroke}/>
-            }
-            return (
-              <path key={s.k}
-                d={`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`}
-                fill={s.color} stroke={C.dusk} strokeWidth={1}
-              />
-            )
-          })}
-          <circle cx={cx} cy={cy} r={r-stroke} fill={C.dusk}/>
-          <text x={cx} y={cy-3} textAnchor="middle" fill={OHK_COLOR[dominant]||C.sand} fontSize="11" fontFamily={FONT_SANS} fontWeight="400">
-            {OHK_KR[dominant]||dominant}
-          </text>
-          <text x={cx} y={cy+11} textAnchor="middle" fill={C.ash} fontSize="9" fontFamily={FONT_SANS}>
-            {ohaeng[dominant]||0}개
-          </text>
-        </svg>
+        {svg}
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 11, color: C.fog, fontFamily: FONT_SANS, fontWeight: 400 }}>
             {Object.entries(ohaeng).filter(([,v])=>v>0).map(([k,v])=>(
-              <span key={k} style={{ marginRight: 8 }}>
-                <span style={{ color: OHK_COLOR[k]||C.fog }}>■</span> {OHK_KR[k]||k} {v}
+              <span key={k} style={{ marginRight: 8, display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <span style={{ width: 8, height: 8, borderRadius: 2, background: OHK_COLOR[k]||C.fog, display: "inline-block" }} />
+                {OHK_KR[k]||k} {v}
               </span>
             ))}
           </div>
@@ -295,6 +303,39 @@ function DonutChart({ ohaeng, dominant, hideDesc }) {
       </div>
       <div style={{ fontSize: 13, color: C.parchment, lineHeight: 1.8, fontFamily: FONT, fontWeight: 400, display: hideDesc ? "none" : "block" }}>
         {OHK_DESC[dominant] || ""}
+      </div>
+    </div>
+  )
+}
+
+// 오행 인덱스 세로 리스트 — 색상 박스(background)로 렌더링 (유니코드 ■ 색상 미표시 이슈 방지)
+function OhaengIndexList({ ohaeng }) {
+  const entries = Object.entries(ohaeng).filter(([,v]) => v > 0)
+  if (!entries.length) return null
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "0 12px 10px" }}>
+      {entries.map(([k, v]) => (
+        <div key={k} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontFamily: FONT_SANS, color: C.parchment }}>
+          <span style={{ width: 9, height: 9, borderRadius: 2, background: OHK_COLOR[k] || C.fog, display: "inline-block", flexShrink: 0 }} />
+          <span style={{ color: C.ash }}>{OHK_KR[k] || k}</span>
+          <span style={{ marginLeft: "auto", color: C.sand, fontWeight: 500 }}>{v}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// 만세력(좌) + 오행 도넛차트(우, svg + 하단 인덱스) 나란히 배치
+function MangseDonutRow({ pillars, noTime, ohaeng, dominant }) {
+  return (
+    <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "stretch" }}>
+      <div style={{ flex: 1 }}>
+        <MangseTable pillars={pillars} noTime={noTime} highlightIlju compact />
+      </div>
+      <div style={{ flex: 1, background: C.dusk, borderRadius: 12, border: `1px solid ${C.ember}`, display: "flex", flexDirection: "column" }}>
+        <DonutChart ohaeng={ohaeng} dominant={dominant} hideDesc hideIndex compact />
+        <div style={{ height: 1, background: C.ember, margin: "2px 10px 8px" }} />
+        <OhaengIndexList ohaeng={ohaeng} />
       </div>
     </div>
   )
@@ -473,12 +514,12 @@ const HOOK_TEXT = {
   "재물운": "지금 눈앞에 돈 들어올 구멍 하나 열려있어. 근데 이거 아무 때나 열려있는 거 아니야. 언제, 어디서 들어오는지 궁금하지 않아?",
   "연애운": "지금 스쳐 지나가는 그 사람, 인연 맞아. 근데 이번에 놓치면 다음 인연은 몇 년 뒤야.",
   "애정운": "연애할 때마다 똑같은 이유로 헤어지는 거, 알고 있었어? 이번에도 모르고 들어가면 또 똑같이 끝나.",
-  "직장운": "지금 이 회사, 더 있어도 될 자리 맞아? 이거 헷갈려서 1~2년 잘못 쓰는 사람 진짜 많아. 답은 이미 나와있어.",
+  "직장운": "열심히 하면 잘될 거라는 착각, 그게 발목을 잡고 있을 수도 있어. 방향이 안 맞으면 아무리 애써도 제자리야.",
   "취업운": "합격 문 열리는 시기, 따로 있어. 같은 이력서도 타이밍만 맞으면 결과 완전히 달라져. 그 시기가 언제인지 궁금하지 않아?",
   "관계운": "곁에 있는 사람 중에, 기운 갉아먹는 사람 하나 있어. 근데 아직 못 알아챘을 수도 있어.",
   "건강운": "별거 아니라고 넘기는 그 신호, 사주에선 이미 잡혀. 이거 놓치면 나중에 제대로 발목 잡혀.",
   "가족운": "반복되는 그 갈등 패턴, 우연 아니야. 뿌리를 모르고 넘어가면 다음 세대까지 그대로 물려줘.",
-  "평생운": "인생 전체를 관통하는 흐름, 딱 하나야. 이거 모르고 사는 사람이랑 알고 사는 사람, 10년 뒤 차이 크게 벌어져.",
+  "평생운": "매년 변하지 않는 진짜 이유, 사주에 다 나와 있어. 모르고 넘기면 내년에도 똑같아.",
 }
 const HOOK_DEFAULT = "지금까지 본 건 기본 풀이야. 진짜 이유는 아직 안 풀었어."
 
@@ -492,7 +533,7 @@ function CategoryListPage({ categories, unlockedCategories, onSelect }) {
     <div style={{ background: C.dusk, border: `1px solid ${C.mahogany}`, borderRadius: 16, overflow: "hidden", minHeight: 480, boxShadow: `0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px ${C.ember}` }}>
       <div style={{ background: `linear-gradient(135deg, ${C.mahogany} 0%, ${C.abyss} 100%)`, padding: "24px 24px 20px", borderBottom: `1px solid ${C.ember}` }}>
         <div style={{ fontSize: 9, letterSpacing: 4, color: C.plum, textTransform: "uppercase", fontFamily: FONT_SANS, marginBottom: 14 }}>더 깊은 리딩</div>
-        <div style={{ fontSize: 15, color: C.parchment, lineHeight: 1.6, fontFamily: FONT, fontWeight: 400 }}>지금까지 본 건 기본 풀이야.{"\n"}진짜 이유는 아직 안 풀었어.</div>
+        <div style={{ fontSize: 15, color: C.parchment, lineHeight: 1.6, fontFamily: FONT, fontWeight: 400 }}>99%가 놓치는{"\n"}인생 역전의 순간, 지금 이 안에 있어.</div>
       </div>
       <div style={{ padding: "16px" }}>
         {categories.map((cat) => {
@@ -895,24 +936,22 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   // 오행 서술 (I-2 오행분포용) — 카테고리 분리 없이 줄글 하나로
   const ohEntries = Object.entries(ohaeng).sort((x, y) => y[1] - x[1])
   const missingOh = Object.entries(ohaeng).filter(([, v]) => !v).map(([k]) => k)
-  const _domCnt = ohaeng[dominant] || 0
   const _domTrait = OHK_STRONG_TRAIT[dominant] || OHK_DESC[dominant] || ""
   const _missTraits = missingOh.map(k => OHK_MISSING_TRAIT[k]).filter(Boolean)
   const _missPart = missingOh.length
-    ? ` 대신 ${missingOh.map(k => OHK_KR[k]).join(", ")} 기운이 아예 없어. ${_josaIga(_missTraits.join(", "))} 비어있는 구조라, 이 부분을 의식적으로 채워야 균형이 잡혀.`
-    : " 오행이 크게 치우치지 않고 고르게 갖춰진 편이라, 상황에 맞게 여러 기운을 꺼내 쓸 수 있는 구조야."
-  const ohaengFull = `${_josaEunNeun(OHK_KR[dominant] || dominant)} ${_domCnt}개로 이 사주에서 가장 강한 기운이야. ${_domTrait}${_missPart}`
+    ? ` 대신 ${missingOh.map(k => OHK_KR[k]).join(", ")} 기운이 없어서 ${_josaIga(_missTraits.join(", "))} 부족한 구조야. 의식적으로 채워야 균형이 잡혀.`
+    : " 오행이 고르게 갖춰진 편이라, 상황에 맞게 여러 기운을 꺼내 쓸 수 있는 구조야."
+  const ohaengFull = `이 사주에서 가장 강한 기운은 ${OHK_KR[dominant] || dominant}${_hasJong(OHK_KR[dominant] || dominant) ? "이야" : "야"}. ${_domTrait}${_missPart}`
   // 임의의 명식(경계 mid 포함)에 대해 오행 분석 풀버전을 동일 포맷으로 생성 — 첫째/둘째 해석 길이 일관성
   const mkOhaengFull = (ohMap, dom) => {
     if (!ohMap) return ohaengFull
     const missing = ["목", "화", "토", "금", "수"].filter(k => !ohMap[k])
-    const domCnt = ohMap[dom] || 0
     const domTrait = OHK_STRONG_TRAIT[dom] || OHK_DESC[dom] || ""
     const missTraits = missing.map(k => OHK_MISSING_TRAIT[k]).filter(Boolean)
     const missPart = missing.length
-      ? ` 대신 ${missing.map(k => OHK_KR[k]).join(", ")} 기운이 아예 없어. ${_josaIga(missTraits.join(", "))} 비어있는 구조라, 이 부분을 의식적으로 채워야 균형이 잡혀.`
-      : " 오행이 크게 치우치지 않고 고르게 갖춰진 편이라, 상황에 맞게 여러 기운을 꺼내 쓸 수 있는 구조야."
-    return `${_josaEunNeun(OHK_KR[dom] || dom)} ${domCnt}개로 이 명식에서 가장 강한 기운이야. ${domTrait}${missPart}`
+      ? ` 대신 ${missing.map(k => OHK_KR[k]).join(", ")} 기운이 없어서 ${_josaIga(missTraits.join(", "))} 부족한 구조야. 의식적으로 채워야 균형이 잡혀.`
+      : " 오행이 고르게 갖춰진 편이라, 상황에 맞게 여러 기운을 꺼내 쓸 수 있는 구조야."
+    return `이 사주에서 가장 강한 기운은 ${OHK_KR[dom] || dom}${_hasJong(OHK_KR[dom] || dom) ? "이야" : "야"}. ${domTrait}${missPart}`
   }
 
   // 월별 세운 (X-2)
@@ -1039,7 +1078,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     tag: opts.tag, tagColor: opts.tagColor, tagText: opts.tagText,
     title: opts.title,
     subtitle: "사주 명식 · 오행 분석",
-    extra: <><MangseTable pillars={opts.pillars} noTime={d.noTime} highlightIlju /><DonutChart ohaeng={opts.ohaeng || ohaeng} dominant={opts.dominant || dominant} hideDesc /></>,
+    extra: <MangseDonutRow pillars={opts.pillars} noTime={d.noTime} ohaeng={opts.ohaeng || ohaeng} dominant={opts.dominant || dominant} />,
     blocks: [
       { h: "오행 분석", text: opts.ohaengFull || ohaengFull, accent: opts.accent },
       { h: "일주 분석", text: opts.iljuDesc || "분석 중이야.", accent: opts.accent },
