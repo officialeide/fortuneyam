@@ -496,10 +496,11 @@ function PeakYears({ data }) {
   )
 }
 
-function Block({ h, text, kw, jsxContent, accent, last }) {
+function Block({ h, text, kw, jsxContent, accent, last, noLine }) {
   if (!text && !h && !jsxContent) return null
+  const wrapStyle = last ? {} : noLine ? { marginBottom: 20 } : dvd
   return (
-    <div style={last ? {} : dvd}>
+    <div style={wrapStyle}>
       {h && <div style={hdg(accent || C.caramel)}>{h}</div>}
       {kw && <div style={{ fontSize: 15, color: C.caramel, fontFamily: FONT, fontWeight: 600, marginBottom: 6, letterSpacing: 1 }}>{kw}</div>}
       {text && <div style={txt}>{text}</div>}
@@ -558,7 +559,7 @@ function CategoryListPage({ categories, unlockedCategories, onSelect }) {
   )
 }
 
-function ChapterCard({ label, tag, tagColor, tagText, accent, title, subtitle, blocks, extra, flipping, flipDir, locked, category, onUnlock }) {
+function ChapterCard({ label, tag, tagColor, tagText, accent, title, subtitle, blocks, extra, flipping, flipDir, locked, category, onUnlock, noDvd }) {
   const visibleBlocks = blocks.filter(Boolean)
   const teaserBlock = locked ? visibleBlocks[0] : null
   const restCount = locked ? Math.max(visibleBlocks.length - 1, 0) : 0
@@ -582,7 +583,7 @@ function ChapterCard({ label, tag, tagColor, tagText, accent, title, subtitle, b
       <div style={{ padding: "20px 24px 24px" }}>
         {extra}
         {!locked && visibleBlocks.map((b, i) => (
-          <Block key={i} {...b} last={i === visibleBlocks.length - 1} />
+          <Block key={i} {...b} last={i === visibleBlocks.length - 1} noLine={noDvd} />
         ))}
         {locked && teaserBlock && <Block {...teaserBlock} last={false} />}
         {locked && (
@@ -885,7 +886,6 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   // 연애
   const desire = mug(night.desire || "")
   const desire2 = mug(night.desire2 || "")
-  const attraction = mug(night.attraction || "")
   const idealType = mug(night.idealType || "")
   const idealType2 = mug(night.idealType2 || "")
   const triggers = (night.triggers || []).map(mug).filter(Boolean)
@@ -1129,12 +1129,19 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     : _jaeStruct === "과다" ? " 재성이 넘칠 만큼 많아서, 기회는 많은데 그만큼 관리가 관건인 구조야."
     : _jaeStruct === "없음" ? " 재성은 약한 대신, 실력과 자리로 승부하는 구조야."
     : ""
-  const page1Special = `${_page1Special}${_page1SpecialJae}`
+  const _obstacleByOh = {
+    목: "근데 그거 알아? 뻗어나가는 나무 앞에 가로막힌 벽이 하나 있어. 방향은 맞는데 속도가 안 나서 답답했던 시기, 여러 번 지나왔을 그림이야.",
+    화: "근데 그거 알아? 활활 타오르다가도 훅 꺼지는 순간이 있어. 열정만큼 결과가 안 따라와서 허탈했던 시기, 여러 번 지나왔을 그림이야.",
+    토: "근데 그거 알아? 단단한 만큼 무거워서 못 움직이는 순간이 있어. 다지기만 하다 정작 못 나선 시기, 여러 번 지나왔을 그림이야.",
+    금: "근데 그거 알아? 날이 선 만큼 자꾸 부딪히는 순간이 있어. 맞다고 확신했는데 자꾸 마찰만 생겼던 시기, 여러 번 지나왔을 그림이야.",
+    수: "근데 그거 알아? 물 앞에 산이 가로막은 형상이야. 앞이 막혀서 답답했던 시기, 여러 번 지나왔을 그림이야.",
+  }
+  const page1Special = `${_page1Special}${_page1SpecialJae} ${_obstacleByOh[dominant] || _obstacleByOh["토"]}`
   const page1Comfort = isBnd
-    ? `경계사주는 원래 스스로도 헷갈리는 순간이 많아. 이게 내 성격인지 저게 내 성격인지, 결정을 내려도 확신이 안 서지. 사주에 이미 그렇게 짜여있어. 우유부단한 게 아니라 두 기운을 동시에 쥐고 있어서 그런 거야.`
+    ? `이런 순간이 있다고 나쁜 게 아니야. 무리해서 밀어붙이지 말고 잠시 멈춰서 방향을 다시 보라는 신호야. 최근 몇 년, 뭘 해도 잘 안 풀린다는 느낌 들었지? 이유가 있었어. 능력이 없어서가 아니라 흐름 자체가 그런 시기였던 거야. 경계사주는 원래 스스로도 헷갈리는 순간이 많아. 이게 내 성격인지 저게 내 성격인지, 결정을 내려도 확신이 안 서지. 맞지? 사주에 이미 그렇게 짜여있어. 우유부단한 게 아니라 두 기운을 동시에 쥐고 있어서 그런 거야.`
     : missingOh.length
-    ? `${missingOh.map(k => OHK_KR[k]).join(", ")} 기운이 없어서 가끔 뭘 해도 안 채워지는 느낌이 들었을 거야. 부족해서 못난 게 아니라, 타고난 구조가 원래 그런 거야. 이 부분만 의식하면 오히려 강점으로 바뀌어.`
-    : `오행이 고르게 갖춰진 구조라 크게 흔들리기보다 상황 따라 유연하게 대응하는 편이야. 대신 뚜렷한 색깔이 없어 보인다고 스스로를 답답해했을 수도 있어. 그건 약점이 아니라 균형이야.`
+    ? `이런 순간이 있다고 나쁜 게 아니야. 무리해서 밀어붙이지 말고 잠시 멈춰서 방향을 다시 보라는 신호야. 최근 몇 년, 뭘 해도 잘 안 풀린다는 느낌 들었지? 이유가 있었어. ${missingOh.map(k => OHK_KR[k]).join(", ")} 기운이 없어서 가끔 뭘 해도 안 채워지는 느낌이 들었을 거야. 부족해서 못난 게 아니라, 타고난 구조가 원래 그런 거야. 이 부분만 의식하면 오히려 강점으로 바뀌어.`
+    : `이런 순간이 있다고 나쁜 게 아니야. 무리해서 밀어붙이지 말고 잠시 멈춰서 방향을 다시 보라는 신호야. 오행이 고르게 갖춰진 구조라 크게 흔들리기보다 상황 따라 유연하게 대응하는 편이야. 대신 뚜렷한 색깔이 없어 보인다고 스스로를 답답해했을 수도 있어. 그건 약점이 아니라 균형이야.`
   const _actionByOh = {
     목: "나무 기운이 강하면 가만히 있을 때보다 뭔가 벌일 때 기운이 살아. 방향만 잘 잡으면 거침없이 뻗어나가는 구조야.",
     화: "불 기운이 강하면 드러내고 표현할 때 기운이 붙어. 숨기지 말고 존재감을 자연스럽게 꺼내는 게 맞아.",
@@ -1148,6 +1155,7 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     tag: "무료", tagColor: C.walnut, tagText: C.sand,
     title: "타고난 판.",
     subtitle: "사주가 하는 말",
+    noDvd: true,
     blocks: [
       { text: page1Special, accent: C.caramel },
       { text: page1Comfort, accent: C.caramel },
@@ -1221,6 +1229,27 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     : isSingang
     ? "적극적으로 투자하고 확장하는 스타일이 맞아. 근데 리스크 관리를 못 하면 한 방에 날려. 욕심의 크기를 조절하는 게 관건이야. 수익이 날 때일수록 목표가를 정해 일부는 챙겨두고, 빚내서 하는 투자는 이 사주에선 특히 조심해야 해."
     : "안정적으로 쌓아가는 스타일이 맞아. 한 번에 크게 가려다 다 잃는 경우가 많아. 꾸준히 쌓는 게 이 구조의 정답이야. 조급함에 무리한 승부를 걸기보다, 매달 정해진 만큼 착실히 넣는 자동 적립이 이 사주엔 가장 잘 맞아."
+
+  // 자산군별 투자 풀이 (오행 기반)
+  const ASSET_CLASS_BY_OH = {
+    목: { 현금: "현금을 마냥 쌓아두면 답답해하는 성향이야. 유동성은 최소한만 쥐고 나머지는 굴려야 몸이 편해.", 부동산: "장기로 눌러앉는 부동산보다 성장성 있는 신흥 지역이 더 잘 맞아.", 금: "안전자산으로 쟁여두기보다는 소량만 보험처럼 들고 가는 편이 나아.", 채권: "고정된 이자만 받는 채권은 답답하게 느껴질 수 있어. 포트폴리오의 일부로만 담아둬.", 주식: "성장주, 신사업 쪽에 감이 좋아. 다만 너무 빨리 갈아타는 습관은 주의해.", 코인: "새로운 걸 먼저 잡는 감각이 있어서 신생 자산에 끌리기 쉬운데, 손절 타이밍을 정해두고 들어가야 해." },
+    화: { 현금: "현금은 손에 있으면 금방 쓰고 싶어지는 타입이야. 자동이체로 강제 저축이 필요해.", 부동산: "실거주 겸 자기표현이 되는 곳(상권, 브랜드 아파트)에 끌리는 편이야.", 금: "화려한 자산보다 안 보이는 안전자산이 어색하지만, 소량은 꼭 챙겨둬.", 채권: "지루하게 느껴지지만 포트폴리오의 브레이크 역할로 꼭 필요해.", 주식: "테마주, 이슈주에 민감하게 반응해. 열기 식기 전에 나오는 타이밍이 관건이야.", 코인: "변동성 큰 자산에 감정적으로 몰입하기 쉬워. 정해둔 금액 이상은 넣지 마." },
+    토: { 현금: "현금 보유 자체를 안정감으로 느끼는 타입이야. 그게 나쁜 게 아니라 이 사주의 강점이야.", 부동산: "가장 잘 맞는 자산군이야. 오래 쥐고 있을수록 결실이 커.", 금: "안전자산 선호도가 높아. 꾸준히 모아가는 방식이 잘 맞아.", 채권: "변동성보다 안정적인 수익을 좋아해서 채권 비중을 높게 가져가도 괜찮아.", 주식: "우량주, 배당주처럼 흔들림 적은 종목이 잘 맞아. 단타는 이 사주엔 안 맞아.", 코인: "변동성이 너무 커서 스트레스만 받는 자산군이야. 최소 비중으로만 접근해." },
+    금: { 현금: "필요할 때 딱 필요한 만큼만 쥐고 있는 걸 선호해. 불필요한 유동성은 바로 굴려.", 부동산: "따지고 분석해서 들어가는 스타일이라 시세차익형 투자에 강해.", 금: "원칙적으로 안전자산을 선호해서 금 비중을 자연스럽게 늘리는 편이야.", 채권: "구조가 명확한 채권과 잘 맞아. 조건 좋은 걸 골라내는 눈이 있어.", 주식: "가치주, 재무구조 탄탄한 종목을 선호해. 감으로 안 사고 분석해서 사.", 코인: "근거 없는 자산은 본능적으로 거리를 둬. 들어가더라도 철저히 분석 후에만 움직여." },
+    수: { 현금: "유동성을 확보해두는 걸 편하게 느껴. 현금 비중이 높아도 불안해하지 않는 타입이야.", 부동산: "묶이는 자산에 답답함을 느낄 수 있어. 유동화 쉬운 소형 자산이 잘 맞아.", 금: "촉이 좋아서 매수·매도 타이밍을 직관적으로 잘 잡아.", 채권: "안정과 유동성 사이 균형을 잘 잡는 편이라 단기채가 잘 맞아.", 주식: "흐름을 읽는 감각이 좋아. 다만 확신이 안 설 때 우유부단해질 수 있어.", 코인: "변동성 있는 자산의 흐름을 직관적으로 잘 타. 대신 과신은 금물이야." },
+  }
+  const assetClass = ASSET_CLASS_BY_OH[dominant] || ASSET_CLASS_BY_OH["토"]
+  const assetClassText = Object.entries(assetClass).map(([k, v]) => `${k} — ${v}`).join("\n\n")
+
+  // 매력적인 순간 — 상대가 나한테 끌리는 포인트 (내 매력 분석)
+  const ATTRACTIVE_BY_OH = {
+    목: "말 안 해도 느껴지는 추진력에 상대가 끌려. 방향을 잡고 나아가는 모습 자체가 매력이야. 우유부단한 사람들 사이에서 특히 눈에 띄어.",
+    화: "존재감과 에너지 자체가 매력이야. 같이 있으면 분위기가 사는 느낌을 줘서, 상대는 자기도 모르게 자꾸 곁에 있고 싶어 해.",
+    토: "흔들리지 않는 안정감에 끌려. 오래 봐도 편안한 사람이라는 인상을 줘서, 상대는 이 사람 앞에서만큼은 긴장을 풀게 돼.",
+    금: "분명한 기준과 태도에서 신뢰를 느껴. 흐리지 않고 확실한 게 매력이라, 상대는 이 사람 말은 믿을 수 있다는 확신을 갖게 돼.",
+    수: "잔잔한 분위기 속 깊이에 끌려. 알아갈수록 매력이 드러나는 타입이라, 상대는 처음보다 시간이 지날수록 더 빠져들어.",
+  }
+  const attractiveText = ATTRACTIVE_BY_OH[dominant] || ATTRACTIVE_BY_OH["토"]
   // 십성 카운트 (재성/관성/인성) — 여러 챕터에서 공용
   const _sc = d.sibsongAnalysis?.counts || {}
   const _gwanCnt = (_sc["정관"] || 0) + (_sc["편관"] || 0)   // 관성 = 직장·인정
@@ -1607,8 +1636,37 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     return `${y.year}년 종합 ${score}점\n${areaStr}\n${mug(y.summary || "")}`
   }).join("\n\n")
 
+  // 사주 심화 요약 텍스트 (십성 · 신살 · 운성 종합)
+  const _sibsongTop1 = d.sibsongAnalysis?.top?.[0]
+  const _sinsalDayItem = (d.sinsal12 || []).find(s => s.label === "일") || (d.sinsal12 || [])[2]
+  const _unseongDayItem = (d.unseong12 || []).find(s => s.label === "일") || (d.unseong12 || [])[2]
+  const sajuSummaryText = `정리하면 이 사주는 십성으로는 ${_sibsongTop1?.label || "특정 기운"}이 가장 강하고, 일주 자리엔 ${(_sinsalDayItem?.name || "").replace(/\(.*\)/, "") || "고유한 신살"}이, 운성으로는 ${_unseongDayItem?.stage || "고유한 단계"}에 걸려 있어. 십성·신살·운성이 다 같은 결을 가리키고 있으니, 이 흐름을 거스르지 말고 타고 가는 게 맞아.`
+
   const lockedChapters = [
-    // ★ 동양이 읽는 나의 결 (심화 도입 · 순수 동양 리딩)
+    // ★ 십성 · 12신살 · 12운성 · 요약 (2페이지)
+    {
+      label: "십성 · 신살 1", accent: C.plum,
+      category: "사주 심화",
+      tag: "유료", tagColor: C.plum, tagText: C.lavender,
+      title: "타고난 재능과\n기질의 뿌리.",
+      subtitle: "사주 십성 · 12신살",
+      blocks: [
+        { h: "가장 강한 십성 세 가지", jsxContent: React.createElement("div", null, ...sibsongJSX), accent: C.plum },
+        { h: "사주 네 기둥의 12신살", jsxContent: React.createElement("div", null, ...sinsal12JSX), accent: C.plum },
+      ],
+    },
+    {
+      label: "운성 · 요약 2", accent: C.plum,
+      category: "사주 심화",
+      tag: "유료", tagColor: C.plum, tagText: C.lavender,
+      title: "태어나 자라고 스러지는\n열두 단계의 기질.",
+      subtitle: "일간 기준 12운성 · 종합 요약",
+      blocks: [
+        { h: "일간 기준 12운성", jsxContent: React.createElement("div", null, ...unseong12JSX), accent: C.plum },
+        { h: "종합 요약", text: sajuSummaryText, accent: C.plum },
+      ],
+    },
+    // ★ 동양이 읽는 나의 결 (사주 요약 인용 + 당사주 · 토정비결 · 주역)
     {
       label: "동서양 종합 1", accent: C.iris,
       category: "사주 심화",
@@ -1616,43 +1674,13 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       title: "동양이 읽는\n나의 결.",
       subtitle: "사주 · 당사주 · 토정비결 · 주역",
       blocks: [
+        { h: "사주", text: mug(page1Special), accent: C.iris },
         dansajuText ? { h: "당사주", text: dansajuText, accent: C.iris } : null,
         { h: "토정비결", kw: tojungKw || null, text: tojungDesc, accent: C.iris },
         { h: "주역", kw: ichingKw || null, text: ichingBodyText, accent: C.iris },
       ].filter(Boolean),
     },
-    // ★ 십성 · 12신살 · 12운성 (사주 구성 심화)
-    {
-      label: "십성 분석", accent: C.plum,
-      category: "사주 심화",
-      tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "타고난 재능과\n기질의 뿌리.",
-      subtitle: "사주 십성 분석",
-      blocks: [
-        { h: "가장 강한 십성 세 가지", jsxContent: React.createElement("div", null, ...sibsongJSX), accent: C.plum },
-      ],
-    },
-    {
-      label: "12신살", accent: C.plum,
-      category: "사주 심화",
-      tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "사주 네 기둥에 박힌\n열두 신살의 자리.",
-      subtitle: "연지 기준 12신살",
-      blocks: [
-        { jsxContent: React.createElement("div", null, ...sinsal12JSX), accent: C.plum },
-      ],
-    },
-    {
-      label: "12운성", accent: C.plum,
-      category: "사주 심화",
-      tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "태어나 자라고 스러지는\n열두 단계의 기질.",
-      subtitle: "일간 기준 12운성",
-      blocks: [
-        { jsxContent: React.createElement("div", null, ...unseong12JSX), accent: C.plum },
-      ],
-    },
-    // II. 동서양 종합 (별자리 · 종합 · 다섯 관점)
+    // ★ 동서양 종합 (별자리)
     {
       label: "동서양 종합 2", accent: C.iris,
       category: "사주 심화",
@@ -1666,28 +1694,31 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
         (!sunSign && !moonSign) ? { h: "별자리", text: "태어난 시간 정보가 없어 별자리는 생략했어. 동양 명식만으로도 충분히 결이 읽혀.", accent: C.iris } : null,
       ].filter(Boolean),
     },
+    // ★ 동서양 종합 3 (신설 · 생명숫자 / 타로 설명칸 분리)
     {
       label: "동서양 종합 3", accent: C.iris,
       category: "사주 심화",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "타로와 다섯 관점이\n하나로 모이는 곳.",
-      subtitle: "타로 · 종합 결론",
+      title: "생명숫자와\n타로가 말하는 것.",
+      subtitle: "생명경로수 · 타로 카드",
       blocks: [
-        { h: `생명경로수 ${t.lifePath || ""} · ${tarotCardName}`, text: `${tarotLifeText || ""}\n\n${tarotSoulText || ""}`.trim() || "분석 중이야.", accent: C.iris },
-        { h: "다섯 관점의 결론", text: fiveViewText, accent: C.iris },
+        { h: `생명숫자 ${t.lifePath || ""}`, text: tarotLifeText || "분석 중이야.", accent: C.iris },
+        { h: `타로 카드 · ${tarotCardName}`, text: tarotSoulText || "분석 중이야.", accent: C.iris },
       ].filter(Boolean),
     },
+    // ★ 동서양 다섯 관점 (신설 · 결론 + 엇갈릴 때 통합)
     {
-      label: "동서양 종합 4", accent: C.iris,
+      label: "동서양 다섯 관점", accent: C.iris,
       category: "사주 심화",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "다섯 관점이\n엇갈리는 지점.",
-      subtitle: "충돌 · 긴장 · 입체감",
+      title: "다섯 관점이\n하나로 모이고, 엇갈리는 곳.",
+      subtitle: "종합 결론 · 충돌 지점",
       blocks: [
+        { h: "다섯 관점의 결론", text: fiveViewText, accent: C.iris },
         { h: "서로 다른 지도가 어긋날 때", text: fiveViewTensionText, accent: C.iris },
       ].filter(Boolean),
     },
-    // III. 재물운 3블록
+    // III. 재물운 4블록
     {
       label: "재물운 1", accent: C.sand,
       category: "재물운",
@@ -1714,10 +1745,20 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
       label: "재물운 3", accent: C.sand,
       category: "재물운",
       tag: "유료", tagColor: C.plum, tagText: C.lavender,
-      title: "투자 체질과\n재물을 강화하는 법.",
-      subtitle: "투자 체질 · 재물 강화 · 향후 흐름",
+      title: "자산군별로 보는\n투자 체질.",
+      subtitle: "현금 · 부동산 · 금 · 채권 · 주식 · 코인",
       blocks: [
-        { h: "투자 체질", text: reomulInvest, accent: C.sand },
+        { h: "자산군별 풀이", text: assetClassText, accent: C.sand },
+        { h: "투자 체질 총평", text: reomulInvest, accent: C.sand },
+      ],
+    },
+    {
+      label: "재물운 4", accent: C.sand,
+      category: "재물운",
+      tag: "유료", tagColor: C.plum, tagText: C.lavender,
+      title: "재물을\n강화하는 법.",
+      subtitle: "재물 습관 · 올해 흐름",
+      blocks: [
         { h: "재물을 실제로 키우는 습관", text: reomulHabitText, accent: C.sand },
         { h: "올해 재물 흐름", jsxContent: <CategoryScore months={monthForecast} category="재물" thisYearScore={thisYear?.areas?.재물 || 0} label="재물운" />, accent: C.sand },
       ].filter(Boolean),
@@ -1729,11 +1770,10 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
         label: "연애운 1", accent: C.lavender,
         category: "연애운",
         tag: "유료", tagColor: C.plum, tagText: C.lavender,
-        title: "혼자인 지금,\n다가오는 인연.",
-        subtitle: "솔로 · 인연의 결",
+        title: "혼자인 지금,\n마음이 열리는 순간.",
+        subtitle: "솔로 · 마음이 열리는 순간",
         blocks: [
           { h: "연애할 때 나", text: desire ? desire + (desire2 ? "\n\n" + desire2 : "") : `겉으로는 별로 안 원하는 척해. 근데 속은 달라. 진심으로 알아봐 주는 사람을 원해. 말 안 해도 알아채고, 기대 없이 챙겨주는 사람. 그런 사람한테 한번 마음 열면 끝까지 열어.`, accent: C.lavender },
-          { h: "끌리는 순간", text: attraction || "말보다 행동으로 보여주는 사람한테 흔들려. 요란한 고백보다 조용히 곁을 지키는 쪽에 마음이 가.", accent: C.lavender },
           { h: "마음이 열리는 순간", text: triggers.length ? triggers.join(" ") : `오래 지켜봐 온 사람이 구체적으로 알아봐 줄 때. 피상적인 칭찬 말고 진짜로 봤다는 느낌. 그 순간 완전히 무너져.`, accent: C.lavender },
         ].filter(Boolean),
       },
@@ -1741,22 +1781,32 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
         label: "연애운 2", accent: C.lavender,
         category: "연애운",
         tag: "유료", tagColor: C.plum, tagText: C.lavender,
-        title: "인연의 자리와\n맞는 사람.",
-        subtitle: "인연의 장소 · 상대",
+        title: "내가 가진 매력과\n인연이 오는 자리.",
+        subtitle: "매력적인 순간 · 인연의 장소",
         blocks: [
+          { h: "매력적인 순간", text: attractiveText, accent: C.lavender },
           { h: "인연이 오는 곳", text: soloPlaceText, accent: C.lavender },
-          { h: "잘 맞는 상대", text: soloTypeText, accent: C.lavender },
-          { h: "피해야 할 상대", text: poisonDetailText, accent: C.lavender },
         ].filter(Boolean),
       },
       {
         label: "연애운 3", accent: C.lavender,
         category: "연애운",
         tag: "유료", tagColor: C.plum, tagText: C.lavender,
-        title: "다가가는 법과\n인연이 열리는 때.",
-        subtitle: "접근법 · 인연 시기 · 점수",
+        title: "맞는 사람과\n다가가는 법.",
+        subtitle: "궁합 · 접근법 · 피해야 할 상대",
         blocks: [
+          { h: "잘 맞는 상대", text: soloTypeText, accent: C.lavender },
           { h: "다가가는 법", text: soloApproachText, accent: C.lavender },
+          { h: "피해야 할 상대", text: poisonDetailText, accent: C.lavender },
+        ].filter(Boolean),
+      },
+      {
+        label: "연애운 4", accent: C.lavender,
+        category: "연애운",
+        tag: "유료", tagColor: C.plum, tagText: C.lavender,
+        title: "오행으로 보는 궁합과\n인연이 열리는 때.",
+        subtitle: "오행 궁합 · 올해 흐름",
+        blocks: [
           { h: "오행으로 보는 궁합", text: matchOhaengText, accent: C.lavender },
           { h: "올해 애정 흐름", jsxContent: <CategoryScore months={monthForecast} category="애정" thisYearScore={thisYear?.areas?.애정 || 0} label="애정운" />, accent: C.lavender },
         ].filter(Boolean),
