@@ -283,7 +283,7 @@ export default function MoraIntro({ onEnter }) {
 
           {/* 이 우주가 너를 받아들인 순간 */}
           <div style={{ marginBottom: 18 }}>
-            <div style={qStyle}>이 우주가 너를 받아들인 순간이 언제야?</div>
+            <div style={qStyle}>생년월일시</div>
 
             {/* 양력/음력 */}
             <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
@@ -387,7 +387,7 @@ export default function MoraIntro({ onEnter }) {
 
           {/* 성별 */}
           <div style={{ marginBottom: 18 }}>
-            <div style={qStyle}>어떤 성별로 태어났어?</div>
+            <div style={qStyle}>성별</div>
             <div style={{ display: "flex", gap: 10 }}>
               {["여", "남"].map(g => (
                 <button key={g}
@@ -409,7 +409,7 @@ export default function MoraIntro({ onEnter }) {
 
           {/* 연애 상태 */}
           <div style={{ marginBottom: 18 }}>
-            <div style={qStyle}>지금 연애 중이야, 혼자야?</div>
+            <div style={qStyle}>연애 상태</div>
             <div style={{ display: "flex", gap: 10 }}>
               {["솔로", "연애중"].map(s => (
                 <button key={s}
@@ -431,7 +431,7 @@ export default function MoraIntro({ onEnter }) {
 
           {/* 입사일 (선택) */}
           <div style={{ marginBottom: 18 }}>
-            <div style={qStyle}>지금 다니는 회사 입사일{"\n"}알려줄 수 있어? (선택)</div>
+            <div style={qStyle}>입사일 (선택)</div>
             <input
               className="mora-input"
               type="text" inputMode="numeric"
@@ -453,7 +453,7 @@ export default function MoraIntro({ onEnter }) {
 
           {/* 회사 창립일·업종 (선택) */}
           <div style={{ marginBottom: 18 }}>
-            <div style={qStyle}>회사 창립 연월과 업종도{"\n"}알면 궁합이 더 정확해져. (선택)</div>
+            <div style={qStyle}>회사 창립일 · 업종 (선택)</div>
             <input
               ref={foundRef}
               className="mora-input"
