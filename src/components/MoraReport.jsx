@@ -205,7 +205,7 @@ function MangseTable({ pillars, noTime, highlightIlju, compact }) {
   const iljuHanja = (i) => (highlightIlju && i === 2) ? { ...hanjaStyle, color: C.caramel } : hanjaStyle
   const iljuKo = (i) => (highlightIlju && i === 2) ? { ...koStyle, color: C.caramel } : koStyle
   return (
-    <div style={{ marginBottom: compact ? 0 : 16, background: C.dusk, borderRadius: 12, padding: compact ? "10px 4px" : "12px 8px", border: `1px solid ${C.ember}`, height: compact ? "100%" : "auto" }}>
+    <div style={{ marginBottom: compact ? 0 : 16, background: C.dusk, borderRadius: 12, padding: compact ? "10px 4px" : "12px 8px", border: `1px solid ${C.ember}`, height: compact ? "100%" : "auto", display: compact ? "flex" : "block", flexDirection: compact ? "column" : undefined, justifyContent: compact ? "center" : undefined, boxSizing: "border-box" }}>
       <div style={{ display: "flex" }}>
         {cols.map(i => (
           <div key={"h" + i} style={{ ...cell, fontSize: compact ? 9 : 10, color: (highlightIlju && i === 2) ? C.caramel : C.fog, fontFamily: FONT_SANS, fontWeight: (highlightIlju && i === 2) ? 600 : 400 }}>{colHead[i]}</div>
@@ -248,7 +248,7 @@ function DonutChart({ ohaeng, dominant, hideDesc, hideIndex, compact }) {
   if (!total) return null
   const size = compact ? 76 : 80; const r = compact ? 26 : 28; const cx = size/2; const cy = size/2; const stroke = compact ? 9 : 10
   let cumAngle = -90
-  const slices = Object.entries(ohaeng).filter(([,v])=>v>0).map(([k,v])=>{
+  const slices = Object.entries(ohaeng).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([k,v])=>{
     const angle = (v/total)*360
     const startA = cumAngle; cumAngle += angle
     return {k, v, startA, angle, color: OHK_COLOR[k]||"#888"}
@@ -292,7 +292,7 @@ function DonutChart({ ohaeng, dominant, hideDesc, hideIndex, compact }) {
         {svg}
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 11, color: C.fog, fontFamily: FONT_SANS, fontWeight: 400 }}>
-            {Object.entries(ohaeng).filter(([,v])=>v>0).map(([k,v])=>(
+            {Object.entries(ohaeng).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([k,v])=>(
               <span key={k} style={{ marginRight: 8, display: "inline-flex", alignItems: "center", gap: 4 }}>
                 <span style={{ width: 8, height: 8, borderRadius: 2, background: OHK_COLOR[k]||C.fog, display: "inline-block" }} />
                 {OHK_KR[k]||k} {v}
@@ -310,7 +310,7 @@ function DonutChart({ ohaeng, dominant, hideDesc, hideIndex, compact }) {
 
 // 오행 인덱스 세로 리스트 — 색상 박스(background)로 렌더링 (유니코드 ■ 색상 미표시 이슈 방지)
 function OhaengIndexList({ ohaeng }) {
-  const entries = Object.entries(ohaeng).filter(([,v]) => v > 0)
+  const entries = Object.entries(ohaeng).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1])
   if (!entries.length) return null
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "0 12px 10px" }}>
@@ -547,7 +547,7 @@ function CategoryListPage({ categories, unlockedCategories, onSelect }) {
               <div style={{ width: 34, height: 34, borderRadius: "50%", background: C.abyss, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: C.lavender }}>{CATEGORY_ICONS[cat.name] || "✦"}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14, color: C.parchment, fontWeight: 400, fontFamily: FONT }}>{cat.name}</div>
-                <div style={{ fontSize: 11, color: unlocked ? C.caramel : C.ash, marginTop: 2, fontFamily: FONT_SANS, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{unlocked ? "구매 완료 · 눌러서 이동" : (HOOK_TEXT[cat.name] || "")}</div>
+                <div style={{ fontSize: 11, color: unlocked ? C.caramel : C.ash, marginTop: 2, fontFamily: FONT_SANS, lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{unlocked ? "구매 완료 · 눌러서 이동" : (HOOK_TEXT[cat.name] || "")}</div>
               </div>
               <div style={{ flexShrink: 0, fontSize: 13, color: unlocked ? C.caramel : C.fog, fontFamily: FONT_SANS }}>{unlocked ? "열림" : "🔒"}</div>
             </div>
@@ -693,17 +693,22 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
   const ascSign = a.asc && a.asc !== "분석 중" ? a.asc : null
 
   // 신살 한 박스, 엔터 구분, 마침표
-  // 신살 JSX로 렌더링 (이름 색상 + 설명 인라인)
+  // 신살 JSX로 렌더링 (이름 색상 + 짧은 한 줄 설명만 — 볼륨 축소)
   const sinsalJSX = d.sinsal?.length
-    ? d.sinsal.map((s, i) => {
-        const nm = s.name.replace(/\([^)]*\)/g, "").trim()
-        const desc = s.kw ? ` ${mug(s.kw)}` : ""
-        const fullDesc = s.desc ? ` ${mug(s.desc).slice(0, 80)}` : ""
-        return React.createElement("div", { key: i, style: { marginBottom: i < d.sinsal.length - 1 ? 10 : 0 } },
-          React.createElement("span", { style: { color: C.sand, fontSize: 14, fontFamily: FONT, fontWeight: 400 } }, nm),
-          React.createElement("span", { style: { color: C.parchment, fontSize: 14, fontFamily: FONT, fontWeight: 400 } }, desc + fullDesc)
-        )
-      })
+    ? (() => {
+        const shown = d.sinsal.slice(0, 5)
+        const restCnt = d.sinsal.length - shown.length
+        const items = shown.map((s, i) => {
+          const nm = s.name.replace(/\([^)]*\)/g, "").trim()
+          const easy = s.easy ? ` ${mug(s.easy)}` : (s.desc ? ` ${mug(s.desc).split(".")[0]}.` : "")
+          return React.createElement("div", { key: i, style: { marginBottom: i < shown.length - 1 ? 8 : 0 } },
+            React.createElement("span", { style: { color: C.sand, fontSize: 14, fontFamily: FONT, fontWeight: 400 } }, nm),
+            React.createElement("span", { style: { color: C.parchment, fontSize: 14, fontFamily: FONT, fontWeight: 400 } }, easy)
+          )
+        })
+        if (restCnt > 0) items.push(React.createElement("div", { key: "more", style: { marginTop: 8, fontSize: 12, color: C.fog, fontFamily: FONT_SANS } }, `그 외 ${restCnt}개 더 있어.`))
+        return items
+      })()
     : [React.createElement("div", { key: 0, style: { color: C.parchment, fontSize: 14, fontFamily: FONT } }, "특별한 신살 없어. 안정적인 구조야. 튀지 않는 대신 오래 가.")]
   const sinsalText = ""
 
@@ -1115,24 +1120,57 @@ export default function MoraReport({ d, onHome, onSavePDF, pdfLoading, pdfMode, 
     mkSajuChapter({ label: "사주 분석", accent: C.caramel, tag: sajuTag, tagColor: C.mahogany, tagText: C.sand, title: `${sajuTag}.\n타고난 판이 이렇게 짜여 있어.`, pillars: d.pillars, iljuDesc: iljuDescStd }),
   ]
 
-  // I. 성격 요약 (무료 첫 페이지 · 특별함/위로/해결방안 3문단 구성, 카테고리 세분화 없음)
-  const personaSpecial = `${personaHook || "분석 중이야."}${strengths.length ? " " + strengths.join(" ") : ""}`
-  const personaComfort = challenges.length
-    ? `${challenges.join(" ")} 의지가 약해서 그런 게 아니야. 태어날 때부터 그렇게 짜인 구조라, 지금까지 유독 힘들었던 것도 다 이유가 있었던 거야.`
-    : `요즘 뭘 해도 애매하게 안 풀린다는 느낌 들었을 수 있어. 능력이 없어서가 아니라 그냥 흐름 자체가 그런 시기였던 것뿐이야.`
+  // I. 사주 풀이 (신설 무료 첫 페이지 · 특별함/위로/해결방안 3문단, 헤더 없음, 실제 사주 데이터 기반 동적 생성)
+  const _page1Special = isBnd
+    ? `자시에 걸친 경계사주야. 태어난 시각 하나로 하루의 기운이 완전히 갈리는데, 하필 그 갈림 한가운데서 태어났어. 흔한 사주 아니야.`
+    : `${sajuTag} 사주야. 여덟 글자가 짜인 결이 뚜렷해서, 타고난 방향이 분명하게 보이는 구조야.`
+  const _page1SpecialJae = _jaeStruct === "편재" ? " 재성 중에서도 편재가 강해서, 큰돈이 오가는 배포를 타고났어."
+    : _jaeStruct === "정재" ? " 정재가 두드러져서, 꾸준히 쌓아가는 재물 감각을 타고났어."
+    : _jaeStruct === "과다" ? " 재성이 넘칠 만큼 많아서, 기회는 많은데 그만큼 관리가 관건인 구조야."
+    : _jaeStruct === "없음" ? " 재성은 약한 대신, 실력과 자리로 승부하는 구조야."
+    : ""
+  const page1Special = `${_page1Special}${_page1SpecialJae}`
+  const page1Comfort = isBnd
+    ? `경계사주는 원래 스스로도 헷갈리는 순간이 많아. 이게 내 성격인지 저게 내 성격인지, 결정을 내려도 확신이 안 서지. 사주에 이미 그렇게 짜여있어. 우유부단한 게 아니라 두 기운을 동시에 쥐고 있어서 그런 거야.`
+    : missingOh.length
+    ? `${missingOh.map(k => OHK_KR[k]).join(", ")} 기운이 없어서 가끔 뭘 해도 안 채워지는 느낌이 들었을 거야. 부족해서 못난 게 아니라, 타고난 구조가 원래 그런 거야. 이 부분만 의식하면 오히려 강점으로 바뀌어.`
+    : `오행이 고르게 갖춰진 구조라 크게 흔들리기보다 상황 따라 유연하게 대응하는 편이야. 대신 뚜렷한 색깔이 없어 보인다고 스스로를 답답해했을 수도 있어. 그건 약점이 아니라 균형이야.`
+  const _actionByOh = {
+    목: "나무 기운이 강하면 가만히 있을 때보다 뭔가 벌일 때 기운이 살아. 방향만 잘 잡으면 거침없이 뻗어나가는 구조야.",
+    화: "불 기운이 강하면 드러내고 표현할 때 기운이 붙어. 숨기지 말고 존재감을 자연스럽게 꺼내는 게 맞아.",
+    토: "흙 기운이 강하면 서두르기보다 다지는 쪽이 맞아. 급하게 가지 말고 기반부터 단단히 다져.",
+    금: "금속 기운이 강하면 원칙과 기준을 분명히 세울 때 힘이 실려. 흐리멍텅하게 가지 말고 확실히 선을 그어.",
+    수: "물 기운이 강하면 억지로 밀어붙이기보다 흐름을 타는 게 맞아. 때를 기다리다 트일 때 확 나아가.",
+  }
+  const page1Action = `${_actionByOh[dominant] || _actionByOh["토"]} 지금 대운 흐름이 바뀌는 시점부터 이 기운이 제대로 풀려. 그 시점과 구체적인 활용법은 다음 사주 분석 챕터에서 이어져.`
+  const page1Chapter = {
+    label: "사주 풀이", accent: C.caramel,
+    tag: "무료", tagColor: C.walnut, tagText: C.sand,
+    title: "타고난 판.",
+    subtitle: "사주가 하는 말",
+    blocks: [
+      { text: page1Special, accent: C.caramel },
+      { text: page1Comfort, accent: C.caramel },
+      { text: page1Action, accent: C.caramel },
+    ],
+  }
+
+  // II. 성격 요약 (무료 두 번째 페이지 · 원래 4헤더 구조)
   const personaChapter = {
     label: "성격 요약", accent: C.caramel,
     tag: "무료", tagColor: C.walnut, tagText: C.sand,
     title: "너라는 사람.",
     subtitle: "타고난 기질",
     blocks: [
-      { h: "특별함", text: personaSpecial, accent: C.caramel },
-      { h: "위로", text: personaComfort, accent: C.caramel },
-      { h: "해결방안", text: personaYear || "올해 흐름을 읽는 중이야.", accent: C.caramel },
-    ],
+      { h: "타고난 기질", text: personaHook || "분석 중이야.", accent: C.caramel },
+      strengths.length ? { h: "숨은 강점", text: strengths.join(" "), accent: C.caramel } : null,
+      challenges.length ? { h: "발목 잡는 것", text: challenges.join(" "), accent: C.caramel } : null,
+      { h: "올해 흐름", text: personaYear || "올해 흐름을 읽는 중이야.", accent: C.caramel },
+    ].filter(Boolean),
   }
 
   const freeChapters = [
+    page1Chapter,
     personaChapter,
     ...bndChapters,
   ]
