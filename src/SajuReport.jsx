@@ -1,12 +1,12 @@
 // SajuReport.jsx — 메인 진입점 v2
 import React, { useState, useMemo, useRef } from 'react';
 import { lunarToSolar, getLeapMonth } from './utils/lunar.js';
-import { saveUser, saveReport, findCachedReport, PROMPT_VERSION } from './supabase.js';
+import { saveUser, saveReport, findCachedReport } from './supabase.js';
 import { buildSajuData } from './utils/saju.js';
 import { callNetlify } from './utils/callNetlify.js';
 import { buildInnerPrompt, buildAstroPrompt, buildTarotPrompt } from './utils/prompts.js';
-import { CY, CM, CD, stripDegree, _GANO } from './data/constants.js';
-import { S, SF, LoadingScreen } from './components/ui.jsx';
+import { CY, stripDegree } from './data/constants.js';
+import { SF, LoadingScreen } from './components/ui.jsx';
 import TabSummary from './components/TabSummary.jsx';
 import TabSaju from './components/TabSaju.jsx';
 import TabInner from './components/TabInner.jsx';
@@ -45,6 +45,8 @@ export default function SajuReport(){
     if(_saved?.data?._innerAI) return _saved.data._innerAI;
     try{const k=_saved?.data?.birth?`fy_inner_v2_${_saved.data.birth}`:null;return k?JSON.parse(sessionStorage.getItem(k)||"null"):null;}catch{return null;}
   });
+  // 열람(구매) 카테고리를 부모에서 관리 — PDF 저장 시 이 상태를 그대로 넘겨야 잠금 없이 캡처됨
+  const [parentUnlockedCategories,setParentUnlockedCategories]=useState(_saved?.data?.unlockedCategories||[]);
   const TABS=["요약","사주","토정·주역","별자리·타로수비학","MBTI","내면 해부"];
 
   function changeTab(t){
@@ -93,10 +95,13 @@ export default function SajuReport(){
       setOpacity(1);
 
       // 2. saveUser 미리 실행해서 userId 확보 (saveReport는 enrichedData 완성 후)
+      // ⚠️ savedUserId 값만 저장하면 안 됨 — 이 async 블록이 끝나기 전에 아래 saveReport 시점에
+      //    도달하면 savedUserId가 아직 null이라 saveUser()가 한 번 더 불려서 유저가 중복 insert됨.
+      //    그래서 Promise 자체를 저장해뒀다가 아래에서 재사용(await)하는 방식으로 고침.
       let savedUserId=null;
-      (async()=>{
-        try{const {userId}=await saveUser(formInput);savedUserId=userId;}
-        catch(e){console.warn("saveUser 실패:", e.message);}
+      const saveUserPromise=(async()=>{
+        try{const {userId}=await saveUser(formInput);savedUserId=userId;return userId;}
+        catch(e){console.warn("saveUser 실패:", e.message);return null;}
       })();
 
       // 3. 네이탈차트 + 성취카드 API 병렬 호출 (로딩 중)
@@ -231,8 +236,8 @@ JSON만 응답: {"sevenInsight":"..."}`;
       // AI 포함된 완성 데이터로 Supabase 저장
       (async()=>{
         try{
-          if(!savedUserId){const {userId}=await saveUser(formInput);savedUserId=userId;}
-          await saveReport(savedUserId, enrichedData);
+          const userId=savedUserId ?? await saveUserPromise;
+          await saveReport(userId, enrichedData);
         }catch(e){console.warn("저장 실패:", e.message);}
       })();
 
@@ -275,7 +280,7 @@ JSON만 응답: {"sevenInsight":"..."}`;
       const {createRoot}=await import("react-dom/client");
       const ce=React.createElement;
       const root=createRoot(container);
-      await new Promise(res=>{root.render(ce(MoraReport,{d,onHome:()=>{},onSavePDF:null,pdfLoading:false,pdfMode:true,parentAstroAI,parentTarotAI}));setTimeout(res,1800);});
+      await new Promise(res=>{root.render(ce(MoraReport,{d,onHome:()=>{},onSavePDF:null,pdfLoading:false,pdfMode:true,parentAstroAI,parentTarotAI,parentUnlockedCategories}));setTimeout(res,1800);});
 
       const {jsPDF}=window.jspdf;
       const pdf=new jsPDF({orientation:"portrait",unit:"px",format:"a4"});
@@ -322,7 +327,7 @@ JSON만 응답: {"sevenInsight":"..."}`;
   if(phase==="intro") return <MoraIntro onEnter={(formInput)=>handleFormSubmit(formInput)}/>;
   if(!d) return null;
 
-  return <MoraReport d={d} onHome={goToForm} onSavePDF={handleSavePDF} pdfLoading={pdfLoading} parentAstroAI={parentAstroAI} setParentAstroAI={setParentAstroAI} parentTarotAI={parentTarotAI} setParentTarotAI={setParentTarotAI}/>;
+  return <MoraReport d={d} onHome={goToForm} onSavePDF={handleSavePDF} pdfLoading={pdfLoading} parentAstroAI={parentAstroAI} setParentAstroAI={setParentAstroAI} parentTarotAI={parentTarotAI} setParentTarotAI={setParentTarotAI} parentUnlockedCategories={parentUnlockedCategories} setParentUnlockedCategories={setParentUnlockedCategories}/>;
 }
 
 

@@ -60,29 +60,16 @@ const INDUSTRY = [
   { label: "서비스·컨설팅·기타", oh: "" },
 ]
 
-const MESSAGES = [
-  "뭔가 항상 한 박자 어긋나.",
-  "분명히 열심히 했는데.",
-  "거슬러 왔던 거야, 처음부터.",
-  "네 잘못이 아니야.\n이제 알면 달라져.",
-  "내가 알려줄게.",
-]
+const INTRO_LINES = ["여전할 것인가,", "역전할 것인가."]
 
-const FloatText = ({ text, isLast, onDone }) => {
-  const [state, setState] = useState("in")
+const FloatText = () => {
+  const [shown, setShown] = useState([false, false])
 
   useEffect(() => {
-    const t1 = setTimeout(() => setState("hold"), 100)
-    const t2 = setTimeout(() => setState("out"), 1000)
-    const t3 = setTimeout(() => onDone(), 1800)
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+    const t1 = setTimeout(() => setShown([true, false]), 300)
+    const t2 = setTimeout(() => setShown([true, true]), 1100)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [])
-
-  const style = {
-    in:   { opacity: 1, transform: "translateY(8px) scale(1)", filter: "blur(20px)" },
-    hold: { opacity: 1, transform: "translateY(0px) scale(1)", filter: "blur(0px)" },
-    out:  { opacity: 0, transform: "translateY(6px) scale(1)", filter: "blur(20px)" },
-  }[state]
 
   return (
     <div style={{
@@ -90,23 +77,24 @@ const FloatText = ({ text, isLast, onDone }) => {
       color: C.parchment,
       textAlign: "center",
       lineHeight: 1.9,
-      whiteSpace: "pre-line",
       letterSpacing: 0.5,
-      ...style,
-      transition: state === "in"
-        ? "opacity 1.2s ease, transform 1.2s ease, filter 1.4s ease"
-        : state === "out"
-        ? "opacity 0.8s ease, transform 0.8s ease, filter 1s ease"
-        : "none",
     }}>
-      {text}
+      {INTRO_LINES.map((line, i) => (
+        <div key={i} style={{
+          opacity: shown[i] ? 1 : 0,
+          transform: shown[i] ? "translateY(0px) scale(1)" : "translateY(8px) scale(1)",
+          filter: shown[i] ? "blur(0px)" : "blur(20px)",
+          transition: "opacity 1.2s ease, transform 1.2s ease, filter 1.4s ease",
+        }}>
+          {line}
+        </div>
+      ))}
     </div>
   )
 }
 
 export default function MoraIntro({ onEnter }) {
   const [phase, setPhase] = useState("intro")
-  const [msgIndex, setMsgIndex] = useState(0)
   const [showBtn, setShowBtn] = useState(false)
 
   // 폼 상태
@@ -121,15 +109,10 @@ export default function MoraIntro({ onEnter }) {
   const nameRef = useRef(null)
   const foundRef = useRef(null)
 
-  const isLast = msgIndex === MESSAGES.length - 1
-
-  const handleDone = () => {
-    if (msgIndex >= MESSAGES.length - 1) {
-      setTimeout(() => setShowBtn(true), 400)
-    } else {
-      setMsgIndex(i => i + 1)
-    }
-  }
+  useEffect(() => {
+    const t = setTimeout(() => setShowBtn(true), 1900)
+    return () => clearTimeout(t)
+  }, [])
 
   const up = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
@@ -254,12 +237,7 @@ export default function MoraIntro({ onEnter }) {
           display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center", minHeight: "50vh",
         }}>
-          <FloatText
-            key={msgIndex}
-            text={MESSAGES[msgIndex]}
-            isLast={isLast}
-            onDone={handleDone}
-          />
+          <FloatText />
           {showBtn && (
             <button
               onClick={() => setPhase("form")}
@@ -281,7 +259,7 @@ export default function MoraIntro({ onEnter }) {
               onMouseEnter={e => e.currentTarget.style.background = C.ember}
               onMouseLeave={e => e.currentTarget.style.background = "transparent"}
             >
-              입장
+              시작하기
             </button>
           )}
         </div>
@@ -303,73 +281,105 @@ export default function MoraIntro({ onEnter }) {
             Mora
           </div>
 
-          {/* 이 우주가 너를 받아들인 순간 */}
+          {/* 이름 + 성별 */}
           <div style={{ marginBottom: 18 }}>
-            <div style={qStyle}>이 우주가 너를 받아들인 순간이 언제야?</div>
-
-            {/* 양력/음력 */}
-            <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-              {["solar", "lunar"].map(t => (
-                <button key={t}
-                  onClick={() => { setCalType(t); if (t === "solar") setIsLeap(false) }}
-                  style={{
-                    flex: 1, padding: "9px", borderRadius: 8,
-                    border: `1px solid ${calType === t ? C.caramel : C.fog}`,
-                    background: calType === t ? C.mahogany : "transparent",
-                    color: calType === t ? C.sand : C.fog,
-                    fontSize: 13, cursor: "pointer", fontFamily: "sans-serif",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {t === "solar" ? "양력" : "음력"}
-                </button>
-              ))}
+            <div style={qStyle}>이름 · 성별</div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                ref={nameRef}
+                className="mora-input"
+                type="text"
+                placeholder="이름"
+                value={form.name}
+                onChange={e => up("name", e.target.value)}
+                style={{ ...iStyle(!!err.name), flex: 1 }}
+              />
+              <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                {["여", "남"].map(g => (
+                  <button key={g}
+                    onClick={() => up("gender", g)}
+                    style={{
+                      padding: "0 14px", borderRadius: 8,
+                      border: `1px solid ${form.gender === g ? C.caramel : C.fog}`,
+                      background: form.gender === g ? C.mahogany : "transparent",
+                      color: form.gender === g ? C.sand : C.fog,
+                      fontSize: 14, cursor: "pointer", fontFamily: "sans-serif",
+                      transition: "all 0.2s", whiteSpace: "nowrap",
+                    }}
+                  >
+                    {g === "여" ? "여성" : "남성"}
+                  </button>
+                ))}
+              </div>
             </div>
+            {err.name && <div style={errStyle}>{err.name}</div>}
+          </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {/* 생년월일 + 음력 체크박스 */}
+          <div style={{ marginBottom: 18 }}>
+            <div style={qStyle}>생년월일</div>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <input
                 className="mora-input"
                 type="text" inputMode="numeric"
-                placeholder="생년월일  예) 900101"
+                placeholder="예) 900101"
                 value={form.birthRaw || ""}
                 onChange={e => handleBirthChange(e.target.value)}
                 maxLength={8}
-                style={iStyle(!!err.birth)}
+                style={{ ...iStyle(!!err.birth), flex: 1 }}
               />
-              {err.birth && <div style={errStyle}>{err.birth}</div>}
+              <div
+                onClick={() => { const next = calType === "solar"; setCalType(next ? "lunar" : "solar"); if (!next) setIsLeap(false) }}
+                style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
+              >
+                <span style={{
+                  width: 18, height: 18, borderRadius: 5, flexShrink: 0,
+                  border: `1px solid ${calType === "lunar" ? C.caramel : C.fog}`,
+                  background: calType === "lunar" ? C.mahogany : "transparent",
+                  color: C.sand, fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center",
+                }}>{calType === "lunar" ? "✓" : ""}</span>
+                <span style={{ fontSize: 13, color: C.ash, fontFamily: "sans-serif" }}>음력</span>
+              </div>
+            </div>
+            {err.birth && <div style={errStyle}>{err.birth}</div>}
 
-              {/* 윤달 토글 */}
-              {calType === "lunar" && leapMonths && (
-                <div style={{ display: "flex", gap: 8 }}>
-                  {["평달", `윤${form.month}월`].map((l, i) => (
-                    <button key={l}
-                      onClick={() => setIsLeap(i === 1)}
-                      style={{
-                        flex: 1, padding: "9px", borderRadius: 8,
-                        border: `1px solid ${isLeap === (i === 1) ? C.caramel : C.fog}`,
-                        background: isLeap === (i === 1) ? C.mahogany : "transparent",
-                        color: isLeap === (i === 1) ? C.sand : C.fog,
-                        fontSize: 13, cursor: "pointer", fontFamily: "sans-serif",
-                      }}
-                    >{l}</button>
-                  ))}
-                </div>
-              )}
+            {/* 윤달 토글 */}
+            {calType === "lunar" && leapMonths && (
+              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                {["평달", `윤${form.month}월`].map((l, i) => (
+                  <button key={l}
+                    onClick={() => setIsLeap(i === 1)}
+                    style={{
+                      flex: 1, padding: "9px", borderRadius: 8,
+                      border: `1px solid ${isLeap === (i === 1) ? C.caramel : C.fog}`,
+                      background: isLeap === (i === 1) ? C.mahogany : "transparent",
+                      color: isLeap === (i === 1) ? C.sand : C.fog,
+                      fontSize: 13, cursor: "pointer", fontFamily: "sans-serif",
+                    }}
+                  >{l}</button>
+                ))}
+              </div>
+            )}
+          </div>
 
+          {/* 태어난 시간 + 모름 */}
+          <div style={{ marginBottom: 18 }}>
+            <div style={qStyle}>태어난 시간</div>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <input
                 ref={timeRef}
                 className="mora-input"
                 type="text" inputMode="numeric"
-                placeholder="태어난 시간  예) 23:28"
+                placeholder="예) 23:28"
                 value={form.timeRaw || ""}
                 onChange={e => handleTimeChange(e.target.value)}
                 maxLength={5}
                 disabled={form.noTime}
-                style={{ ...iStyle(false), opacity: form.noTime ? 0.4 : 1 }}
+                style={{ ...iStyle(false), flex: 1, opacity: form.noTime ? 0.4 : 1 }}
               />
               <div
                 onClick={() => up("noTime", !form.noTime)}
-                style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", margin: "4px 2px 0" }}
+                style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
               >
                 <span style={{
                   width: 18, height: 18, borderRadius: 5, flexShrink: 0,
@@ -377,24 +387,28 @@ export default function MoraIntro({ onEnter }) {
                   background: form.noTime ? C.mahogany : "transparent",
                   color: C.sand, fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center",
                 }}>{form.noTime ? "✓" : ""}</span>
-                <span style={{ fontSize: 13, color: C.ash, fontFamily: "sans-serif" }}>태어난 시간을 몰라요</span>
+                <span style={{ fontSize: 13, color: C.ash, fontFamily: "sans-serif" }}>모름</span>
               </div>
+            </div>
+          </div>
 
+          {/* 태어난 곳 + 모름 */}
+          <div style={{ marginBottom: 18 }}>
+            <div style={qStyle}>태어난 곳</div>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <select
                 className="mora-select"
                 value={form.sido}
                 onChange={e => { up("sido", e.target.value); up("sigungu", "") }}
                 disabled={form.noPlace}
-                style={{ ...sStyle(!!err.sido), opacity: form.noPlace ? 0.4 : 1 }}
+                style={{ ...sStyle(!!err.sido), flex: 1, opacity: form.noPlace ? 0.4 : 1 }}
               >
-                <option value="" disabled>태어난 곳  시/도 선택</option>
+                <option value="" disabled>시/도 선택</option>
                 {Object.keys(REGIONS).map(s => <option key={s} value={s}>{s}</option>)}
               </select>
-              {err.sido && <div style={errStyle}>{err.sido}</div>}
-
               <div
                 onClick={() => up("noPlace", !form.noPlace)}
-                style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", margin: "4px 2px 0" }}
+                style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}
               >
                 <span style={{
                   width: 18, height: 18, borderRadius: 5, flexShrink: 0,
@@ -402,36 +416,15 @@ export default function MoraIntro({ onEnter }) {
                   background: form.noPlace ? C.mahogany : "transparent",
                   color: C.sand, fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center",
                 }}>{form.noPlace ? "✓" : ""}</span>
-                <span style={{ fontSize: 13, color: C.ash, fontFamily: "sans-serif" }}>태어난 곳을 몰라요</span>
+                <span style={{ fontSize: 13, color: C.ash, fontFamily: "sans-serif" }}>모름</span>
               </div>
             </div>
-          </div>
-
-          {/* 성별 */}
-          <div style={{ marginBottom: 18 }}>
-            <div style={qStyle}>어떤 성별로 태어났어?</div>
-            <div style={{ display: "flex", gap: 10 }}>
-              {["여", "남"].map(g => (
-                <button key={g}
-                  onClick={() => up("gender", g)}
-                  style={{
-                    flex: 1, padding: "10px", borderRadius: 8,
-                    border: `1px solid ${form.gender === g ? C.caramel : C.fog}`,
-                    background: form.gender === g ? C.mahogany : "transparent",
-                    color: form.gender === g ? C.sand : C.fog,
-                    fontSize: 14, cursor: "pointer", fontFamily: "sans-serif",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {g === "여" ? "여성" : "남성"}
-                </button>
-              ))}
-            </div>
+            {err.sido && <div style={errStyle}>{err.sido}</div>}
           </div>
 
           {/* 연애 상태 */}
           <div style={{ marginBottom: 18 }}>
-            <div style={qStyle}>지금 연애 중이야, 혼자야?</div>
+            <div style={qStyle}>연애 상태</div>
             <div style={{ display: "flex", gap: 10 }}>
               {["솔로", "연애중"].map(s => (
                 <button key={s}
@@ -453,11 +446,11 @@ export default function MoraIntro({ onEnter }) {
 
           {/* 입사일 (선택) */}
           <div style={{ marginBottom: 18 }}>
-            <div style={qStyle}>지금 다니는 회사 입사일{"\n"}알려줄 수 있어? (선택)</div>
+            <div style={qStyle}>입사일 (선택)</div>
             <input
               className="mora-input"
               type="text" inputMode="numeric"
-              placeholder="입사 연월  예) 2021.03  (없으면 비워둬)"
+              placeholder="입사 연월  예) 2021.03  (없으면 비움)"
               value={form.joinRaw || ""}
               onChange={e => {
                 let digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 6)
@@ -474,13 +467,13 @@ export default function MoraIntro({ onEnter }) {
           </div>
 
           {/* 회사 창립일·업종 (선택) */}
-          <div style={{ marginBottom: 18 }}>
-            <div style={qStyle}>회사 창립 연월과 업종도{"\n"}알면 궁합이 더 정확해져. (선택)</div>
+          <div style={{ marginBottom: 22 }}>
+            <div style={qStyle}>회사 창립일 · 업종 (선택)</div>
             <input
               ref={foundRef}
               className="mora-input"
               type="text" inputMode="numeric"
-              placeholder="창립 연월  예) 2015.06  (없으면 비워둬)"
+              placeholder="창립 연월  예) 2015.06  (없으면 비움)"
               value={form.foundRaw || ""}
               onChange={e => {
                 let digits = e.target.value.replace(/[^0-9]/g, "").slice(0, 6)
@@ -504,23 +497,6 @@ export default function MoraIntro({ onEnter }) {
             </div>
           </div>
 
-          {/* 이름 */}
-          <div style={{ marginBottom: 22 }}>
-            <div style={qStyle}>
-              이 우주에서 선물받은 이름,{"\n"}나한테도 알려줄 수 있어?
-            </div>
-            <input
-              ref={nameRef}
-              className="mora-input"
-              type="text"
-              placeholder="이름"
-              value={form.name}
-              onChange={e => up("name", e.target.value)}
-              style={iStyle(!!err.name)}
-            />
-            {err.name && <div style={errStyle}>{err.name}</div>}
-          </div>
-
           <button
             onClick={handleSubmit}
             style={{
@@ -537,7 +513,7 @@ export default function MoraIntro({ onEnter }) {
               transition: "all 0.2s",
             }}
           >
-            보내기
+            보기
           </button>
         </div>
       )}
